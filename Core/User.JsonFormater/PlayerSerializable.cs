@@ -28,6 +28,9 @@ public class PlayerSerializable
         get
         {
             var result = new List<string>();
+            if (ownedPackagesObfuscated == null)
+                return result;
+
             foreach (var obf in ownedPackagesObfuscated)
                 result.Add(MemoryObfuscation.DeobfuscateString(obf));
             return result;
@@ -173,8 +176,8 @@ public class PlayerSerializable
         }
     }
 
-    public void RemoveAllProducts() => 
-        OwnedPackages.Clear();
+    public void RemoveAllProducts() =>
+        OwnedPackages = new List<string>();
 
     public void LogAllProducts()
     {
@@ -198,17 +201,19 @@ public class ExtensionDataClass
     public void Set(string key, string value)
     {
         string obfuscated = MemoryObfuscation.ObfuscateString(value);
+        string checksum = MemoryChecksum.GenerateChecksum(obfuscated).ToString();
         int idx = keys.IndexOf(key);
         if (idx >= 0)
         {
+            EnsureValueSlots(idx);
             values[idx] = obfuscated;
-            checksums[idx] = ""; // Không cần checksum cho string
+            checksums[idx] = checksum;
         }
         else
         {
             keys.Add(key);
             values.Add(obfuscated);
-            checksums.Add("");
+            checksums.Add(checksum);
         }
     }
 
@@ -216,8 +221,18 @@ public class ExtensionDataClass
     public string Get(string key, string defaultValue = null)
     {
         int idx = keys.IndexOf(key);
-        if (idx >= 0)
+        if (idx >= 0 && idx < values.Count)
+        {
+            if (idx < checksums.Count && !string.IsNullOrEmpty(checksums[idx]))
+            {
+                if (!int.TryParse(checksums[idx], out int checksum) ||
+                    !MemoryChecksum.VerifyChecksum(values[idx], checksum))
+                    return defaultValue;
+            }
+
             return MemoryObfuscation.DeobfuscateString(values[idx]);
+        }
+
         return defaultValue;
     }
 
@@ -231,6 +246,7 @@ public class ExtensionDataClass
         int idx = keys.IndexOf(key);
         if (idx >= 0)
         {
+            EnsureValueSlots(idx);
             values[idx] = obfStr;
             checksums[idx] = checksumStr;
         }
@@ -246,10 +262,12 @@ public class ExtensionDataClass
     public int GetInt(string key, int defaultValue = 0)
     {
         int idx = keys.IndexOf(key);
-        if (idx >= 0)
+        if (idx >= 0 && idx < values.Count && idx < checksums.Count)
         {
-            int obfuscated = int.Parse(values[idx]);
-            int checksum = int.Parse(checksums[idx]);
+            if (!int.TryParse(values[idx], out int obfuscated) ||
+                !int.TryParse(checksums[idx], out int checksum))
+                return defaultValue;
+
             int realValue = MemoryObfuscation.DeobfuscateInt(obfuscated);
             if (MemoryChecksum.VerifyChecksum(realValue, checksum))
                 return realValue;
@@ -267,6 +285,7 @@ public class ExtensionDataClass
         int idx = keys.IndexOf(key);
         if (idx >= 0)
         {
+            EnsureValueSlots(idx);
             values[idx] = obfStr;
             checksums[idx] = checksumStr;
         }
@@ -282,10 +301,12 @@ public class ExtensionDataClass
     public float GetFloat(string key, float defaultValue = 0f)
     {
         int idx = keys.IndexOf(key);
-        if (idx >= 0)
+        if (idx >= 0 && idx < values.Count && idx < checksums.Count)
         {
-            int obfuscated = int.Parse(values[idx]);
-            int checksum = int.Parse(checksums[idx]);
+            if (!int.TryParse(values[idx], out int obfuscated) ||
+                !int.TryParse(checksums[idx], out int checksum))
+                return defaultValue;
+
             if (MemoryChecksum.VerifyChecksum(obfuscated, checksum))
                 return MemoryObfuscation.DeobfuscateFloat(obfuscated);
         }
@@ -307,9 +328,19 @@ public class ExtensionDataClass
     public Dictionary<string, string> ToDictionary()
     {
         var dict = new Dictionary<string, string>();
-        for (int i = 0; i < keys.Count; i++)
+        int count = Math.Min(keys.Count, values.Count);
+        for (int i = 0; i < count; i++)
             dict[keys[i]] = values[i];
         return dict;
+    }
+
+    private void EnsureValueSlots(int idx)
+    {
+        while (values.Count <= idx)
+            values.Add("");
+
+        while (checksums.Count <= idx)
+            checksums.Add("");
     }
 }
 

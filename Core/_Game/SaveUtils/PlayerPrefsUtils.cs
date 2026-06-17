@@ -6,19 +6,33 @@ using UnityEngine;
 /// </summary>
 public static class PlayerPrefsUtils
 {
+    private const string ChecksumSuffix = "_checksum";
+    private const string ObfuscationKeySuffix = "_obfkey";
+
     // Bool
-    public static void SetBool(string key, bool value) => PlayerPrefs.SetInt(key, value ? 1 : 0);
-    public static bool GetBool(string key, bool defaultValue = false) => PlayerPrefs.GetInt(key, defaultValue ? 1 : 0) != 0;
+    public static void SetBool(string key, bool value) => SetInt(key, value ? 1 : 0);
+    public static bool GetBool(string key, bool defaultValue = false)
+    {
+        if (Config.ENABLE_ANTI_CHEAT &&
+            PlayerPrefs.HasKey(key) &&
+            !PlayerPrefs.HasKey(key + ChecksumSuffix) &&
+            !PlayerPrefs.HasKey(key + ObfuscationKeySuffix))
+            return PlayerPrefs.GetInt(key, defaultValue ? 1 : 0) != 0;
+
+        return GetInt(key, defaultValue ? 1 : 0) != 0;
+    }
 
     // Int với anti-cheat
     public static void SetInt(string key, int value)
     {
         if (Config.ENABLE_ANTI_CHEAT)
         {
-            int obfuscated = MemoryObfuscation.ObfuscateInt(value);
+            int valueKey = MemoryObfuscation.GenerateKey();
+            int obfuscated = MemoryObfuscation.ObfuscateInt(value, valueKey);
             int checksum = MemoryChecksum.GenerateChecksum(value);
             PlayerPrefs.SetInt(key, obfuscated);
-            PlayerPrefs.SetInt(key + "_checksum", checksum);
+            PlayerPrefs.SetInt(key + ObfuscationKeySuffix, valueKey);
+            PlayerPrefs.SetInt(key + ChecksumSuffix, checksum);
         }
         else
         {
@@ -30,9 +44,13 @@ public static class PlayerPrefsUtils
     {
         if (Config.ENABLE_ANTI_CHEAT)
         {
-            int obfuscated = PlayerPrefs.GetInt(key, MemoryObfuscation.ObfuscateInt(defaultValue));
-            int checksum = PlayerPrefs.GetInt(key + "_checksum", MemoryChecksum.GenerateChecksum(defaultValue));
-            int value = MemoryObfuscation.DeobfuscateInt(obfuscated);
+            if (!PlayerPrefs.HasKey(key))
+                return defaultValue;
+
+            int valueKey = PlayerPrefs.GetInt(key + ObfuscationKeySuffix, MemoryObfuscation.FixedKey);
+            int obfuscated = PlayerPrefs.GetInt(key);
+            int checksum = PlayerPrefs.GetInt(key + ChecksumSuffix, MemoryChecksum.GenerateChecksum(defaultValue));
+            int value = MemoryObfuscation.DeobfuscateInt(obfuscated, valueKey);
             bool isValid = MemoryChecksum.VerifyChecksum(value, checksum);
             if (isValid)
                 return value;
@@ -50,10 +68,12 @@ public static class PlayerPrefsUtils
     {
         if (Config.ENABLE_ANTI_CHEAT)
         {
-            int obfuscated = MemoryObfuscation.ObfuscateFloat(value);
+            int valueKey = MemoryObfuscation.GenerateKey();
+            int obfuscated = MemoryObfuscation.ObfuscateFloat(value, valueKey);
             int checksum = MemoryChecksum.GenerateChecksum(obfuscated);
             PlayerPrefs.SetInt(key, obfuscated);
-            PlayerPrefs.SetInt(key + "_checksum", checksum);
+            PlayerPrefs.SetInt(key + ObfuscationKeySuffix, valueKey);
+            PlayerPrefs.SetInt(key + ChecksumSuffix, checksum);
         }
         else
         {
@@ -65,11 +85,15 @@ public static class PlayerPrefsUtils
     {
         if (Config.ENABLE_ANTI_CHEAT)
         {
-            int obfuscated = PlayerPrefs.GetInt(key, MemoryObfuscation.ObfuscateFloat(defaultValue));
-            int checksum = PlayerPrefs.GetInt(key + "_checksum", MemoryChecksum.GenerateChecksum(obfuscated));
+            if (!PlayerPrefs.HasKey(key))
+                return defaultValue;
+
+            int valueKey = PlayerPrefs.GetInt(key + ObfuscationKeySuffix, MemoryObfuscation.FixedKey);
+            int obfuscated = PlayerPrefs.GetInt(key);
+            int checksum = PlayerPrefs.GetInt(key + ChecksumSuffix, MemoryChecksum.GenerateChecksum(obfuscated));
             bool isValid = MemoryChecksum.VerifyChecksum(obfuscated, checksum);
             if (isValid)
-                return MemoryObfuscation.DeobfuscateFloat(obfuscated);
+                return MemoryObfuscation.DeobfuscateFloat(obfuscated, valueKey);
             else
                 return defaultValue;
         }
@@ -84,8 +108,12 @@ public static class PlayerPrefsUtils
     {
         if (Config.ENABLE_ANTI_CHEAT)
         {
-            string obfuscated = MemoryObfuscation.ObfuscateString(value);
+            int valueKey = MemoryObfuscation.GenerateKey();
+            string obfuscated = MemoryObfuscation.ObfuscateString(value, valueKey);
+            int checksum = MemoryChecksum.GenerateChecksum(obfuscated);
             PlayerPrefs.SetString(key, obfuscated);
+            PlayerPrefs.SetInt(key + ObfuscationKeySuffix, valueKey);
+            PlayerPrefs.SetInt(key + ChecksumSuffix, checksum);
         }
         else
         {
@@ -97,8 +125,19 @@ public static class PlayerPrefsUtils
     {
         if (Config.ENABLE_ANTI_CHEAT)
         {
-            string obfuscated = PlayerPrefs.GetString(key, MemoryObfuscation.ObfuscateString(defaultValue));
-            return MemoryObfuscation.DeobfuscateString(obfuscated);
+            if (!PlayerPrefs.HasKey(key))
+                return defaultValue;
+
+            int valueKey = PlayerPrefs.GetInt(key + ObfuscationKeySuffix, MemoryObfuscation.FixedKey);
+            string obfuscated = PlayerPrefs.GetString(key);
+            if (PlayerPrefs.HasKey(key + ChecksumSuffix))
+            {
+                int checksum = PlayerPrefs.GetInt(key + ChecksumSuffix);
+                if (!MemoryChecksum.VerifyChecksum(obfuscated, checksum))
+                    return defaultValue;
+            }
+
+            return MemoryObfuscation.DeobfuscateString(obfuscated, valueKey);
         }
         else
         {
@@ -109,7 +148,8 @@ public static class PlayerPrefsUtils
     public static void DeleteKey(string key)
     {
         PlayerPrefs.DeleteKey(key);
-        PlayerPrefs.DeleteKey(key + "_checksum");
+        PlayerPrefs.DeleteKey(key + ChecksumSuffix);
+        PlayerPrefs.DeleteKey(key + ObfuscationKeySuffix);
     }
 
     // Kiểm tra tồn tại

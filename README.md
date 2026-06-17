@@ -203,7 +203,12 @@ Chỉ bật define này sau khi đã import Unity IAP.
 int key = MemoryObfuscation.GenerateKey();
 int encrypted = MemoryObfuscation.EncryptInt(100, key);
 int value = MemoryObfuscation.DecryptInt(encrypted, key);
+
+int checksum = MemoryChecksum.GenerateChecksum(value);
+bool valid = MemoryChecksum.VerifyChecksum(value, checksum);
 ```
+
+`MemoryChecksum` uses device-bound HMAC for new values and still accepts the legacy checksum format when reading old saves.
 
 ## Quy Ước Mở Rộng
 

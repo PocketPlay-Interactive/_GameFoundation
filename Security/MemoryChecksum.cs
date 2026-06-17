@@ -1,38 +1,55 @@
+using System;
+using System.Security.Cryptography;
+using System.Text;
+using UnityEngine;
+
 public static class MemoryChecksum
 {
     public const int FixedKey = 0xABCDEF;
-    // Tạo checksum từ giá trị và key
+
+    private const string Salt = "GameFoundation.Security.MemoryChecksum.v2";
+
     public static int GenerateChecksum(int value)
     {
-        return (value ^ FixedKey) + 0xABCDEF;
+        return GenerateHmacChecksum(value.ToString());
     }
 
-    // Kiểm tra giá trị với checksum
+    public static int GenerateChecksum(string value)
+    {
+        return GenerateHmacChecksum(value ?? string.Empty);
+    }
+
     public static bool VerifyChecksum(int value, int checksum)
+    {
+        return GenerateChecksum(value) == checksum || GenerateLegacyChecksum(value) == checksum;
+    }
+
+    public static bool VerifyChecksum(string value, int checksum)
     {
         return GenerateChecksum(value) == checksum;
     }
 
-    /*
-    ===========================
-    HƯỚNG DẪN SỬ DỤNG
-    ===========================
-    1. Khi lưu giá trị:
-        int value = 123;
-        int key = 0x1A2B3C4D;
-        int checksum = MemoryChecksum.GenerateChecksum(value, key);
-        // Lưu cả value và checksum
+    private static int GenerateHmacChecksum(string value)
+    {
+        byte[] keyBytes = Encoding.UTF8.GetBytes(GetDeviceBoundSecret());
+        byte[] dataBytes = Encoding.UTF8.GetBytes(value);
 
-    2. Khi đọc lại giá trị:
-        // Đọc value và checksum đã lưu
-        bool isValid = MemoryChecksum.VerifyChecksum(value, key, checksum);
-        if (isValid)
+        using (var hmac = new HMACSHA256(keyBytes))
         {
-            // Giá trị hợp lệ
+            byte[] hash = hmac.ComputeHash(dataBytes);
+            return BitConverter.ToInt32(hash, 0);
         }
-        else
-        {
-            // Giá trị đã bị thay đổi hoặc gian lận
-        }
-    */
+    }
+
+    private static int GenerateLegacyChecksum(int value)
+    {
+        return (value ^ FixedKey) + 0xABCDEF;
+    }
+
+    private static string GetDeviceBoundSecret()
+    {
+        string deviceId = SystemInfo.deviceUniqueIdentifier;
+        string appId = Application.identifier;
+        return Salt + "|" + appId + "|" + deviceId;
+    }
 }

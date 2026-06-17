@@ -1,46 +1,100 @@
-using UnityEngine;
+using System;
+using System.Security.Cryptography;
 
 public static class MemoryObfuscation
 {
     public const int FixedKey = 0x1A2B3C4D;
 
+    public static int GenerateKey()
+    {
+        byte[] bytes = new byte[4];
+        using (var rng = RandomNumberGenerator.Create())
+        {
+            rng.GetBytes(bytes);
+        }
+
+        int key = BitConverter.ToInt32(bytes, 0);
+        return key == 0 ? FixedKey : key;
+    }
+
+    public static int EncryptInt(int value, int key)
+    {
+        return ObfuscateInt(value, key);
+    }
+
+    public static int DecryptInt(int encryptedValue, int key)
+    {
+        return DeobfuscateInt(encryptedValue, key);
+    }
+
     public static int ObfuscateInt(int value)
     {
-        return value ^ FixedKey;
+        return ObfuscateInt(value, FixedKey);
+    }
+
+    public static int ObfuscateInt(int value, int key)
+    {
+        return value ^ key;
     }
 
     public static int DeobfuscateInt(int obfuscatedValue)
     {
-        return obfuscatedValue ^ FixedKey;
+        return DeobfuscateInt(obfuscatedValue, FixedKey);
+    }
+
+    public static int DeobfuscateInt(int obfuscatedValue, int key)
+    {
+        return obfuscatedValue ^ key;
     }
 
     public static int ObfuscateFloat(float value)
     {
-        int intValue = System.BitConverter.ToInt32(System.BitConverter.GetBytes(value), 0);
-        return intValue ^ FixedKey;
+        return ObfuscateFloat(value, FixedKey);
+    }
+
+    public static int ObfuscateFloat(float value, int key)
+    {
+        int intValue = BitConverter.ToInt32(BitConverter.GetBytes(value), 0);
+        return intValue ^ key;
     }
 
     public static float DeobfuscateFloat(int obfuscatedValue)
     {
-        int intValue = obfuscatedValue ^ FixedKey;
-        return System.BitConverter.ToSingle(System.BitConverter.GetBytes(intValue), 0);
+        return DeobfuscateFloat(obfuscatedValue, FixedKey);
+    }
+
+    public static float DeobfuscateFloat(int obfuscatedValue, int key)
+    {
+        int intValue = obfuscatedValue ^ key;
+        return BitConverter.ToSingle(BitConverter.GetBytes(intValue), 0);
     }
 
     public static string ObfuscateString(string value)
     {
+        return ObfuscateString(value, FixedKey);
+    }
+
+    public static string ObfuscateString(string value, int key)
+    {
         if (string.IsNullOrEmpty(value)) return value;
+
         char[] chars = value.ToCharArray();
         for (int i = 0; i < chars.Length; i++)
         {
-            chars[i] = (char)(chars[i] ^ (FixedKey + i));
+            chars[i] = (char)(chars[i] ^ (key + i));
         }
+
         return new string(chars);
     }
 
     public static string DeobfuscateString(string obfuscated)
     {
-        // XOR lại với cùng key sẽ trả về chuỗi gốc
-        return ObfuscateString(obfuscated);
+        return DeobfuscateString(obfuscated, FixedKey);
+    }
+
+    public static string DeobfuscateString(string obfuscated, int key)
+    {
+        return ObfuscateString(obfuscated, key);
     }
 
     public static bool CompareObfuscatedString(string obfuscatedA, string obfuscatedB)
@@ -55,32 +109,4 @@ public static class MemoryObfuscation
         string decoded = DeobfuscateString(obfuscated);
         return real == decoded;
     }
-
-    /*
-    ===========================
-    HƯỚNG DẪN SỬ DỤNG
-    ===========================
-    1. Che giấu giá trị int:
-        int realValue = 100;
-        int obfuscated = MemoryObfuscation.ObfuscateInt(realValue);
-        // Lưu obfuscated
-
-    2. Lấy lại giá trị int:
-        int restored = MemoryObfuscation.DeobfuscateInt(obfuscated);
-
-    3. Che giấu giá trị float:
-        float realFloat = 123.45f;
-        int obfuscatedFloat = MemoryObfuscation.ObfuscateFloat(realFloat);
-        // Lưu obfuscatedFloat
-
-    4. Lấy lại giá trị float:
-        float restoredFloat = MemoryObfuscation.DeobfuscateFloat(obfuscatedFloat);
-    */
-
-    // string original = "Hello123";
-    // string obfuscated = MemoryObfuscation.ObfuscateString(original, MemoryObfuscation.FixedKey);
-    // // Lưu obfuscated
-
-    // string restored = MemoryObfuscation.DeobfuscateString(obfuscated, MemoryObfuscation.FixedKey);
-    // // restored == original
 }
