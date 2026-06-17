@@ -1,2 +1,4 @@
-# Ignore all Unity meta files
+# Ignore Unity meta files inside GameFoundation.
+# This folder is shared across projects as source; each project can import
+# and generate its own Unity GUIDs locally.
 *.meta

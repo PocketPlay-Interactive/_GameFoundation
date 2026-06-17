@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public enum Scene
@@ -29,6 +31,7 @@ public class Manager : SingletonGlobal<Manager>
 
     [Header("References")]
     [SerializeField] private LoadingCanvas loadingCanvas;
+    [SerializeField] private MonoBehaviour[] extensionModules;
 
     private bool hasAdCallbackCompleted = false;
     [Header("SDK Initialization State")]
@@ -51,12 +54,12 @@ public class Manager : SingletonGlobal<Manager>
 
     private void Start()
     {
-#if USE_INAPPURCHASE
+        Time.timeScale = 1;
+        ShowLoading();
+#if IAPPURCHASE_ENABLE
         InappPurchase.I.InitializePurchasing();
 #endif
         StartCoroutine(InitializeSDK());
-        Time.timeScale = 1;
-        ShowLoading();
     }
 
     private IEnumerator InitializeSDK()
@@ -68,18 +71,44 @@ public class Manager : SingletonGlobal<Manager>
 #endif
 #if ADMOB
         yield return null;
+#if ADMOB_UMP_BACON
         bool umpCompleted = false;
         yield return Bacon.UMP.Instance.DOGatherConsent(() => umpCompleted = true);
         yield return new WaitUntil(() => umpCompleted);
-        FirebaseManager.I.LogUMP("initialized_consent");
-
+        FirebaseManager.I?.LogUMP("initialized_consent");
+#else
+        FirebaseManager.I?.LogUMP("skipped_consent");
+#endif
 
         yield return AdManager.I.InitializeAsync();
         yield return new WaitUntil(() => IsAdvertisementReady == true);
         LogSystem.LogSuccess($"[Manager] ADMOB SDK INITIALIZED: {IsAdvertisementReady}");
 #endif
-        yield return null;
 
+        yield return InitializeExtensionModules();
+
+#if !ADMOB
+        yield return null;
+        FinalizeAdSequence();
+#endif
+    }
+
+    private IEnumerator InitializeExtensionModules()
+    {
+        foreach (var module in GetExtensionModules())
+        {
+            LogSystem.LogSuccess($"[Manager] INITIALIZE MODULE: {module.GetType().Name}");
+            yield return module.Initialize();
+        }
+    }
+
+    private IEnumerable<IGameFoundationModule> GetExtensionModules()
+    {
+        var sceneModules = extensionModules == null
+            ? Enumerable.Empty<IGameFoundationModule>()
+            : extensionModules.OfType<IGameFoundationModule>();
+
+        return GameFoundationModuleRegistry.MergeWith(sceneModules);
     }
 
     private void Update()
@@ -97,13 +126,15 @@ public class Manager : SingletonGlobal<Manager>
     private void ShowLoading()
     {
         IsLoadingActive = true;
-        loadingCanvas.Show(null, 0.0f, 0.9f);
+        if (loadingCanvas != null)
+            loadingCanvas.Show(null, 0.0f, 0.9f);
     }
 
     public void HideLoading(float delay = 1.0f)
     {
         IsLoadingActive = false;
-        loadingCanvas.Hide(delay);
+        if (loadingCanvas != null)
+            loadingCanvas.Hide(delay);
     }
 
     public LoadingCanvas LoadingUI() => loadingCanvas;
@@ -129,7 +160,7 @@ public class Manager : SingletonGlobal<Manager>
     private void OnApplicationPause(bool pause)
     {
         RuntimeStorageData.SaveAllData();
-        if (!pause) AdManager.I.CheckingOpenAd();
+        if (!pause) AdManager.I?.CheckingOpenAd();
     }
 
     private void OnApplicationQuit()
