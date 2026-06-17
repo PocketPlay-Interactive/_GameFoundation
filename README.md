@@ -155,6 +155,87 @@ Nếu muốn đăng ký bằng code thay vì kéo trên Inspector:
 GameFoundationModuleRegistry.Register(myModule);
 ```
 
+### Thêm User Data Riêng Mà Không Sửa GameFoundation
+
+Không thêm field riêng của từng game vào `PlayerSerializable`, `RuntimeStorageData` hoặc file nào trong `Assets/GameFoundation/Core`. Nếu cần lưu thêm data người chơi cho một game cụ thể, dùng sẵn `RuntimeStorageData.Player.ExtensionData` rồi bọc lại bằng class riêng trong:
+
+```text
+Assets/_Project/GameFoundationExtensions
+```
+
+Ví dụ tạo file:
+
+```text
+Assets/_Project/GameFoundationExtensions/UserProjectData.cs
+```
+
+```csharp
+public static class UserProjectData
+{
+    private const string SkinIdKey = "project.skin_id";
+    private const string BestScoreKey = "project.best_score";
+    private const string TutorialDoneKey = "project.tutorial_done";
+
+    public static string SkinId
+    {
+        get => RuntimeStorageData.Player.ExtensionData.Get(SkinIdKey, "default");
+        set => RuntimeStorageData.Player.ExtensionData.Set(SkinIdKey, value);
+    }
+
+    public static int BestScore
+    {
+        get => RuntimeStorageData.Player.ExtensionData.GetInt(BestScoreKey, 0);
+        set => RuntimeStorageData.Player.ExtensionData.SetInt(BestScoreKey, value);
+    }
+
+    public static bool TutorialDone
+    {
+        get => RuntimeStorageData.Player.ExtensionData.GetBool(TutorialDoneKey, false);
+        set => RuntimeStorageData.Player.ExtensionData.SetBool(TutorialDoneKey, value);
+    }
+
+    public static void Save()
+    {
+        RuntimeStorageData.SaveAllData();
+    }
+}
+```
+
+Gameplay chỉ gọi class riêng này, không gọi key string rải rác khắp project:
+
+```csharp
+UserProjectData.BestScore = 1200;
+UserProjectData.TutorialDone = true;
+UserProjectData.Save();
+```
+
+Nếu data cần init default hoặc migrate khi mở game, tạo thêm module trong `_Project`:
+
+```csharp
+using System.Collections;
+
+public class ProjectUserDataModule : GameFoundationModuleBehaviour
+{
+    public override IEnumerator Initialize()
+    {
+        if (string.IsNullOrEmpty(UserProjectData.SkinId))
+            UserProjectData.SkinId = "default";
+
+        yield return null;
+    }
+}
+```
+
+Sau đó gắn `ProjectUserDataModule` lên một GameObject trong scene và kéo vào `Manager > Extension Modules`.
+
+Quy tắc cho user data riêng:
+
+- Key nên có prefix riêng của project, ví dụ `project.best_score`, `project.skin_id`, để tránh trùng key với module khác.
+- Data đơn giản dùng `ExtensionData.Set`, `SetInt`, `SetFloat`, `SetBool` và các hàm `Get` tương ứng.
+- Sau khi đổi data quan trọng, gọi `RuntimeStorageData.SaveAllData()` hoặc bọc qua hàm `UserProjectData.Save()`.
+- Nếu data phức tạp, nhiều field hoặc cần migration rõ ràng, vẫn đặt code trong `_Project` và serialize thành string/json rồi lưu qua `ExtensionData.Set`.
+- Chỉ sửa model gốc trong `GameFoundation` khi data đó thật sự là tính năng dùng chung cho mọi game.
+
 Quy tắc:
 
 - Thứ nào dùng chung cho mọi project đặt trong `GameFoundation/Core`.
@@ -226,7 +307,7 @@ RuntimeStorageData.Player.ExtensionData.SetInt("score", 1234);
 RuntimeStorageData.SaveAllData();
 ```
 
-Với dự án mới, nếu cần data riêng, ưu tiên dùng `PlayerSerializable.ExtensionData` hoặc tạo module riêng trong `_Project` trước khi sửa model gốc.
+Với dự án mới, nếu cần data riêng, ưu tiên tạo wrapper trong `Assets/_Project/GameFoundationExtensions` dùng `PlayerSerializable.ExtensionData`. Xem mục [Thêm User Data Riêng Mà Không Sửa GameFoundation](#thêm-user-data-riêng-mà-không-sửa-gamefoundation) trước khi sửa model gốc.
 
 ## Integrations
 
