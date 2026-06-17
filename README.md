@@ -273,7 +273,15 @@ Quy tắc:
 
 ## Scripting Define Symbols
 
-Vào `Project Settings > Player > Other Settings > Scripting Define Symbols`, thêm symbol theo SDK đang dùng.
+Có thể bật/tắt define bằng editor window:
+
+```text
+Unity menu > GameFoundation > Define Symbols
+```
+
+Window này đọc define của selected build target hiện tại, cho tick/bỏ tick các SDK define thường dùng, rồi bấm `Apply Defines` để lưu.
+
+Nếu muốn chỉnh tay, vào `Project Settings > Player > Other Settings > Scripting Define Symbols`, thêm symbol theo SDK đang dùng.
 
 | Define | Dùng khi |
 | --- | --- |
