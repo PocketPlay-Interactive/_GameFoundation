@@ -147,13 +147,39 @@ public class ProjectBootstrapModule : GameFoundationModuleBehaviour
 }
 ```
 
-Sau đó gắn script này lên một GameObject trong scene và kéo vào `Manager > Extension Modules`.
+Sau đó gắn script này lên một GameObject trong scene và kéo component đó vào `Manager > Extension Modules`.
 
-Nếu muốn đăng ký bằng code thay vì kéo trên Inspector:
+Nếu muốn đăng ký bằng code thay vì kéo trên Inspector, dùng `GameFoundationModuleRegistry.Register(...)`. Tham số truyền vào phải là một object implement `IGameFoundationModule`, thường là component kế thừa `GameFoundationModuleBehaviour`.
+
+Ví dụ đăng ký chính component hiện tại:
 
 ```csharp
-GameFoundationModuleRegistry.Register(myModule);
+using System.Collections;
+using UnityEngine;
+
+public class ProjectBootstrapModule : GameFoundationModuleBehaviour
+{
+    private void Awake()
+    {
+        GameFoundationModuleRegistry.Register(this);
+    }
+
+    private void OnDestroy()
+    {
+        GameFoundationModuleRegistry.Unregister(this);
+    }
+
+    public override IEnumerator Initialize()
+    {
+        Debug.Log("Init project-specific data here");
+        yield return null;
+    }
+}
 ```
+
+`Register(this)` nghĩa là đăng ký chính module này vào danh sách extension modules để `Manager` gọi `Initialize()`. Cách này chỉ cần khi module không tiện kéo vào `Manager > Extension Modules`, ví dụ module được tạo bằng code, nằm trong prefab spawn sớm, hoặc muốn tự bật/tắt module theo điều kiện.
+
+Lưu ý: module phải được register trước khi `Manager` chạy bước init extension modules thì mới được gọi trong lượt bootstrap hiện tại. Với scene setup bình thường, cách dễ nhớ và ít lỗi nhất vẫn là kéo component vào `Manager > Extension Modules`.
 
 ### Thêm User Data Riêng Mà Không Sửa GameFoundation
 
