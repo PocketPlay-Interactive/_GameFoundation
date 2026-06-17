@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7032824313747052485
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5940858082189616049}
+  - component: {fileID: 881819302813849094}
+  m_Layer: 0
+  m_Name: FloatingDamageInstance
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5940858082189616049
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7032824313747052485}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &881819302813849094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7032824313747052485}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f743c043b735749ad95c70b4aeca9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  digitSprites:
+  - {fileID: 2471540666933701338, guid: 558f2bb2bc1bdf54c9607591a2fbb0be, type: 3}
+  - {fileID: -593767268770212755, guid: 558f2bb2bc1bdf54c9607591a2fbb0be, type: 3}
+  - {fileID: -6730156996920740558, guid: 558f2bb2bc1bdf54c9607591a2fbb0be, type: 3}
+  - {fileID: -8501441334811022652, guid: 558f2bb2bc1bdf54c9607591a2fbb0be, type: 3}
+  - {fileID: -7635060830608860149, guid: 558f2bb2bc1bdf54c9607591a2fbb0be, type: 3}
+  - {fileID: -5945409381412246644, guid: 558f2bb2bc1bdf54c9607591a2fbb0be, type: 3}
+  - {fileID: 946351537953105901, guid: 558f2bb2bc1bdf54c9607591a2fbb0be, type: 3}
+  - {fileID: 7977936206054151588, guid: 558f2bb2bc1bdf54c9607591a2fbb0be, type: 3}
+  - {fileID: 7451518841020366888, guid: 558f2bb2bc1bdf54c9607591a2fbb0be, type: 3}
+  - {fileID: -6045663466708945456, guid: 558f2bb2bc1bdf54c9607591a2fbb0be, type: 3}
+  specialSprites:
+  - {fileID: 4202698914770235485, guid: 558f2bb2bc1bdf54c9607591a2fbb0be, type: 3}
+  - {fileID: 8071399752420759823, guid: 558f2bb2bc1bdf54c9607591a2fbb0be, type: 3}
+  - {fileID: 5383662276876092981, guid: 558f2bb2bc1bdf54c9607591a2fbb0be, type: 3}
+  - {fileID: 4641303425618558863, guid: 558f2bb2bc1bdf54c9607591a2fbb0be, type: 3}
+  - {fileID: -1104897504907529354, guid: 558f2bb2bc1bdf54c9607591a2fbb0be, type: 3}
+  - {fileID: 2585981521888892805, guid: 558f2bb2bc1bdf54c9607591a2fbb0be, type: 3}
+  - {fileID: -879164912962680101, guid: 558f2bb2bc1bdf54c9607591a2fbb0be, type: 3}
+  digitSpritePrefab: {fileID: 3380450626885412683, guid: 0f6ea496c7b4ac3419e0412eec12372a, type: 3}
+  charSpacing: 0.5
+  moveUpDistance: 1
+  fadeOutDuration: 0.5
+  totalLifetime: 1.5
+  moveType: 0
