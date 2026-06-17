@@ -1,30 +1,19 @@
 # GameFoundation
 
-Thư viện nền dùng chung cho các Unity project: helper, manager, pattern, extension, security utilities và wrapper SDK. Mục tiêu là có thể copy sang dự án mới nhanh, bật SDK bằng define khi cần, và vẫn compile được khi SDK chưa import.
-
-## Mục Lục
-
-- [Cấu trúc](#cấu-trúc)
-- [Cài đặt](#cài-đặt)
-- [Scripting Define Symbols](#scripting-define-symbols)
-- [Core](#core)
-- [Integrations](#integrations)
-- [Security](#security)
-- [Quy ước mở rộng](#quy-ước-mở-rộng)
-- [Kiểm tra sau khi import](#kiểm-tra-sau-khi-import)
-- [Troubleshooting](#troubleshooting)
+Thư viện nền dùng chung cho các Unity project: helper, manager, pattern, save/load, security utilities và wrapper SDK. Mục tiêu là copy sang dự án mới nhanh, bật SDK bằng define khi cần, và vẫn compile được khi SDK chưa import.
 
 ## Cấu Trúc
 
 | Folder | Vai trò |
 | --- | --- |
-| `Core` | Code dùng chung: manager, pattern, pooling, save/load, canvas, audio, input, editor tools, extensions. |
-| `Integrations` | Các wrapper SDK: AdMob, Firebase, AppsFlyer, native ads plugin. |
+| `Core` | Code dùng chung: manager, extensibility, pattern, pooling, save/load, canvas, audio, input, editor tools, extensions. |
+| `Integrations` | Wrapper SDK: AdMob, Firebase, AppsFlyer, native ads plugin. |
 | `Security` | Utility chống sửa value runtime: checksum, obfuscation. |
 
 ```text
 Assets/GameFoundation
 |-- Core
+|   |-- Extensibility
 |   |-- _Game
 |   |-- Unity.*
 |   |-- User.*
@@ -41,10 +30,139 @@ Assets/GameFoundation
 ## Cài Đặt
 
 1. Copy nguyên folder `Assets/GameFoundation` sang project Unity mới.
-2. Copy kèm `Assets/GameFoundation.meta` để giữ GUID folder.
+2. Không cần copy `.meta` trong `Assets/GameFoundation`; để Unity của từng project tự sinh GUID riêng khi import.
 3. Mở Unity và đợi reimport xong.
-4. Nếu dùng flow mặc định, đảm bảo scene có các object/prefab cần thiết như `Manager`, `Concurrency`, `FirebaseManager`, `AdManager`.
+4. Tạo scene bootstrap theo mục [Tạo Scene Mới](#tạo-scene-mới).
 5. Chỉ bật define cho SDK đã import thật sự.
+
+## Tạo Scene Mới
+
+### Checklist Script Mặc Định
+
+Với một scene bootstrap mới, mặc định nên có các script sau:
+
+| Bắt buộc? | Script | Gắn vào GameObject | Lý do |
+| --- | --- | --- | --- |
+| Bắt buộc | `Manager` | `GameFoundation` hoặc `Manager` | Khởi tạo save, SDK, extension modules, loading state. |
+| Bắt buộc | `Concurrency` | `Concurrency` | Chạy callback/coroutine về main thread. Nhiều manager dùng `Concurrency.Instance()`. |
+| Nên có | `LoadingCanvas` | `LoadingCanvas` hoặc child UI của `Manager` | UI loading mặc định cho bootstrap. Có thể bỏ trống nếu project tự quản lý loading. |
+| Tùy game | `CanvasManager` | `CanvasManager` | Quản lý screen/popup nếu dùng hệ UI có sẵn của foundation. |
+| Tùy game | `SoundManager` | `SoundManager` | Quản lý sound effect dùng chung. |
+| Tùy game | `MusicManager` | `MusicManager` | Quản lý background music dùng chung. |
+| Tùy game | `InputManager` | `InputManager` | Dùng input wrapper trong `Core/Unity.Interact/Input`. |
+| Tùy game | `RaycastSystem` | `RaycastSystem` | Dùng raycast/touch interaction helper. |
+
+Setup tối thiểu không ads/Firebase:
+
+```text
+Scene
+|-- GameFoundation
+|   `-- Manager
+`-- Concurrency
+    `-- Concurrency
+```
+
+Setup đầy đủ hay dùng cho mobile game:
+
+```text
+Scene
+|-- GameFoundation
+|   |-- Manager
+|   `-- LoadingCanvas
+|       |-- Canvas
+|       `-- CanvasGroup
+|-- Concurrency
+|   `-- Concurrency
+|-- CanvasManager
+|   `-- CanvasManager
+|-- SoundManager
+|   `-- SoundManager
+|-- MusicManager
+|   `-- MusicManager
+|-- FirebaseManager              # Nếu bật FIREBASE
+|   `-- FirebaseManager
+|-- AdManager                    # Nếu bật ADMOB
+|   |-- AdManager
+|   |-- AdmobInterstitalOpen
+|   |-- AdMobInterstital
+|   |-- AdmobNativeCollap        # Nếu bật USE_ADMOB_CUSTOM_PLUGIN
+|   `-- AdMobNativeInterstital   # Nếu bật USE_ADMOB_CUSTOM_PLUGIN
+`-- AppflyerEventTracking        # Nếu bật APPFLYER
+    `-- AppflyerEventTracking
+```
+
+Nếu chỉ muốn dùng core helper và save/load, chỉ cần `Manager` + `Concurrency`. Các script còn lại thêm theo tính năng project thực sự dùng.
+
+### Bắt Buộc
+
+Tạo các GameObject sau trong scene đầu tiên:
+
+| GameObject gợi ý | Script cần gắn | Ghi chú |
+| --- | --- | --- |
+| `GameFoundation` hoặc `Manager` | `Manager` | Bootstrap chính: đọc save, init SDK, init extension modules, quản lý loading. |
+| `Concurrency` | `Concurrency` | Cần cho action/coroutine chạy về Unity main thread. Nhiều flow ads, callback, delayed action phụ thuộc object này. |
+
+Trên object có script `Manager`:
+
+- Field `Loading Canvas`: kéo object có script `LoadingCanvas` vào nếu dùng UI loading mặc định. Có thể để trống nếu scene không cần loading UI.
+- Field `Extension Modules`: kéo các script project riêng kế thừa `GameFoundationModuleBehaviour` vào đây nếu cần init thêm data, remote config, scene service, economy, tutorial, v.v.
+
+### Optional Theo Nhu Cầu
+
+| Khi dùng | GameObject gợi ý | Script cần gắn | Define cần bật |
+| --- | --- | --- | --- |
+| Firebase Analytics | `FirebaseManager` | `FirebaseManager` | `FIREBASE` |
+| AdMob | `AdManager` | `AdManager`, `AdmobInterstitalOpen`, `AdMobInterstital` và support component cần thiết | `ADMOB` |
+| AdMob test id | `AdManager` | `AdManager` | `ADMOB;ADMOB_TEST` |
+| Native ads/JKit | `AdManager` | `AdManager`, `AdmobNativeCollap`, `AdMobNativeInterstital` | `ADMOB;USE_ADMOB_CUSTOM_PLUGIN` |
+| Bacon UMP consent flow | Bật qua `Manager` | SDK/script `Bacon.UMP` phải tồn tại trong project | `ADMOB;ADMOB_UMP_BACON` |
+| AppsFlyer | `AppflyerEventTracking` | `AppflyerEventTracking` | `APPFLYER` |
+| IAP | Không cần scene object | Gọi qua `InappPurchase.I` | `IAPPURCHASE_ENABLE` |
+| Audio dùng chung | `SoundManager`, `MusicManager` | `SoundManager`, `MusicManager` | Không cần |
+| UI dùng chung | `CanvasManager` | `CanvasManager` | Không cần |
+
+Nếu không bật `ADMOB`, `Manager` sẽ tự finalize bootstrap sau khi init extension modules. Nếu có `AdManager` fallback trong scene thì callback bị gọi lặp cũng được chặn bởi `Manager.FinalizeAdSequence()`.
+
+## Mở Rộng Cho Dự Án Mới
+
+Không sửa trực tiếp `Manager`, `RuntimeStorageData`, `AdManager` cho logic riêng của từng game nếu có thể tránh được. Đặt code riêng của project vào:
+
+```text
+Assets/_Project/GameFoundationExtensions
+```
+
+Tạo module mới bằng cách kế thừa `GameFoundationModuleBehaviour`:
+
+```csharp
+using System.Collections;
+using UnityEngine;
+
+public class ProjectBootstrapModule : GameFoundationModuleBehaviour
+{
+    public override IEnumerator Initialize()
+    {
+        Debug.Log("Init project-specific data here");
+        yield return null;
+    }
+}
+```
+
+Sau đó gắn script này lên một GameObject trong scene và kéo vào `Manager > Extension Modules`.
+
+Nếu muốn đăng ký bằng code thay vì kéo trên Inspector:
+
+```csharp
+GameFoundationModuleRegistry.Register(myModule);
+```
+
+Quy tắc:
+
+- Thứ nào dùng chung cho mọi project đặt trong `GameFoundation/Core`.
+- Thứ nào chỉ của một game đặt trong `Assets/_Project/GameFoundationExtensions`.
+- SDK hoặc package ngoài đặt trong `GameFoundation/Integrations` và bọc bằng define.
+- Public API mà gameplay gọi nên có fallback/no-op khi define tắt.
+- Config của từng game như ad unit id, product id, economy, level, remote flag nên nằm trong ScriptableObject hoặc folder `_Project`, không hard-code vào foundation.
+- Không commit `.meta` trong `Assets/GameFoundation` nếu folder này được dùng như source shared giữa nhiều project.
 
 ## Scripting Define Symbols
 
@@ -55,11 +173,12 @@ Vào `Project Settings > Player > Other Settings > Scripting Define Symbols`, th
 | `FIREBASE` | Đã import Firebase Unity SDK. |
 | `ADMOB` | Đã import Google Mobile Ads SDK. |
 | `ADMOB_TEST` | Muốn dùng test ad unit id của Google. |
+| `ADMOB_UMP_BACON` | Đã import flow UMP có API `Bacon.UMP`. |
 | `USE_ADMOB_CUSTOM_PLUGIN` | Đã import plugin native ads/JKit. |
 | `APPFLYER` | Đã import AppsFlyer SDK. |
 | `IAPPURCHASE_ENABLE` | Đã import Unity IAP. |
 
-Nếu chưa import SDK, không bật define tương ứng. Các wrapper đã có fallback/no-op để project vẫn compile.
+Nếu chưa import SDK, không bật define tương ứng.
 
 ## Core
 
@@ -75,11 +194,11 @@ GameManager.I.Init();
 ```
 
 ```csharp
-public class UIManager : Singleton<UIManager>
+public class InventoryService : GenericSingleton<InventoryService>
 {
 }
 
-UIManager.I.Show();
+InventoryService.I.ToString();
 ```
 
 ### Concurrency
@@ -95,36 +214,30 @@ Concurrency.Instance().Enqueue(() =>
 Concurrency.Instance().Enqueue(MyCoroutine(), 0.5f);
 ```
 
-Scene phải có `Concurrency` object trước khi gọi `Concurrency.Instance()`.
-
-### LogSystem
-
-```csharp
-LogSystem.LogSuccess("Loaded");
-LogSystem.LogWarning("Missing optional config");
-LogSystem.LogError("Failed");
-LogSystem.LogArray(1, 2, 3);
-```
+Scene phải có object gắn script `Concurrency` trước khi gọi `Concurrency.Instance()`.
 
 ### Runtime Storage Và Save
 
-`PlayerPrefsUtils` và `RuntimeStorageData` dùng cho save/load nhanh. Khi copy sang dự án mới, kiểm tra lại model data để tránh lệch field.
+`RuntimeStorageData` đọc/ghi `SettingSerializable` và `PlayerSerializable`.
+
+```csharp
+RuntimeStorageData.ReadData();
+RuntimeStorageData.Player.ExtensionData.SetInt("score", 1234);
+RuntimeStorageData.SaveAllData();
+```
+
+Với dự án mới, nếu cần data riêng, ưu tiên dùng `PlayerSerializable.ExtensionData` hoặc tạo module riêng trong `_Project` trước khi sửa model gốc.
 
 ## Integrations
 
 ### Firebase
 
-Yêu cầu:
-
 ```text
 FIREBASE
 ```
 
-Ví dụ:
-
 ```csharp
 yield return FirebaseManager.I.InitializeAsync();
-
 FirebaseManager.I.TrackingEvent("level_start");
 FirebaseManager.I.TrackingEvent("level_complete", ("level", 10), ("time", 42.5f));
 FirebaseManager.I.TrackingAdsEvent("paid_ads_banner", "home_banner", "0.0012");
@@ -134,22 +247,8 @@ Khi không có `FIREBASE`, các hàm tracking là no-op.
 
 ### AdMob
 
-Yêu cầu cơ bản:
-
 ```text
 ADMOB
-```
-
-Dùng test id:
-
-```text
-ADMOB;ADMOB_TEST
-```
-
-Dùng native ads/JKit:
-
-```text
-ADMOB;USE_ADMOB_CUSTOM_PLUGIN
 ```
 
 API hay dùng:
@@ -169,11 +268,9 @@ AdManager.I.ShowRewardedAd(() =>
 }, "double_coin");
 ```
 
-Khi không bật `ADMOB`, fallback sẽ gọi callback trực tiếp để test gameplay không cần SDK ads.
+Lưu ý: kiểm tra lại ad unit id trên `AdManager` cho từng project mới. Không nên giữ production id của project khác.
 
 ### AppsFlyer
-
-Yêu cầu:
 
 ```text
 APPFLYER
@@ -185,17 +282,15 @@ Tracking ad revenue cần cả AppsFlyer và AdMob:
 APPFLYER;ADMOB
 ```
 
-`AppflyerEventTracking.I.LogAdRevenue(adValue)` sẽ forward paid event từ AdMob sang AppsFlyer.
+`AppflyerEventTracking.I.LogAdRevenue(adValue)` forward paid event từ AdMob sang AppsFlyer.
 
 ### In-App Purchase
-
-Yêu cầu:
 
 ```text
 IAPPURCHASE_ENABLE
 ```
 
-Chỉ bật define này sau khi đã import Unity IAP.
+Chỉ bật define này sau khi đã import Unity IAP. Product list nên để trong asset/project config riêng của game.
 
 ## Security
 
@@ -208,24 +303,16 @@ int checksum = MemoryChecksum.GenerateChecksum(value);
 bool valid = MemoryChecksum.VerifyChecksum(value, checksum);
 ```
 
-`MemoryChecksum` uses device-bound HMAC for new values and still accepts the legacy checksum format when reading old saves.
-
-## Quy Ước Mở Rộng
-
-- Helper dùng chung đặt trong `Core`.
-- SDK hoặc package ngoài đặt trong `Integrations`.
-- Anti-cheat, validation, runtime protection đặt trong `Security`.
-- SDK không phải built-in Unity phải được bọc bằng `#if DEFINE`.
-- API public được gameplay gọi nên có fallback/no-op khi define tắt.
-- Khi di chuyển asset, move kèm `.meta` để giữ GUID.
+`MemoryChecksum` dùng device-bound HMAC cho value mới và vẫn chấp nhận legacy checksum khi đọc save cũ.
 
 ## Kiểm Tra Sau Khi Import
 
 1. Mở Unity và đợi reimport xong.
 2. Kiểm tra Console không có compile error.
-3. Nếu dùng IDE, regenerate `.csproj` từ Unity khi path bị cũ.
-4. Nếu bật define SDK, đảm bảo SDK đã import trước.
-5. Test scene đầu tiên có `Manager` và `Concurrency`.
+3. Kiểm tra scene đầu tiên có object `Manager` và `Concurrency`.
+4. Nếu dùng loading mặc định, `Manager.Loading Canvas` phải trỏ tới object có script `LoadingCanvas`.
+5. Nếu bật define SDK, đảm bảo SDK đã import trước.
+6. Regenerate `.csproj` từ Unity nếu IDE vẫn đọc path cũ.
 
 ## Troubleshooting
 
@@ -233,14 +320,18 @@ bool valid = MemoryChecksum.VerifyChecksum(value, checksum);
 
 Tắt define tương ứng hoặc import đúng SDK trước khi bật define.
 
+### Lỗi `Bacon` không tồn tại khi bật AdMob
+
+Chỉ bật `ADMOB_UMP_BACON` khi project đã có SDK/script cung cấp `Bacon.UMP`. Nếu chỉ dùng Google Mobile Ads cơ bản, bật `ADMOB` là đủ.
+
 ### Gameplay không tiếp tục sau ads
 
-Kiểm tra callback truyền vào `ShowInterstitialAdWithSpaceTime` / `ShowRewardedAd`, và đảm bảo scene có `Concurrency`.
+Kiểm tra callback truyền vào `ShowInterstitialAdWithSpaceTime` / `ShowRewardedAd`, đảm bảo scene có `Concurrency`, và đảm bảo `Manager.FinalizeAdSequence()` được gọi khi flow ads kết thúc.
 
 ### Manager initialize bị treo
 
-Kiểm tra `ADMOB` chỉ bật khi AdMob/UMP flow đã sẵn sàng. Nếu không dùng ads, bỏ define để fallback tự finalize.
+Kiểm tra scene có `AdManager` khi bật `ADMOB`. Nếu không dùng ads, bỏ define `ADMOB` để `Manager` tự finalize bootstrap.
 
 ### Mất reference prefab/script sau khi rename hoặc move
 
-Đảm bảo move kèm file `.meta`. Folder này đã được sắp xếp để giữ lại `.meta` của các folder cũ.
+Nếu import `GameFoundation` như source shared không kèm `.meta`, Unity sẽ tự sinh GUID mới cho từng project. Hạn chế để prefab/scene trong foundation reference trực tiếp tới asset ngoài foundation; nếu cần prefab dùng chung ổn định GUID thì nên đóng gói thành Unity package riêng và quản lý `.meta` theo package đó.
