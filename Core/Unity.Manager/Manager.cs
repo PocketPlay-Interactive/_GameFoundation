@@ -66,7 +66,7 @@ public class Manager : SingletonGlobal<Manager>
         yield return new WaitUntil(() => IsFirebaseInitialized == true);
         LogSystem.LogSuccess($"[Manager] FIREBASE SDK INITIALIZED: {IsFirebaseInitialized}");
 #endif
-#if USE_ADMOB && ADMOB
+#if ADMOB
         yield return null;
         bool umpCompleted = false;
         yield return Bacon.UMP.Instance.DOGatherConsent(() => umpCompleted = true);

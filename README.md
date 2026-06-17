@@ -54,7 +54,6 @@ Vào `Project Settings > Player > Other Settings > Scripting Define Symbols`, th
 | --- | --- |
 | `FIREBASE` | Đã import Firebase Unity SDK. |
 | `ADMOB` | Đã import Google Mobile Ads SDK. |
-| `USE_ADMOB` | Muốn `Manager.InitializeSDK()` chạy flow khởi tạo ads. Thường dùng cùng `ADMOB`. |
 | `ADMOB_TEST` | Muốn dùng test ad unit id của Google. |
 | `USE_ADMOB_CUSTOM_PLUGIN` | Đã import plugin native ads/JKit. |
 | `APPFLYER` | Đã import AppsFlyer SDK. |
@@ -138,19 +137,19 @@ Khi không có `FIREBASE`, các hàm tracking là no-op.
 Yêu cầu cơ bản:
 
 ```text
-ADMOB;USE_ADMOB
+ADMOB
 ```
 
 Dùng test id:
 
 ```text
-ADMOB;USE_ADMOB;ADMOB_TEST
+ADMOB;ADMOB_TEST
 ```
 
 Dùng native ads/JKit:
 
 ```text
-ADMOB;USE_ADMOB;USE_ADMOB_CUSTOM_PLUGIN
+ADMOB;USE_ADMOB_CUSTOM_PLUGIN
 ```
 
 API hay dùng:
@@ -235,7 +234,7 @@ Kiểm tra callback truyền vào `ShowInterstitialAdWithSpaceTime` / `ShowRewar
 
 ### Manager initialize bị treo
 
-Kiểm tra `USE_ADMOB && ADMOB` chỉ bật khi AdMob/UMP flow đã sẵn sàng. Nếu không dùng ads, bỏ define để fallback tự finalize.
+Kiểm tra `ADMOB` chỉ bật khi AdMob/UMP flow đã sẵn sàng. Nếu không dùng ads, bỏ define để fallback tự finalize.
 
 ### Mất reference prefab/script sau khi rename hoặc move
 
