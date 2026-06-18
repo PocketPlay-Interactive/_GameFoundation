@@ -31,8 +31,8 @@ public static class AutoPackageDownloader
         EditorApplication.update += CheckAndInstall;
     }
 
-    [MenuItem("GameFoundation/Update Latest From GitHub")]
-    public static void UpdateGameFoundationFromGithub()
+    [MenuItem("Packages/Download Git GameFoundation")]
+    public static void DownloadGameFoundationFromGit()
     {
         try
         {
@@ -114,7 +114,6 @@ public static class AutoPackageDownloader
             if (toInstall.Count == 0)
             {
                 Debug.Log("[AutoPackageDownloader] All packages already installed.");
-                UpdateGameFoundationFromGithub();
             }
             else
             {
@@ -141,7 +140,6 @@ public static class AutoPackageDownloader
         if (_installQueue.Count == 0)
         {
             Debug.Log("[AutoPackageDownloader] All selected packages installed.");
-            UpdateGameFoundationFromGithub();
             return;
         }
 
