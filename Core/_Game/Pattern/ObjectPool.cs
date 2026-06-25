@@ -18,13 +18,13 @@ public class ObjectPool<T> where T : Component
         if (pool.Count == 0)
             pool.Enqueue(Object.Instantiate(prefab));
         var obj = pool.Dequeue();
-        obj.gameObject.SetActive(true);
+        obj.gameObject.Show();
         return obj;
     }
 
     public void Release(T obj)
     {
-        obj.gameObject.SetActive(false);
+        obj.gameObject.Hide();
         pool.Enqueue(obj);
     }
 }

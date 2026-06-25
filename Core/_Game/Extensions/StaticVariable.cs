@@ -107,11 +107,78 @@ public static class StaticVariable
     public static Vector3 ToEulerAngles(this Quaternion quaternion) => quaternion.eulerAngles;
 
     // --- Safe active toggles via Concurrency (kept as original behavior) ---
-    public static void Show(this GameObject obj) { Concurrency.Instance().Enqueue(() => obj.SetActive(true)); }
-    public static void Hide(this GameObject obj) { Concurrency.Instance().Enqueue(() => obj.SetActive(false)); }
-    public static void Show(this Transform obj) { Concurrency.Instance().Enqueue(() => obj.gameObject.SetActive(true)); }
-    public static void Hide(this Transform obj) { Concurrency.Instance().Enqueue(() => obj.gameObject.SetActive(false)); }
-    public static void SetActive(this Transform obj, bool active) { if (active) obj.Show(); else obj.Hide(); }
+    public static void Show(this GameObject obj, bool isConcurrent = false) 
+    { 
+        if (obj == null)
+        {
+            Debug.LogWarning("Show() called on a null GameObject.");
+            return;
+        }
+        if (isConcurrent)
+            Concurrency.Instance().Enqueue(() => { if (obj != null) obj.SetActive(true); });
+        else
+            obj.SetActive(true);
+    }
+    public static void Hide(this GameObject obj, bool isConcurrent = false) 
+    { 
+        if (obj == null)
+        {
+            Debug.LogWarning("Hide() called on a null GameObject.");
+            return;
+        }
+        if (isConcurrent)
+            Concurrency.Instance().Enqueue(() => { if (obj != null) obj.SetActive(false); });
+        else
+            obj.SetActive(false);
+    }
+    public static void ConcurrentSetActive(this GameObject obj, bool value, bool isConcurrent = false) 
+    { 
+        if (obj == null)
+        {
+            Debug.LogWarning("ConcurrentSetActive() called on a null GameObject.");
+            return;
+        }
+        if (isConcurrent)
+            Concurrency.Instance().Enqueue(() => { if (obj != null) obj.SetActive(value); });
+        else
+            obj.SetActive(value);
+    }
+    public static void Show(this Transform obj, bool isConcurrent = false) 
+    { 
+        if (obj == null)
+        {
+            Debug.LogWarning("Show() called on a null Transform.");
+            return;
+        }
+        if (isConcurrent)
+            Concurrency.Instance().Enqueue(() => { if (obj != null) obj.gameObject.SetActive(true); });
+        else
+            obj.gameObject.SetActive(true);
+    }
+    public static void Hide(this Transform obj, bool isConcurrent = false) 
+    { 
+        if (obj == null)
+        {
+            Debug.LogWarning("Hide() called on a null Transform.");
+            return;
+        }
+        if (isConcurrent)
+            Concurrency.Instance().Enqueue(() => { if (obj != null) obj.gameObject.SetActive(false); });
+        else
+            obj.gameObject.SetActive(false);
+    }
+    public static void ConcurrentSetActive(this Transform obj, bool value, bool isConcurrent = false) 
+    { 
+        if (obj == null)
+        {
+            Debug.LogWarning("ConcurrentSetActive() called on a null Transform.");
+            return;
+        }
+        if (isConcurrent)
+            Concurrency.Instance().Enqueue(() => { if (obj != null) obj.gameObject.SetActive(value); });
+        else
+            obj.gameObject.SetActive(value);
+    }
 
     /// <summary>
     /// Clear Unity Console (Editor only).

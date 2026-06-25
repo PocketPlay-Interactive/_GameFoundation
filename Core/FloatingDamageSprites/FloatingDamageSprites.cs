@@ -35,9 +35,9 @@ public class FloatingDamageSprites : MonoBehaviour
         if (inst == null)
             inst = Instantiate(damageInstancePrefab, transform);
 
-        inst.gameObject.SetActive(true);
+        inst.gameObject.Show();
         inst.Show(damage, pos, crit, moveType, () => {
-            inst.gameObject.SetActive(false);
+            inst.gameObject.Hide();
             pool.Enqueue(inst);
         });
     }

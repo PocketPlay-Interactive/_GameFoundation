@@ -46,7 +46,7 @@ public class FloatingDamageInstance : MonoBehaviour
     {
         _cachedTransform.position = startPosition;
         _cachedTransform.localScale = damageCrit ? Vector3.one : Vector3.one * 0.65f;
-        gameObject.SetActive(true);
+        gameObject.Show();
 
         // Compact number, tránh tạo string mới nhiều lần
         sb.Clear();
@@ -82,7 +82,7 @@ public class FloatingDamageInstance : MonoBehaviour
             if (go == null)
                 go = Instantiate(digitSpritePrefab, _cachedTransform);
 
-            go.SetActive(true);
+            go.Show();
             var sr = go.GetComponent<SpriteRenderer>();
             if (sr)
             {
@@ -174,7 +174,7 @@ public class FloatingDamageInstance : MonoBehaviour
             foreach (var sr in currentDigits)
             {
                 sr.DOFade(1f, 0);
-                sr.gameObject.SetActive(false);
+                sr.gameObject.Hide();
                 digitPool.Enqueue(sr.gameObject);
             }
             currentDigits.Clear();

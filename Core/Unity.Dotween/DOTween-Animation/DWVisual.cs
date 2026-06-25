@@ -29,7 +29,7 @@ public static class DWVisual
         // Nếu outParent, chỉ animate child 0
         if (outParent && popup.transform.childCount > 0)
         {
-            popup.SetActive(true);
+            popup.Show();
             var child = popup.transform.GetChild(0).gameObject;
             rect = child.transform as RectTransform;
             cg = child.GetComponent<CanvasGroup>();
@@ -40,48 +40,48 @@ public static class DWVisual
         switch (effect)
         {
             case DWPopupEffect.None:
-                popup.SetActive(true);
+                popup.Show();
                 onComplete?.Invoke();
                 return;
 
             case DWPopupEffect.PopPunch:
-                popup.SetActive(true);
+                popup.Show();
                 rect.localScale = Vector3.one * 0.8f;
                 tween = rect.DOScale(Vector3.one, duration).SetEase(Ease.OutBack);
                 break;
 
             case DWPopupEffect.GlideInFromLeft:
-                popup.SetActive(true);
+                popup.Show();
                 rect.anchoredPosition = new Vector2(-Screen.width, rect.anchoredPosition.y);
                 tween = rect.DOAnchorPosX(0, duration).SetEase(Ease.OutCubic);
                 break;
 
             case DWPopupEffect.GlideInFromRight:
-                popup.SetActive(true);
+                popup.Show();
                 rect.anchoredPosition = new Vector2(Screen.width, rect.anchoredPosition.y);
                 tween = rect.DOAnchorPosX(0, duration).SetEase(Ease.OutCubic);
                 break;
 
             case DWPopupEffect.GlideDownFromTop:
-                popup.SetActive(true);
+                popup.Show();
                 rect.anchoredPosition = new Vector2(rect.anchoredPosition.x, Screen.height);
                 tween = rect.DOAnchorPosY(0, duration).SetEase(Ease.OutCubic);
                 break;
 
             case DWPopupEffect.GlideUpFromBottom:
-                popup.SetActive(true);
+                popup.Show();
                 rect.anchoredPosition = new Vector2(rect.anchoredPosition.x, -Screen.height);
                 tween = rect.DOAnchorPosY(0, duration).SetEase(Ease.OutCubic);
                 break;
 
             case DWPopupEffect.ScaleAppear:
-                popup.SetActive(true);
+                popup.Show();
                 rect.localScale = Vector3.zero;
                 tween = rect.DOScale(Vector3.one, duration).SetEase(Ease.OutBack);
                 break;
 
             case DWPopupEffect.FadeReveal:
-                popup.SetActive(true);
+                popup.Show();
                 cg = popup.GetComponent<CanvasGroup>();
                 if (cg == null) cg = popup.AddComponent<CanvasGroup>();
                 cg.alpha = 0;
@@ -89,7 +89,7 @@ public static class DWVisual
                 break;
 
             case DWPopupEffect.FadeInScaleOutParent:
-                popup.SetActive(true);
+                popup.Show();
                 cg = popup.GetComponent<CanvasGroup>();
                 if (cg == null) cg = popup.AddComponent<CanvasGroup>();
                 cg.alpha = 0f;
@@ -108,7 +108,7 @@ public static class DWVisual
 
             case DWPopupEffect.SlideInFromTopParent:
             {
-                popup.SetActive(true);
+                popup.Show();
                 Vector3 originalPos = rect.localPosition;
                 rect.localPosition = originalPos + new Vector3(0, 500f, 0);
                 tween = rect.DOLocalMove(originalPos, duration)
@@ -118,7 +118,7 @@ public static class DWVisual
             }
             case DWPopupEffect.GrowFromCenterParent:
             {
-                popup.SetActive(true);
+                popup.Show();
                 rect.localScale = Vector3.zero;
                 tween = rect.DOScale(Vector3.one, duration)
                     .SetEase(Ease.OutBack)

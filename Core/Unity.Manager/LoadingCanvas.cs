@@ -33,7 +33,7 @@ public class LoadingCanvas : MonoBehaviour
 
     public void Show(Action CALLBACK_PROGRESS_COMPLETE, float startValue = 0f, float endValue = 1f, float fillTime = 1f)
     {
-        gameObject.SetActive(true);
+        gameObject.Show();
         canvasGroup.alpha = 0f;
         
         _isFading = true;
@@ -116,7 +116,7 @@ public class LoadingCanvas : MonoBehaviour
         
         _onFadeComplete = () =>
         {
-            gameObject.SetActive(false);
+            gameObject.Hide();
         };
     }
 

@@ -65,8 +65,8 @@ public class Pooling : GenericSingleton<Pooling>
     public void PushToPool(GameObject obj, bool keepParent = false)
     {
         if (obj == null) return;
-        if (!keepParent) obj.transform.SetParent(null);
         obj.SetActive(false);
+        if (!keepParent) obj.transform.SetParent(null);
     }
 
     public void PushToPool(GameObject obj, float time)

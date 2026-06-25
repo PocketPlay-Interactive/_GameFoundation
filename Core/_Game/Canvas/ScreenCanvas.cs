@@ -4,11 +4,11 @@ public class ScreenCanvas : MonoBehaviour
 {
     public virtual void Show()
     {
-        gameObject.SetActive(true);
+        gameObject.Show();
     }
 
     public virtual void Hide()
     {
-        gameObject.SetActive(false);
+        gameObject.Hide();
     }
 }

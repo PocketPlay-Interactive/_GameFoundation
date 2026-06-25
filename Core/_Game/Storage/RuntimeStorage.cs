@@ -48,14 +48,14 @@ public static class RuntimeStorageData
             Player = ReadNew<PlayerSerializable>(DATATYPE.PLAYER) as PlayerSerializable;
             Debug.LogWarning("Player data was null, created new default player data.");
         }
-        LogSystem.LogSuccess("LOAD ALL DATA IN GAME SUCCESS");
+        // LogSystem.LogSuccess("LOAD ALL DATA IN GAME SUCCESS");
     }
 
     public static void SaveAllData()
     {
         SaveData(_dataSetting, Setting);
         SaveData(_dataPlayer, Player);
-        LogSystem.LogSuccess("SAVE ALL DATA IN GAME SUCCESS");
+        // LogSystem.LogSuccess("SAVE ALL DATA IN GAME SUCCESS");
     }
 
     public static bool CanShowAds()
@@ -67,7 +67,7 @@ public static class RuntimeStorageData
     public static T ReadData<T>(DATATYPE dataType) where T : class, new()
     {
         var dataPath = GetPath(dataType);
-        LogSystem.LogSuccess(dataPath);
+        // LogSystem.LogSuccess(dataPath);
 
         if (File.Exists(dataPath))
         {
@@ -78,7 +78,7 @@ public static class RuntimeStorageData
             }
             catch (System.Exception error)
             {
-                LogSystem.LogError($"[RuntimeStorage] ReadData Error: {error.Message}");
+                // LogSystem.LogError($"[RuntimeStorage] ReadData Error: {error.Message}");
                 var data = GetDataDefault<T>(dataType);
                 return data;
             }
@@ -103,11 +103,11 @@ public static class RuntimeStorageData
         if (File.Exists(dataPath))
         {
             File.Delete(dataPath);
-            LogSystem.LogSuccess($"Delete {dataPath} success!");
+            // LogSystem.LogSuccess($"Delete {dataPath} success!");
         }
         else
         {
-            LogSystem.LogError($"Can't delete {dataPath} because it's not found!");
+            // LogSystem.LogError($"Can't delete {dataPath} because it's not found!");
         }
     }
 
@@ -117,7 +117,7 @@ public static class RuntimeStorageData
         foreach (var path in paths)
         {
             File.Delete(path);
-            LogSystem.LogSuccess($"Deleted {path} successfully!");
+            // LogSystem.LogSuccess($"Deleted {path} successfully!");
         }
     }
 
@@ -141,7 +141,7 @@ public static class RuntimeStorageData
         catch (System.Exception ex)
         {
             // Debug.Log(ex.Message);
-            LogSystem.LogError($"[RuntimeStorage] GetDataDefault Error: {ex.Message}");
+            // LogSystem.LogError($"[RuntimeStorage] GetDataDefault Error: {ex.Message}");
         }
         return null;
     }
@@ -152,7 +152,7 @@ public static class RuntimeStorageData
         string _data = JsonUtility.ToJson(data);
         if (_data == null || _data == "" || _data == "{}") return;
 
-        // LogSystem.LogSuccess(_data);
+        // // LogSystem.LogSuccess(_data);
 
         _data = HashLib.Base64Encode(_data);
         var encodeMD5 = HashLib.EncryptAndDeviceID(_data);
@@ -177,7 +177,7 @@ public static class RuntimeStorageData
         }
         catch (System.Exception ex)
         {
-            LogSystem.LogError($"[RuntimeStorage] ReadDataExist Error: {ex.Message}");
+            // LogSystem.LogError($"[RuntimeStorage] ReadDataExist Error: {ex.Message}");
             // Debug.Log(ex.Message);
         }
         return null;
@@ -199,7 +199,7 @@ public static class RuntimeStorageData
                 break;
         }
 
-        //LogSystem.LogSuccess(OptimizeComponent.GetStringOptimize("Load ", dataPath));
+        //// LogSystem.LogSuccess(OptimizeComponent.GetStringOptimize("Load ", dataPath));
 
         return dataPath;
     }
