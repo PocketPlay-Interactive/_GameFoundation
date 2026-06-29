@@ -13,106 +13,106 @@ public class PlayerSerializable
         set => playerIdObfuscated = MemoryObfuscation.ObfuscateString(value);
     }
 
-    // Mã hoá PreferredLanguage
-    private string preferredLanguageObfuscated;
-    public string PreferredLanguage
+    // Mã hoá SelectedLanguage
+    private string selectedLanguageObfuscated;
+    public string SelectedLanguage
     {
-        get => MemoryObfuscation.DeobfuscateString(preferredLanguageObfuscated);
-        set => preferredLanguageObfuscated = MemoryObfuscation.ObfuscateString(value);
+        get => MemoryObfuscation.DeobfuscateString(selectedLanguageObfuscated);
+        set => selectedLanguageObfuscated = MemoryObfuscation.ObfuscateString(value);
     }
 
-    // Mã hoá OwnedPackages (List<string>)
-    private List<string> ownedPackagesObfuscated = new List<string>();
-    public List<string> OwnedPackages
+    // Mã hoá OwnedProductIds (List<string>)
+    private List<string> ownedProductIdsObfuscated = new List<string>();
+    public List<string> OwnedProductIds
     {
         get
         {
             var result = new List<string>();
-            if (ownedPackagesObfuscated == null)
+            if (ownedProductIdsObfuscated == null)
                 return result;
 
-            foreach (var obf in ownedPackagesObfuscated)
+            foreach (var obf in ownedProductIdsObfuscated)
                 result.Add(MemoryObfuscation.DeobfuscateString(obf));
             return result;
         }
         set
         {
-            ownedPackagesObfuscated = new List<string>();
+            ownedProductIdsObfuscated = new List<string>();
             if (value != null)
                 foreach (var s in value)
-                    ownedPackagesObfuscated.Add(MemoryObfuscation.ObfuscateString(s));
+                    ownedProductIdsObfuscated.Add(MemoryObfuscation.ObfuscateString(s));
         }
     }
 
-    // GoldAmount
-    private int GoldAmountObfuscated;
-    private int GoldAmountChecksum;
-    public int GoldAmount
+    // GoldBalance
+    private int goldBalanceObfuscated;
+    private int goldBalanceChecksum;
+    public int GoldBalance
     {
         get
         {
-            int realValue = MemoryObfuscation.DeobfuscateInt(GoldAmountObfuscated);
-            if (MemoryChecksum.VerifyChecksum(realValue, GoldAmountChecksum))
+            int realValue = MemoryObfuscation.DeobfuscateInt(goldBalanceObfuscated);
+            if (MemoryChecksum.VerifyChecksum(realValue, goldBalanceChecksum))
                 return realValue;
             else
                 return 0;
         }
         set
         {
-            GoldAmountObfuscated = MemoryObfuscation.ObfuscateInt(value);
-            GoldAmountChecksum = MemoryChecksum.GenerateChecksum(value);
+            goldBalanceObfuscated = MemoryObfuscation.ObfuscateInt(value);
+            goldBalanceChecksum = MemoryChecksum.GenerateChecksum(value);
         }
     }
 
-    // LastLoginDay
-    private int LastLoginDayObfuscated;
-    private int LastLoginDayChecksum;
-    public int LastLoginDay
+    // LastLoginDayOfMonth
+    private int lastLoginDayOfMonthObfuscated;
+    private int lastLoginDayOfMonthChecksum;
+    public int LastLoginDayOfMonth
     {
         get
         {
-            int realValue = MemoryObfuscation.DeobfuscateInt(LastLoginDayObfuscated);
-            if (MemoryChecksum.VerifyChecksum(realValue, LastLoginDayChecksum))
+            int realValue = MemoryObfuscation.DeobfuscateInt(lastLoginDayOfMonthObfuscated);
+            if (MemoryChecksum.VerifyChecksum(realValue, lastLoginDayOfMonthChecksum))
                 return realValue;
             else
                 return 0;
         }
         set
         {
-            LastLoginDayObfuscated = MemoryObfuscation.ObfuscateInt(value);
-            LastLoginDayChecksum = MemoryChecksum.GenerateChecksum(value);
+            lastLoginDayOfMonthObfuscated = MemoryObfuscation.ObfuscateInt(value);
+            lastLoginDayOfMonthChecksum = MemoryChecksum.GenerateChecksum(value);
         }
     }
 
-    // TotalLoginDays
-    private int TotalLoginDaysObfuscated;
-    private int TotalLoginDaysChecksum;
-    public int TotalLoginDays
+    // LoginDayCount
+    private int loginDayCountObfuscated;
+    private int loginDayCountChecksum;
+    public int LoginDayCount
     {
         get
         {
-            int realValue = MemoryObfuscation.DeobfuscateInt(TotalLoginDaysObfuscated);
-            if (MemoryChecksum.VerifyChecksum(realValue, TotalLoginDaysChecksum))
+            int realValue = MemoryObfuscation.DeobfuscateInt(loginDayCountObfuscated);
+            if (MemoryChecksum.VerifyChecksum(realValue, loginDayCountChecksum))
                 return realValue;
             else
                 return 0;
         }
         set
         {
-            TotalLoginDaysObfuscated = MemoryObfuscation.ObfuscateInt(value);
-            TotalLoginDaysChecksum = MemoryChecksum.GenerateChecksum(value);
+            loginDayCountObfuscated = MemoryObfuscation.ObfuscateInt(value);
+            loginDayCountChecksum = MemoryChecksum.GenerateChecksum(value);
         }
     }
 
-    // IsFirstLaunch
-    private int IsFirstLaunchObfuscated;
-    private int IsFirstLaunchChecksum;
-    public bool IsFirstLaunch
+    // IsInitialLaunch
+    private int isInitialLaunchObfuscated;
+    private int isInitialLaunchChecksum;
+    public bool IsInitialLaunch
     {
         get
         {
-            int realValue = MemoryObfuscation.DeobfuscateInt(IsFirstLaunchObfuscated);
-            if (MemoryChecksum.VerifyChecksum(realValue, IsFirstLaunchChecksum))
+            int realValue = MemoryObfuscation.DeobfuscateInt(isInitialLaunchObfuscated);
+            if (MemoryChecksum.VerifyChecksum(realValue, isInitialLaunchChecksum))
                 return realValue != 0;
             else
                 return false;
@@ -120,28 +120,28 @@ public class PlayerSerializable
         set
         {
             int intValue = value ? 1 : 0;
-            IsFirstLaunchObfuscated = MemoryObfuscation.ObfuscateInt(intValue);
-            IsFirstLaunchChecksum = MemoryChecksum.GenerateChecksum(intValue);
+            isInitialLaunchObfuscated = MemoryObfuscation.ObfuscateInt(intValue);
+            isInitialLaunchChecksum = MemoryChecksum.GenerateChecksum(intValue);
         }
     }
 
-    // CurrentLevel
-    private int CurrentLevelObfuscated;
-    private int CurrentLevelChecksum;
-    public int CurrentLevel
+    // CurrentLevelIndex
+    private int currentLevelIndexObfuscated;
+    private int currentLevelIndexChecksum;
+    public int CurrentLevelIndex
     {
         get
         {
-            int realValue = MemoryObfuscation.DeobfuscateInt(CurrentLevelObfuscated);
-            if (MemoryChecksum.VerifyChecksum(realValue, CurrentLevelChecksum))
+            int realValue = MemoryObfuscation.DeobfuscateInt(currentLevelIndexObfuscated);
+            if (MemoryChecksum.VerifyChecksum(realValue, currentLevelIndexChecksum))
                 return realValue;
             else
                 return 0;
         }
         set
         {
-            CurrentLevelObfuscated = MemoryObfuscation.ObfuscateInt(value);
-            CurrentLevelChecksum = MemoryChecksum.GenerateChecksum(value);
+            currentLevelIndexObfuscated = MemoryObfuscation.ObfuscateInt(value);
+            currentLevelIndexChecksum = MemoryChecksum.GenerateChecksum(value);
         }
     }
 
@@ -150,38 +150,38 @@ public class PlayerSerializable
     public PlayerSerializable()
     {
         PlayerId = SystemInfo.deviceUniqueIdentifier;
-        GoldAmount = 0;
-        PreferredLanguage = "English";
-        OwnedPackages = new List<string>();
-        LastLoginDay = 0;
-        TotalLoginDays = 0;
-        IsFirstLaunch = false;
-        CurrentLevel = 0;
+        GoldBalance = 0;
+        SelectedLanguage = "English";
+        OwnedProductIds = new List<string>();
+        LastLoginDayOfMonth = 0;
+        LoginDayCount = 0;
+        IsInitialLaunch = false;
+        CurrentLevelIndex = 0;
         ExtensionData = new ExtensionDataClass();
     }
 
     public bool CanShowAds() =>
-        OwnedPackages == null || OwnedPackages.Count == 0;
+        OwnedProductIds == null || OwnedProductIds.Count == 0;
 
     public bool HasProduct(string productId) =>
-        OwnedPackages != null && OwnedPackages.Contains(productId);
+        OwnedProductIds != null && OwnedProductIds.Contains(productId);
 
     public void AddProduct(string productId)
     {
-        var pkgs = OwnedPackages;
+        var pkgs = OwnedProductIds;
         if (pkgs != null && !pkgs.Contains(productId))
         {
             pkgs.Add(productId);
-            OwnedPackages = pkgs;
+            OwnedProductIds = pkgs;
         }
     }
 
     public void RemoveAllProducts() =>
-        OwnedPackages = new List<string>();
+        OwnedProductIds = new List<string>();
 
     public void LogAllProducts()
     {
-        var pkgs = OwnedPackages;
+        var pkgs = OwnedProductIds;
         if (pkgs != null)
         {
             foreach (var p in pkgs)

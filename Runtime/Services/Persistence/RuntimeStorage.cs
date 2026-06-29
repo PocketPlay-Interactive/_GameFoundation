@@ -48,14 +48,12 @@ public static class RuntimeStorageData
             Player = ReadNew<PlayerSerializable>(DATATYPE.PLAYER) as PlayerSerializable;
             Debug.LogWarning("Player data was null, created new default player data.");
         }
-        // LogSystem.LogSuccess("LOAD ALL DATA IN GAME SUCCESS");
     }
 
     public static void SaveAllData()
     {
         SaveData(_dataSetting, Setting);
         SaveData(_dataPlayer, Player);
-        // LogSystem.LogSuccess("SAVE ALL DATA IN GAME SUCCESS");
     }
 
     public static bool CanShowAds()
@@ -67,7 +65,6 @@ public static class RuntimeStorageData
     public static T ReadData<T>(DATATYPE dataType) where T : class, new()
     {
         var dataPath = GetPath(dataType);
-        // LogSystem.LogSuccess(dataPath);
 
         if (File.Exists(dataPath))
         {
@@ -78,7 +75,6 @@ public static class RuntimeStorageData
             }
             catch (System.Exception error)
             {
-                // LogSystem.LogError($"[RuntimeStorage] ReadData Error: {error.Message}");
                 var data = GetDataDefault<T>(dataType);
                 return data;
             }
@@ -103,11 +99,6 @@ public static class RuntimeStorageData
         if (File.Exists(dataPath))
         {
             File.Delete(dataPath);
-            // LogSystem.LogSuccess($"Delete {dataPath} success!");
-        }
-        else
-        {
-            // LogSystem.LogError($"Can't delete {dataPath} because it's not found!");
         }
     }
 
@@ -117,7 +108,6 @@ public static class RuntimeStorageData
         foreach (var path in paths)
         {
             File.Delete(path);
-            // LogSystem.LogSuccess($"Deleted {path} successfully!");
         }
     }
 
@@ -140,8 +130,7 @@ public static class RuntimeStorageData
         }
         catch (System.Exception ex)
         {
-            // Debug.Log(ex.Message);
-            // LogSystem.LogError($"[RuntimeStorage] GetDataDefault Error: {ex.Message}");
+            LogSystem.LogError($"[RuntimeStorage] GetDataDefault Error: {ex.Message}");
         }
         return null;
     }
@@ -151,9 +140,6 @@ public static class RuntimeStorageData
         if (data == null) return;
         string _data = JsonUtility.ToJson(data);
         if (_data == null || _data == "" || _data == "{}") return;
-
-        // // LogSystem.LogSuccess(_data);
-
         _data = HashLib.Base64Encode(_data);
         var encodeMD5 = HashLib.EncryptAndDeviceID(_data);
         File.WriteAllText(path, encodeMD5);
@@ -177,8 +163,7 @@ public static class RuntimeStorageData
         }
         catch (System.Exception ex)
         {
-            // LogSystem.LogError($"[RuntimeStorage] ReadDataExist Error: {ex.Message}");
-            // Debug.Log(ex.Message);
+            LogSystem.LogError($"[RuntimeStorage] ReadDataExist Error: {ex.Message}");
         }
         return null;
     }
@@ -198,9 +183,86 @@ public static class RuntimeStorageData
             default:
                 break;
         }
-
-        //// LogSystem.LogSuccess(OptimizeComponent.GetStringOptimize("Load ", dataPath));
-
         return dataPath;
+    }
+}
+
+public static class RuntimeStorageExtention
+{
+    public static bool Has(string key)
+    {
+        return !string.IsNullOrEmpty(RuntimeStorageData.Player.ExtensionData.Get(key));
+    }
+
+    public static void Delete(string key)
+    {
+        // RuntimeStorageData.Player.ExtensionData.remo
+        LogSystem.LogError("This function is not yet available.");
+    }
+
+    public static T Load<T>(string key) where T : new()
+    {
+        System.Type type = typeof(T);
+
+        if (type == typeof(string))
+            return (T)(object)RuntimeStorageData.Player.ExtensionData.Get(key);
+
+        if (type == typeof(int))
+            return (T)(object)RuntimeStorageData.Player.ExtensionData.GetInt(key);
+
+        if (type == typeof(float))
+            return (T)(object)RuntimeStorageData.Player.ExtensionData.GetFloat(key);
+
+        if (type == typeof(bool))
+            return (T)(object)RuntimeStorageData.Player.ExtensionData.GetBool(key);
+
+        string json = RuntimeStorageData.Player.ExtensionData.Get(key);
+
+        if (string.IsNullOrEmpty(json))
+            return new T();
+
+        try
+        {
+            T data = JsonUtility.FromJson<T>(json);
+            return data ?? new T();
+        }
+        catch
+        {
+            return new T();
+        }
+    }
+
+    public static void Save<T>(string key, T data)
+    {
+        if (data == null)
+            throw new System.ArgumentNullException(nameof(data));
+
+        switch (data)
+        {
+            case string s:
+                RuntimeStorageData.Player.ExtensionData.Set(key, s);
+                break;
+
+            case int i:
+                RuntimeStorageData.Player.ExtensionData.SetInt(key, i);
+                break;
+
+            case float f:
+                RuntimeStorageData.Player.ExtensionData.SetFloat(key, f);
+                break;
+
+            case bool b:
+                RuntimeStorageData.Player.ExtensionData.SetBool(key, b);
+                break;
+
+            default:
+                RuntimeStorageData.Player.ExtensionData.Set(
+                    key,
+                    JsonUtility.ToJson(data)
+                );
+                break;
+        }
+
+        RuntimeStorageData.SaveAllData();
     }
 }

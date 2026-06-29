@@ -12,9 +12,9 @@ public class SettingSerializable
     public SettingSerializable()
     {
         // Khởi tạo mặc định nếu muốn
-        Set("music", true);
-        Set("sound", true);
-        Set("vibrate", true);
+        Set("MUSIC", true);
+        Set("SOUND", true);
+        Set("VIBRATE", true);
     }
 
     public void Set(string key, bool value)
