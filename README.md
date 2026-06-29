@@ -7,6 +7,7 @@ Thư viện nền dùng chung cho các Unity project: helper, manager, pattern, 
 | Folder | Vai trò |
 | --- | --- |
 | `Core` | Code dùng chung: manager, extensibility, pattern, pooling, save/load, canvas, audio, input, editor tools, extensions. |
+| `Services` | Capability dùng chung cấp ứng dụng, có thể quản lý state, cache, I/O hoặc một workflow hoàn chỉnh. |
 | `Integrations` | Wrapper SDK: AdMob, Firebase, AppsFlyer, native ads plugin. |
 | `Security` | Utility chống sửa value runtime: checksum, obfuscation. |
 
@@ -19,6 +20,8 @@ Assets/GameFoundation
 |   |-- User.*
 |   |-- Editor
 |   `-- EditorCools
+|-- Services
+|   `-- Time
 |-- Integrations
 |   |-- Ad
 |   |-- Ad.Support
@@ -26,6 +29,99 @@ Assets/GameFoundation
 |   `-- Firebase
 `-- Security
 ```
+
+### Ranh Giới Giữa Core, Services Và Integrations
+
+Không phân loại theo tên class có chữ `Manager` hay không. Phân loại theo trách nhiệm và chiều dependency:
+
+```text
+Project / Features
+        |
+        v
+     Services
+        |
+        v
+       Core
+```
+
+- `Core` là lớp nền thấp nhất: contract, data structure, pattern, helper thuần, serialization, concurrency và Unity adapter cơ bản. Core không được phụ thuộc ngược vào Services hoặc logic riêng của một game.
+- `Services` cung cấp một capability hoàn chỉnh cho gameplay sử dụng, thường có state/cache, truy cập file/network/resource hoặc điều phối nhiều utility. Service có thể là static class, plain C# object hoặc `MonoBehaviour` nếu thực sự cần Unity lifecycle.
+- `Integrations` chứa code chạm trực tiếp SDK/package/native API bên ngoài như AdMob, Firebase, Unity IAP hoặc camera torch của từng platform.
+- Logic chỉ phục vụ một game, ID sản phẩm, enum âm thanh, event gameplay và config economy phải nằm trong `Assets/_Project`, không nằm trong Core hay Services dùng chung.
+
+Quy tắc dependency mong muốn:
+
+- `Services` được phép phụ thuộc `Core`; `Core` không được gọi ngược lên `Services`.
+- Integration nên được bọc sau interface/facade có fallback khi define tắt.
+- Bootstrap (`Manager`) là composition root, được phép nối Core, Services và Integrations với nhau; không lấy dependency của `Manager` làm lý do đưa mọi thứ vào Core.
+
+### Kết Quả Rà Soát Folder Core
+
+Các nhóm nên chuyển khỏi `Core` trong một đợt refactor riêng:
+
+| Code hiện tại | Đích đề xuất | Lý do |
+| --- | --- | --- |
+| `_Game/Storage/RuntimeStorage.cs`, `User.JsonFormater/*`, `_Game/SaveUtils/PlayerPrefsUtils.cs` | `Services/Storage` | Đây là persistence capability hoàn chỉnh, quản lý model, file save, mã hóa và runtime state. |
+| `_Game/Audio/SoundManager.cs`, `MusicManager.cs` | `Services/Audio` | Quản lý state và playback toàn ứng dụng. Cần bỏ enum `WIN`, `LOSE` riêng của game khỏi service trước khi coi là dùng chung. |
+| `_Game/File/ResourceHandle.cs`, `ImageHandler.cs` | `Services/Assets` | Có cache, network/file I/O và quản lý vòng đời resource. |
+| `_Game/Pooling/Pooling.cs` | `Services/Pooling` | Đây là facade global điều phối prefab, resource và pool. Generic `ObjectPool<T>` vẫn ở Core. |
+
+Các nhóm nên giữ ở `Core`:
+
+- `Extensibility`: contract và registry module.
+- `Pattern`: singleton base, event bus, service locator và `ObjectPool<T>` tổng quát.
+- Helper/extension thuần như JSON wrapper, timer conversion, collection/vector helper.
+- `Unity.Concurrency`: hạ tầng chạy callback/coroutine trên main thread.
+- Low-level file/hash/security primitive không sở hữu workflow save của người chơi.
+- Editor attribute/tool thực sự dùng chung. Tool chỉ phục vụ một feature nên đi cùng feature đó.
+
+Các nhóm không nên đưa sang `Services` chỉ để làm Core nhỏ hơn:
+
+| Nhóm | Đích phù hợp hơn |
+| --- | --- |
+| `_Game/Purchase` | `Integrations/IAP`, vì code chạm trực tiếp Unity IAP. |
+| `Unity.Interact/Torchs` | `Integrations/Device/Torch`, vì đây là native platform bridge. |
+| `Pathfinding`, `FloatingDamageSprites`, `Capture`, `User.Object` | `Features` hoặc module riêng; đây là feature/component, không phải application service. |
+| `_Game/Canvas` | `Features/UI`; `CanvasManager` điều phối UI nhưng phụ thuộc trực tiếp screen/popup component. |
+| `Unity.Interact`, `Unity.Raycast` | Giữ như Unity subsystem trong Core nếu mọi game đều dùng; nếu optional thì tách thành feature/package. |
+| `Manager` | `Bootstrap`; đây là composition root, không phải service nghiệp vụ. |
+
+Ngoài việc chuyển folder, có một số code cần làm sạch trước:
+
+- `Core/Config.cs` đang chứa product ID và shake key cụ thể; chuyển các giá trị riêng này sang `_Project` hoặc ScriptableObject config.
+- `Core/GameEvent.cs` đang trộn event nền với event IAP/gameplay; thay bằng event type riêng hoặc chuyển phần project-specific ra `_Project`.
+- `SoundManager.Sound` và `MusicManager.Music` không nên chứa danh sách enum riêng của từng game trong thư viện dùng chung; dùng ID/config do project cung cấp.
+- `Core/EnumConfig.cs` đang rỗng; xóa hoặc chỉ giữ khi có trách nhiệm dùng chung rõ ràng.
+
+Đây là cấu trúc đích đề xuất, chưa phải cấu trúc hiện tại:
+
+```text
+Core
+|-- Extensibility
+|-- Patterns
+|-- Serialization
+|-- Collections
+|-- Concurrency
+`-- Unity
+Services
+|-- Time
+|-- Storage
+|-- Audio
+|-- Assets
+`-- Pooling
+Integrations
+|-- Ads
+|-- Analytics
+|-- IAP
+`-- Device
+Features
+|-- UI
+|-- Pathfinding
+|-- FloatingDamage
+`-- UserComponents
+```
+
+Nên refactor từng nhóm và giữ public API tương thích trước, thay vì move toàn bộ cùng lúc. Nếu sau này dùng assembly definition, chiều dependency trên có thể được enforce bằng `.asmdef` thay vì chỉ dựa vào convention.
 
 ## Cài Đặt
 
@@ -235,6 +331,102 @@ UserProjectData.TutorialDone = true;
 UserProjectData.Save();
 ```
 
+#### Lưu Một Object Bằng JSON
+
+`ExtensionData` chỉ lưu trực tiếp `string`, `int`, `float` và `bool`. Muốn lưu một object, serialize object thành JSON string, lưu string đó bằng `ExtensionData.Set`, rồi deserialize khi đọc.
+
+Ví dụ model riêng của project:
+
+```csharp
+using System;
+using System.Collections.Generic;
+
+[Serializable]
+public class InventorySaveData
+{
+    public int version = 1;
+    public int coins;
+    public List<string> ownedSkinIds = new List<string>();
+}
+```
+
+Bọc toàn bộ key và logic JSON trong `UserProjectData`, không serialize rải rác ở gameplay:
+
+```csharp
+using UnityEngine;
+
+public static class UserProjectData
+{
+    private const string InventoryKey = "project.inventory";
+
+    public static InventorySaveData LoadInventory()
+    {
+        string json = RuntimeStorageData.Player.ExtensionData.Get(InventoryKey);
+
+        if (string.IsNullOrEmpty(json))
+            return new InventorySaveData();
+
+        try
+        {
+            InventorySaveData data =
+                JsonUtility.FromJson<InventorySaveData>(json);
+
+            return data ?? new InventorySaveData();
+        }
+        catch (System.Exception exception)
+        {
+            Debug.LogWarning(
+                $"Could not read inventory data: {exception.Message}");
+            return new InventorySaveData();
+        }
+    }
+
+    public static void SaveInventory(InventorySaveData data)
+    {
+        if (data == null)
+            return;
+
+        string json = JsonUtility.ToJson(data);
+        RuntimeStorageData.Player.ExtensionData.Set(InventoryKey, json);
+        RuntimeStorageData.SaveAllData();
+    }
+}
+```
+
+Gameplay sử dụng object bình thường và chỉ gọi wrapper để load/save:
+
+```csharp
+InventorySaveData inventory = UserProjectData.LoadInventory();
+inventory.coins += 100;
+inventory.ownedSkinIds.Add("skin_red");
+UserProjectData.SaveInventory(inventory);
+```
+
+Luồng dữ liệu thực tế:
+
+```text
+InventorySaveData
+    -> JsonUtility.ToJson
+    -> ExtensionData.Set("project.inventory", json)
+    -> RuntimeStorageData.SaveAllData
+    -> file player save đã được bảo vệ bởi GameFoundation
+```
+
+JSON này là một string nằm bên trong player save, không phải file `.json` riêng trong `Application.persistentDataPath`.
+Không cần tự mã hóa hoặc Base64 JSON trước khi gọi `Set`; `ExtensionData` và runtime storage sẽ xử lý lớp bảo vệ save hiện có.
+
+Giới hạn của `JsonUtility`:
+
+- Class cần có `[Serializable]`.
+- Dữ liệu cần lưu phải là field; property không được serialize.
+- `List<T>` và array được hỗ trợ. `Dictionary<TKey, TValue>` không được hỗ trợ trực tiếp; chuyển dictionary thành một list entry có `key` và `value`.
+- Hạn chế dùng interface hoặc kiểu đa hình trong save model.
+- Nên có field `version` để migrate khi cấu trúc object thay đổi.
+
+Chỉ gọi wrapper sau khi `Manager.Awake()` đã chạy `RuntimeStorageData.ReadData()`. Với flow mặc định, có thể load default và migrate object trong một `GameFoundationModuleBehaviour`, vì extension modules được khởi tạo sau khi player save đã được đọc.
+
+Với object nhỏ và luôn thay đổi cùng nhau, lưu một JSON blob là đủ. Với data lớn hoặc các phần có vòng đời khác nhau, chia thành nhiều key như `project.inventory`, `project.progress`, `project.settings` để tránh phải serialize lại toàn bộ data mỗi lần.
+
 Nếu data cần init default hoặc migrate khi mở game, tạo thêm module trong `_Project`:
 
 ```csharp
@@ -342,6 +534,63 @@ RuntimeStorageData.SaveAllData();
 ```
 
 Với dự án mới, nếu cần data riêng, ưu tiên tạo wrapper trong `Assets/_Project/GameFoundationExtensions` dùng `PlayerSerializable.ExtensionData`. Xem mục [Thêm User Data Riêng Mà Không Sửa GameFoundation](#thêm-user-data-riêng-mà-không-sửa-gamefoundation) trước khi sửa model gốc.
+
+## Services
+
+`Services` chứa các capability dùng chung để gameplay gọi ở mức cao. Service chỉ dành cho logic có thể tái sử dụng giữa nhiều project; logic riêng của một game vẫn đặt trong `Assets/_Project`.
+
+Hiện tại folder này mới có `Time/NetworkTime.cs`. Các folder Storage, Audio, Assets và Pooling trong cấu trúc đề xuất phía trên là hướng refactor, chưa được di chuyển trong code.
+
+### Time/NetworkTime
+
+`NetworkTime` lấy thời gian UTC từ network, cache lần lấy thành công gần nhất trong `RuntimeStorageData.Player.ExtensionData`, rồi trả kết quả đã đổi sang múi giờ local của thiết bị.
+
+Yêu cầu:
+
+- Project đã import `Cysharp.Threading.Tasks` (UniTask).
+- `RuntimeStorageData.ReadData()` đã chạy. Trong scene bootstrap mặc định, `Manager.Awake()` thực hiện bước này.
+- Thiết bị cần network để lấy thời gian mới. Khi request lỗi, service dùng thời gian cache; nếu chưa có cache hợp lệ thì dùng `DateTime.UtcNow` của thiết bị.
+
+Cách dùng:
+
+```csharp
+using System;
+using Cysharp.Threading.Tasks;
+using UnityEngine;
+
+public class DailyRewardController : MonoBehaviour
+{
+    private void Start()
+    {
+        LoadNetworkTimeAsync().Forget();
+    }
+
+    private async UniTask LoadNetworkTimeAsync()
+    {
+        DateTime localTime = await NetworkTime.GetTimeAsync();
+        Debug.Log($"Current local time: {localTime:o}");
+    }
+}
+```
+
+`GetTimeAsync()` bắt lỗi network, log warning và trả về thời gian fallback thay vì đẩy lỗi network ra caller.
+
+#### Cache Và Save
+
+Cache dùng key `NetworkTime_UTC` trong `Player.ExtensionData` và lưu UTC theo định dạng round-trip (`"o"`). Khi lấy giờ mạng thành công, `NetworkTime` chỉ cập nhật cache trong runtime, không tự gọi `RuntimeStorageData.SaveAllData()`.
+
+`Manager` mặc định save khi application pause hoặc quit. Nếu project cần ghi cache xuống disk ngay lập tức:
+
+```csharp
+await NetworkTime.GetTimeAsync();
+RuntimeStorageData.SaveAllData();
+```
+
+#### Giá Trị Trả Về
+
+Method trả `DateTime` đã cộng offset local hiện tại của thiết bị và có `DateTimeKind.Unspecified`. Nếu gameplay cần so sánh deadline tuyệt đối giữa các múi giờ, project nên chuẩn hóa quy ước UTC riêng thay vì dựa vào `DateTime.Kind` của giá trị trả về.
+
+Network time giúp giảm phụ thuộc vào đồng hồ thiết bị nhưng cache local vẫn chỉ là fallback. Không dùng service này làm nguồn xác thực duy nhất cho economy hoặc giao dịch có giá trị; quyết định quan trọng nên được kiểm tra ở server.
 
 ## Integrations
 
