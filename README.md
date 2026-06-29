@@ -6,31 +6,62 @@ Thư viện nền dùng chung cho các Unity project: helper, manager, pattern, 
 
 | Folder | Vai trò |
 | --- | --- |
-| `Core` | Code dùng chung: manager, extensibility, pattern, pooling, save/load, canvas, audio, input, editor tools, extensions. |
-| `Services` | Capability dùng chung cấp ứng dụng, có thể quản lý state, cache, I/O hoặc một workflow hoàn chỉnh. |
-| `Integrations` | Wrapper SDK: AdMob, Firebase, AppsFlyer, native ads plugin. |
-| `Security` | Utility chống sửa value runtime: checksum, obfuscation. |
+| `Runtime/Core` | Primitive và hạ tầng thấp nhất: pattern, extensibility, threading, I/O và utility. |
+| `Runtime/Services` | Capability dùng chung cấp ứng dụng: persistence, audio, asset loading, pooling và network time. |
+| `Runtime/Features` | Feature Unity tùy chọn: UI, interaction, pathfinding, combat text và common behaviour. |
+| `Runtime/Bootstrap` | Composition root và loading flow của `Manager`. |
+| `Runtime/Integrations` | Adapter SDK/native API: ads, analytics, IAP, haptics và device API. |
+| `Runtime/Security` | Integrity, obfuscation và compatibility với save encryption cũ. |
+| `Editor` | Build tool, importer, inspector và data tool chỉ chạy trong Unity Editor. |
+| `ThirdParty` | Source vendor giữ tách biệt khỏi code GameFoundation. |
+| `Samples~` | Scene và code mẫu, không thuộc runtime production. |
 
 ```text
 Assets/GameFoundation
-|-- Core
-|   |-- Extensibility
-|   |-- _Game
-|   |-- Unity.*
-|   |-- User.*
-|   |-- Editor
-|   `-- EditorCools
-|-- Services
-|   `-- Time
-|-- Integrations
-|   |-- Ad
-|   |-- Ad.Support
-|   |-- Appflyer
-|   `-- Firebase
-`-- Security
+|-- Runtime
+|   |-- Core
+|   |   |-- Diagnostics
+|   |   |-- EditorAttributes
+|   |   |-- Extensibility
+|   |   |-- IO
+|   |   |-- Patterns
+|   |   |-- Threading
+|   |   `-- Utilities
+|   |-- Services
+|   |   |-- Assets
+|   |   |-- Audio
+|   |   |-- Persistence
+|   |   |-- Pooling
+|   |   `-- Time
+|   |-- Features
+|   |   |-- CombatText
+|   |   |-- Common
+|   |   |-- CommonBehaviours
+|   |   |-- Interaction
+|   |   |-- Pathfinding
+|   |   `-- UI
+|   |-- Bootstrap
+|   |-- Configuration
+|   |-- Integrations
+|   |   |-- Advertising
+|   |   |-- Analytics
+|   |   |-- Device
+|   |   |-- Haptics
+|   |   `-- Purchasing
+|   `-- Security
+|       |-- Integrity
+|       |-- Legacy
+|       `-- Obfuscation
+|-- Editor
+|-- ThirdParty
+|   |-- DOTween
+|   `-- NiceVibrations
+`-- Samples~
 ```
 
-### Ranh Giới Giữa Core, Services Và Integrations
+Không đổi tên file, class hoặc public API trong đợt tổ chức folder này. Code cũ tiếp tục gọi API bằng tên hiện có.
+
+### Quy Tắc Phân Loại
 
 Không phân loại theo tên class có chữ `Manager` hay không. Phân loại theo trách nhiệm và chiều dependency:
 
@@ -55,73 +86,9 @@ Quy tắc dependency mong muốn:
 - Integration nên được bọc sau interface/facade có fallback khi define tắt.
 - Bootstrap (`Manager`) là composition root, được phép nối Core, Services và Integrations với nhau; không lấy dependency của `Manager` làm lý do đưa mọi thứ vào Core.
 
-### Kết Quả Rà Soát Folder Core
+`Runtime/Configuration` và `Runtime/Features/Common` hiện giữ lại các class cũ chưa đủ tổng quát để đưa vào Core. Với project mới, product ID, gameplay event và economy config vẫn nên đặt trong `Assets/_Project` hoặc ScriptableObject riêng.
 
-Các nhóm nên chuyển khỏi `Core` trong một đợt refactor riêng:
-
-| Code hiện tại | Đích đề xuất | Lý do |
-| --- | --- | --- |
-| `_Game/Storage/RuntimeStorage.cs`, `User.JsonFormater/*`, `_Game/SaveUtils/PlayerPrefsUtils.cs` | `Services/Storage` | Đây là persistence capability hoàn chỉnh, quản lý model, file save, mã hóa và runtime state. |
-| `_Game/Audio/SoundManager.cs`, `MusicManager.cs` | `Services/Audio` | Quản lý state và playback toàn ứng dụng. Cần bỏ enum `WIN`, `LOSE` riêng của game khỏi service trước khi coi là dùng chung. |
-| `_Game/File/ResourceHandle.cs`, `ImageHandler.cs` | `Services/Assets` | Có cache, network/file I/O và quản lý vòng đời resource. |
-| `_Game/Pooling/Pooling.cs` | `Services/Pooling` | Đây là facade global điều phối prefab, resource và pool. Generic `ObjectPool<T>` vẫn ở Core. |
-
-Các nhóm nên giữ ở `Core`:
-
-- `Extensibility`: contract và registry module.
-- `Pattern`: singleton base, event bus, service locator và `ObjectPool<T>` tổng quát.
-- Helper/extension thuần như JSON wrapper, timer conversion, collection/vector helper.
-- `Unity.Concurrency`: hạ tầng chạy callback/coroutine trên main thread.
-- Low-level file/hash/security primitive không sở hữu workflow save của người chơi.
-- Editor attribute/tool thực sự dùng chung. Tool chỉ phục vụ một feature nên đi cùng feature đó.
-
-Các nhóm không nên đưa sang `Services` chỉ để làm Core nhỏ hơn:
-
-| Nhóm | Đích phù hợp hơn |
-| --- | --- |
-| `_Game/Purchase` | `Integrations/IAP`, vì code chạm trực tiếp Unity IAP. |
-| `Unity.Interact/Torchs` | `Integrations/Device/Torch`, vì đây là native platform bridge. |
-| `Pathfinding`, `FloatingDamageSprites`, `Capture`, `User.Object` | `Features` hoặc module riêng; đây là feature/component, không phải application service. |
-| `_Game/Canvas` | `Features/UI`; `CanvasManager` điều phối UI nhưng phụ thuộc trực tiếp screen/popup component. |
-| `Unity.Interact`, `Unity.Raycast` | Giữ như Unity subsystem trong Core nếu mọi game đều dùng; nếu optional thì tách thành feature/package. |
-| `Manager` | `Bootstrap`; đây là composition root, không phải service nghiệp vụ. |
-
-Ngoài việc chuyển folder, có một số code cần làm sạch trước:
-
-- `Core/Config.cs` đang chứa product ID và shake key cụ thể; chuyển các giá trị riêng này sang `_Project` hoặc ScriptableObject config.
-- `Core/GameEvent.cs` đang trộn event nền với event IAP/gameplay; thay bằng event type riêng hoặc chuyển phần project-specific ra `_Project`.
-- `SoundManager.Sound` và `MusicManager.Music` không nên chứa danh sách enum riêng của từng game trong thư viện dùng chung; dùng ID/config do project cung cấp.
-- `Core/EnumConfig.cs` đang rỗng; xóa hoặc chỉ giữ khi có trách nhiệm dùng chung rõ ràng.
-
-Đây là cấu trúc đích đề xuất, chưa phải cấu trúc hiện tại:
-
-```text
-Core
-|-- Extensibility
-|-- Patterns
-|-- Serialization
-|-- Collections
-|-- Concurrency
-`-- Unity
-Services
-|-- Time
-|-- Storage
-|-- Audio
-|-- Assets
-`-- Pooling
-Integrations
-|-- Ads
-|-- Analytics
-|-- IAP
-`-- Device
-Features
-|-- UI
-|-- Pathfinding
-|-- FloatingDamage
-`-- UserComponents
-```
-
-Nên refactor từng nhóm và giữ public API tương thích trước, thay vì move toàn bộ cùng lúc. Nếu sau này dùng assembly definition, chiều dependency trên có thể được enforce bằng `.asmdef` thay vì chỉ dựa vào convention.
+`Runtime/Security/Legacy/HashLib.cs` tồn tại để tương thích save hiện tại. Phần TripleDES/MD5 trong đó là legacy compatibility, không nên dùng làm primitive bảo mật mới.
 
 ## Cài Đặt
 
@@ -145,7 +112,7 @@ Với một scene bootstrap mới, mặc định nên có các script sau:
 | Tùy game | `CanvasManager` | `CanvasManager` | Quản lý screen/popup nếu dùng hệ UI có sẵn của foundation. |
 | Tùy game | `SoundManager` | `SoundManager` | Quản lý sound effect dùng chung. |
 | Tùy game | `MusicManager` | `MusicManager` | Quản lý background music dùng chung. |
-| Tùy game | `InputManager` | `InputManager` | Dùng input wrapper trong `Core/Unity.Interact/Input`. |
+| Tùy game | `InputManager` | `InputManager` | Dùng input wrapper trong `Runtime/Features/Interaction/Input`. |
 | Tùy game | `RaycastSystem` | `RaycastSystem` | Dùng raycast/touch interaction helper. |
 
 Setup tối thiểu không ads/Firebase:
@@ -279,7 +246,7 @@ Lưu ý: module phải được register trước khi `Manager` chạy bước i
 
 ### Thêm User Data Riêng Mà Không Sửa GameFoundation
 
-Không thêm field riêng của từng game vào `PlayerSerializable`, `RuntimeStorageData` hoặc file nào trong `Assets/GameFoundation/Core`. Nếu cần lưu thêm data người chơi cho một game cụ thể, dùng sẵn `RuntimeStorageData.Player.ExtensionData` rồi bọc lại bằng class riêng trong:
+Không thêm field riêng của từng game vào `PlayerSerializable`, `RuntimeStorageData` hoặc file nào trong `Assets/GameFoundation/Runtime`. Nếu cần lưu thêm data người chơi cho một game cụ thể, dùng sẵn `RuntimeStorageData.Player.ExtensionData` rồi bọc lại bằng class riêng trong:
 
 ```text
 Assets/_Project/GameFoundationExtensions
@@ -456,9 +423,12 @@ Quy tắc cho user data riêng:
 
 Quy tắc:
 
-- Thứ nào dùng chung cho mọi project đặt trong `GameFoundation/Core`.
+- Primitive và hạ tầng dùng chung đặt trong `GameFoundation/Runtime/Core`.
+- Capability cấp ứng dụng đặt trong `GameFoundation/Runtime/Services`.
+- Component gameplay/UI tùy chọn đặt trong `GameFoundation/Runtime/Features`.
 - Thứ nào chỉ của một game đặt trong `Assets/_Project/GameFoundationExtensions`.
-- SDK hoặc package ngoài đặt trong `GameFoundation/Integrations` và bọc bằng define.
+- Adapter SDK/native API đặt trong `GameFoundation/Runtime/Integrations` và bọc bằng define.
+- Source vendor không chỉnh sửa đặt trong `GameFoundation/ThirdParty`.
 - Public API mà gameplay gọi nên có fallback/no-op khi define tắt.
 - Config của từng game như ad unit id, product id, economy, level, remote flag nên nằm trong ScriptableObject hoặc folder `_Project`, không hard-code vào foundation.
 - Không commit `.meta` trong `Assets/GameFoundation` nếu folder này được dùng như source shared giữa nhiều project.
@@ -488,6 +458,8 @@ Nếu muốn chỉnh tay, vào `Project Settings > Player > Other Settings > Scr
 Nếu chưa import SDK, không bật define tương ứng.
 
 ## Core
+
+Code nền nằm trong `Runtime/Core`. Nhóm này không chứa SDK, gameplay feature hay state cấp ứng dụng.
 
 ### Singleton
 
@@ -523,6 +495,18 @@ Concurrency.Instance().Enqueue(MyCoroutine(), 0.5f);
 
 Scene phải có object gắn script `Concurrency` trước khi gọi `Concurrency.Instance()`.
 
+## Services
+
+Các service nằm trong `Runtime/Services` và cung cấp API cấp ứng dụng cho gameplay:
+
+| Folder | Trách nhiệm |
+| --- | --- |
+| `Assets` | Load/cache Unity resource và download image. |
+| `Audio` | Music, sound effect và audio UI adapter. |
+| `Persistence` | Player/setting model, runtime save và PlayerPrefs wrapper. |
+| `Pooling` | Facade pool prefab dùng chung. |
+| `Time` | Lấy network time và cache thời gian gần nhất. |
+
 ### Runtime Storage Và Save
 
 `RuntimeStorageData` đọc/ghi `SettingSerializable` và `PlayerSerializable`.
@@ -534,12 +518,6 @@ RuntimeStorageData.SaveAllData();
 ```
 
 Với dự án mới, nếu cần data riêng, ưu tiên tạo wrapper trong `Assets/_Project/GameFoundationExtensions` dùng `PlayerSerializable.ExtensionData`. Xem mục [Thêm User Data Riêng Mà Không Sửa GameFoundation](#thêm-user-data-riêng-mà-không-sửa-gamefoundation) trước khi sửa model gốc.
-
-## Services
-
-`Services` chứa các capability dùng chung để gameplay gọi ở mức cao. Service chỉ dành cho logic có thể tái sử dụng giữa nhiều project; logic riêng của một game vẫn đặt trong `Assets/_Project`.
-
-Hiện tại folder này mới có `Time/NetworkTime.cs`. Các folder Storage, Audio, Assets và Pooling trong cấu trúc đề xuất phía trên là hướng refactor, chưa được di chuyển trong code.
 
 ### Time/NetworkTime
 
@@ -592,9 +570,57 @@ Method trả `DateTime` đã cộng offset local hiện tại của thiết bị
 
 Network time giúp giảm phụ thuộc vào đồng hồ thiết bị nhưng cache local vẫn chỉ là fallback. Không dùng service này làm nguồn xác thực duy nhất cho economy hoặc giao dịch có giá trị; quyết định quan trọng nên được kiểm tra ở server.
 
+## Features
+
+Feature Unity tùy chọn nằm trong `Runtime/Features`. Chỉ đưa feature thực sự dùng vào scene/project:
+
+- `UI`: screen, popup, button guard và shader UI dùng chung.
+- `Interaction`: input, touch, shake và raycast system.
+- `Pathfinding`: A* graph/pathfinding component và editor tool đi kèm.
+- `CombatText`: floating damage prefab/component.
+- `CommonBehaviours`: các `MonoBehaviour` tiện dụng cho move, rotation, popup và reset state.
+
+### Raycast Listener
+
+Gắn `RaycastSystem` vào scene, sau đó component nhận event implement `IRaycastEventsListener` và tự register theo lifecycle:
+
+```csharp
+using UnityEngine;
+
+public class MyRaycastHandler : MonoBehaviour, IRaycastEventsListener
+{
+    private void OnEnable() => RaycastSystem.RegisterListener(this);
+    private void OnDisable() => RaycastSystem.UnregisterListener(this);
+
+    public void OnRaycast3DBegan(RaycastHit hit) { }
+    public void OnRaycast2DBegan(RaycastHit2D hit) { }
+    public void OnRaycastBeganPosition(Vector2 position) { }
+    public void OnRaycastDrag(Vector2 position) { }
+    public void OnRaycastEnded(Vector2 position) { }
+}
+```
+
 ## Integrations
 
+Adapter SDK và native API nằm trong `Runtime/Integrations`:
+
+| Folder | Provider/chức năng |
+| --- | --- |
+| `Advertising/GoogleMobileAds` | AdMob và support component dùng Google Mobile Ads. |
+| `Advertising/JKit` | Native/collapse ad adapter dùng JKit. |
+| `Analytics/Firebase` | Firebase initialization và analytics. |
+| `Analytics/AppsFlyer` | AppsFlyer và ad revenue forwarding. |
+| `Purchasing/UnityIAP` | Unity In-App Purchasing. |
+| `Device/Torch` | Android/iOS torch native bridge. |
+| `Haptics` | Facade gọi haptic provider. |
+
 ### Firebase
+
+Setup:
+
+1. Import Firebase Analytics SDK.
+2. Thêm `google-services.json` cho Android hoặc `GoogleService-Info.plist` cho iOS vào `Assets/`.
+3. Thêm `FIREBASE` vào Scripting Define Symbols.
 
 ```text
 FIREBASE
@@ -608,6 +634,8 @@ FirebaseManager.I.TrackingAdsEvent("paid_ads_banner", "home_banner", "0.0012");
 ```
 
 Khi không có `FIREBASE`, các hàm tracking là no-op.
+
+Firebase event được queue khi manager chưa init. Kiểm tra event trong `Firebase Console > Analytics > Events`.
 
 ### AdMob
 
@@ -656,7 +684,23 @@ IAPPURCHASE_ENABLE
 
 Chỉ bật define này sau khi đã import Unity IAP. Product list nên để trong asset/project config riêng của game.
 
+### Torch Trên Android
+
+Nếu project dùng `Torch`, Android manifest cần khai báo camera/flash:
+
+```xml
+<uses-permission android:name="android.permission.CAMERA" />
+<uses-feature android:name="android.hardware.camera" android:required="false" />
+<uses-feature android:name="android.hardware.camera.flash" android:required="false" />
+```
+
 ## Security
+
+Security runtime nằm trong `Runtime/Security`:
+
+- `Integrity`: checksum và kiểm tra dữ liệu bị thay đổi.
+- `Obfuscation`: che giấu value trong memory; đây không phải encryption chống attacker có chủ đích.
+- `Legacy`: thuật toán giữ lại để đọc/ghi save format hiện tại. Không dùng làm API bảo mật mới.
 
 ```csharp
 int key = MemoryObfuscation.GenerateKey();
@@ -668,6 +712,12 @@ bool valid = MemoryChecksum.VerifyChecksum(value, checksum);
 ```
 
 `MemoryChecksum` dùng device-bound HMAC cho value mới và vẫn chấp nhận legacy checksum khi đọc save cũ.
+
+## ThirdParty
+
+Source nguyên bản của DOTween và NiceVibrations nằm trong `ThirdParty`. Không đặt code GameFoundation hoặc code project vào đây; khi update vendor nên thay nguyên package và kiểm tra lại integration tương ứng.
+
+Editor tool nằm trong `Editor`, tách khỏi runtime build. Scene/code demo của inspector helper nằm trong `Samples~`.
 
 ## Kiểm Tra Sau Khi Import
 

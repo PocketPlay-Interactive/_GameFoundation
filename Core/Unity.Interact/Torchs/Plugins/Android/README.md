@@ -1,5 +1,0 @@
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-feature android:name="android.hardware.camera" android:required="false" />
-    <uses-feature android:name="android.hardware.camera.flash" android:required="false" />
-
-Thêm vào manifest cái này
