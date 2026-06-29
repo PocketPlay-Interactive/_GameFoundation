@@ -519,6 +519,23 @@ RuntimeStorageData.SaveAllData();
 
 Với dự án mới, nếu cần data riêng, ưu tiên tạo wrapper trong `Assets/_Project/GameFoundationExtensions` dùng `PlayerSerializable.ExtensionData`. Xem mục [Thêm User Data Riêng Mà Không Sửa GameFoundation](#thêm-user-data-riêng-mà-không-sửa-gamefoundation) trước khi sửa model gốc.
 
+#### RuntimeStorageExtention
+
+`RuntimeStorageExtention` là API rút gọn để lưu và đọc data riêng của project qua `Player.ExtensionData`. API hỗ trợ trực tiếp `string`, `int`, `float`, `bool`; các kiểu còn lại được serialize bằng `JsonUtility`.
+
+```csharp
+RuntimeStorageExtention.Save("project.best_score", 1200);
+int bestScore = RuntimeStorageExtention.Load<int>("project.best_score");
+
+RuntimeStorageExtention.Save("project.inventory", inventoryData);
+InventorySaveData inventory =
+    RuntimeStorageExtention.Load<InventorySaveData>("project.inventory");
+
+bool hasInventory = RuntimeStorageExtention.Has("project.inventory");
+```
+
+`Save<T>` tự gọi `RuntimeStorageData.SaveAllData()` sau khi cập nhật. Với object, class phải tương thích với `JsonUtility`, có constructor không tham số và được đánh dấu `[Serializable]`; nếu key không tồn tại hoặc JSON không hợp lệ, `Load<T>` trả về `new T()`. Chỉ gọi API sau khi `RuntimeStorageData.ReadData()` đã khởi tạo player data. `Delete` hiện chưa khả dụng.
+
 ### Time/NetworkTime
 
 `NetworkTime` lấy thời gian UTC từ network, cache lần lấy thành công gần nhất trong `RuntimeStorageData.Player.ExtensionData`, rồi trả kết quả đã đổi sang múi giờ local của thiết bị.
