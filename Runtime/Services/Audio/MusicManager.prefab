@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7012952902988736980}
-  - component: {fileID: 1724704573317332758}
+  - component: {fileID: 6846131185824356775}
   - component: {fileID: 1307309314973277180}
   m_Layer: 0
   m_Name: MusicManager
@@ -33,7 +33,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1724704573317332758
+--- !u!114 &6846131185824356775
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -42,9 +42,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 7549664112543380765}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e65796cf8e3a7fe4a952b39fa912880a, type: 3}
+  m_Script: {fileID: 11500000, guid: 990cc4804c464654ab78ce8adfc147f2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::MusicManager
   musics: []
   audioSource: {fileID: 1307309314973277180}
 --- !u!82 &1307309314973277180

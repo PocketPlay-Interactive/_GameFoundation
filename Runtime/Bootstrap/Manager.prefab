@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7643055558205950407}
-  - component: {fileID: 186433326358490758}
+  - component: {fileID: 2816955290720987726}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -33,7 +33,7 @@ Transform:
   - {fileID: 1612346186588289092}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &186433326358490758
+--- !u!114 &2816955290720987726
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -42,17 +42,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 1639776016276752850}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0513c3bab8575ad40851befe7d4d909d, type: 3}
+  m_Script: {fileID: 11500000, guid: dd220801284f30b49a6b05594c0ac14f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::Manager
   IsFirebaseInitialized: 0
   IsAdvertisementReady: 0
+  IsInAppPurchaseInitialized: 0
+  AlwayShowInterstitialAd: 1
+  IsAdvertisementIntertitialOpen: 0
   IsLoadingActive: 0
   AutoHideLoadingAfterTimeout: 1
-  LoadingTimeout: 5
-  LoadingTimer: 0
-  loadingCanvas: {fileID: 6609785348613455331}
-  PauseCount: 0
+  MaxLoadingDuration: 15
+  CurrentLoadingElapsed: 0
+  loadingCanvas: {fileID: 3652908642130193025}
+  extensionModules: []
+  _hasInitialized: 0
 --- !u!1 &3977181263697738829
 GameObject:
   m_ObjectHideFlags: 0
@@ -142,7 +146,7 @@ GameObject:
   - component: {fileID: 7793805366007604150}
   - component: {fileID: 5776548151830148384}
   - component: {fileID: 7786513643118279107}
-  - component: {fileID: 6609785348613455331}
+  - component: {fileID: 3652908642130193025}
   m_Layer: 5
   m_Name: LoadingCanvas
   m_TagString: Untagged
@@ -245,7 +249,7 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &6609785348613455331
+--- !u!114 &3652908642130193025
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -254,11 +258,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 4118293565669824063}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dd95f6f7fb2a7b6438c3297b4695d001, type: 3}
+  m_Script: {fileID: 11500000, guid: 52304f39ee07c7b488c545de4c89afb6, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier: Assembly-CSharp::LoadingCanvas
   canvasGroup: {fileID: 7786513643118279107}
-  progress: {fileID: 0}
 --- !u!1 &6260841762308903473
 GameObject:
   m_ObjectHideFlags: 0
@@ -270,7 +273,7 @@ GameObject:
   - component: {fileID: 820087248280628796}
   - component: {fileID: 2299287944640640034}
   - component: {fileID: 2272663828514487221}
-  - component: {fileID: 6557087782547213889}
+  - component: {fileID: 4773468804089151493}
   m_Layer: 5
   m_Name: SmartRotation
   m_TagString: Untagged
@@ -325,7 +328,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: c97561e9f75278748a66381bf5d0bb32, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 9df14ca402bb2ff4195a77a115a9d6b9, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -335,7 +338,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &6557087782547213889
+--- !u!114 &4773468804089151493
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -344,10 +347,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 6260841762308903473}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ccda2e09e55aa4cd58ea9700b464340e, type: 3}
+  m_Script: {fileID: 11500000, guid: 0440420d0c1e0794597c792c8853d864, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: 
-  speed: -100
+  m_EditorClassIdentifier: Assembly-CSharp::SmartRotation
+  speed: 90
   IsActive: 1
-  directionRotation: {x: 0, y: 0, z: 2}
+  directionRotation: {x: 0, y: 0, z: -1}
   useUnscaledTime: 1
