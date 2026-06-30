@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -34,9 +35,14 @@ public static class AutoPackageDownloader
     [MenuItem("Packages/Download Git GameFoundation")]
     public static void DownloadGameFoundationFromGit()
     {
+        Dictionary<string, byte[]> localMetaFiles = null;
+        bool stashedMetaChanges = false;
+
         try
         {
             string targetPath = Path.Combine(Directory.GetCurrentDirectory(), GameFoundationAssetPath);
+            localMetaFiles = BackupLocalMetaFiles(targetPath);
+
             if (Directory.Exists(targetPath))
             {
                 if (!Directory.Exists(Path.Combine(targetPath, ".git")))
@@ -56,6 +62,7 @@ public static class AutoPackageDownloader
                 else
                 {
                     Debug.Log("[AutoPackageDownloader] Pulling latest GameFoundation from git...");
+                    stashedMetaChanges = StashLocalMetaChanges(targetPath);
                     RunGitCommand("pull --ff-only", targetPath);
                 }
             }
@@ -64,13 +71,76 @@ public static class AutoPackageDownloader
                 CloneGameFoundation(targetPath, false);
             }
 
+            RestoreLocalMetaFiles(localMetaFiles);
+            DropStashedMetaChanges(targetPath, stashedMetaChanges);
+            stashedMetaChanges = false;
+
             AssetDatabase.Refresh();
             Debug.Log("[AutoPackageDownloader] GameFoundation is up to date.");
         }
         catch (System.Exception ex)
         {
+            RestoreLocalMetaFiles(localMetaFiles);
+
+            string targetPath = Path.Combine(Directory.GetCurrentDirectory(), GameFoundationAssetPath);
+            DropStashedMetaChanges(targetPath, stashedMetaChanges);
+
             Debug.LogError("[AutoPackageDownloader] Failed to update GameFoundation: " + ex.Message);
         }
+    }
+
+    private static Dictionary<string, byte[]> BackupLocalMetaFiles(string targetPath)
+    {
+        var metaFiles = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase);
+
+        if (Directory.Exists(targetPath))
+        {
+            foreach (string metaPath in Directory.GetFiles(targetPath, "*.meta", SearchOption.AllDirectories))
+                metaFiles[metaPath] = File.ReadAllBytes(metaPath);
+        }
+
+        string rootMetaPath = targetPath + ".meta";
+        if (File.Exists(rootMetaPath))
+            metaFiles[rootMetaPath] = File.ReadAllBytes(rootMetaPath);
+
+        Debug.Log($"[AutoPackageDownloader] Preserving {metaFiles.Count} local GameFoundation meta files.");
+        return metaFiles;
+    }
+
+    private static void RestoreLocalMetaFiles(Dictionary<string, byte[]> metaFiles)
+    {
+        if (metaFiles == null)
+            return;
+
+        foreach (var metaFile in metaFiles)
+        {
+            string directory = Path.GetDirectoryName(metaFile.Key);
+            if (!string.IsNullOrEmpty(directory))
+                Directory.CreateDirectory(directory);
+
+            File.WriteAllBytes(metaFile.Key, metaFile.Value);
+        }
+    }
+
+    private static bool StashLocalMetaChanges(string targetPath)
+    {
+        string status = RunGitCommand("status --porcelain -- \"*.meta\"", targetPath);
+        if (string.IsNullOrWhiteSpace(status))
+            return false;
+
+        Debug.Log("[AutoPackageDownloader] Temporarily stashing local GameFoundation meta changes...");
+        RunGitCommand(
+            "stash push --include-untracked -m \"AutoPackageDownloader preserved meta files\" -- \"*.meta\"",
+            targetPath);
+        return true;
+    }
+
+    private static void DropStashedMetaChanges(string targetPath, bool stashedMetaChanges)
+    {
+        if (!stashedMetaChanges || !Directory.Exists(Path.Combine(targetPath, ".git")))
+            return;
+
+        RunGitCommand("stash drop stash@{0}", targetPath);
     }
 
     private static void CloneGameFoundation(string targetPath, bool replaceExisting)
@@ -163,7 +233,7 @@ public static class AutoPackageDownloader
         InstallNext();
     }
 
-    private static void RunGitCommand(string arguments, string workingDirectory = null)
+    private static string RunGitCommand(string arguments, string workingDirectory = null)
     {
         var process = new System.Diagnostics.Process
         {
@@ -192,6 +262,8 @@ public static class AutoPackageDownloader
 
         if (!string.IsNullOrWhiteSpace(error))
             Debug.Log("[AutoPackageDownloader] " + error);
+
+        return output;
     }
 
     private class GameFoundationGitUrlWindow : EditorWindow

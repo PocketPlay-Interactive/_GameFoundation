@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7643055558205950407}
-  - component: {fileID: 5014230913763217566}
+  - component: {fileID: 2796265353164499477}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -33,7 +33,7 @@ Transform:
   - {fileID: 1612346186588289092}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5014230913763217566
+--- !u!114 &2796265353164499477
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -42,7 +42,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1639776016276752850}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5eb6d271c1e6c8419d5208093f912a6, type: 3}
+  m_Script: {fileID: 11500000, guid: dd220801284f30b49a6b05594c0ac14f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Manager
   IsFirebaseInitialized: 0
@@ -54,7 +54,7 @@ MonoBehaviour:
   AutoHideLoadingAfterTimeout: 1
   MaxLoadingDuration: 15
   CurrentLoadingElapsed: 0
-  loadingCanvas: {fileID: 2418108298938788418}
+  loadingCanvas: {fileID: 2909244574543829887}
   extensionModules: []
   _hasInitialized: 0
 --- !u!1 &3977181263697738829
@@ -146,7 +146,7 @@ GameObject:
   - component: {fileID: 7793805366007604150}
   - component: {fileID: 5776548151830148384}
   - component: {fileID: 7786513643118279107}
-  - component: {fileID: 2418108298938788418}
+  - component: {fileID: 2909244574543829887}
   m_Layer: 5
   m_Name: LoadingCanvas
   m_TagString: Untagged
@@ -249,7 +249,7 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &2418108298938788418
+--- !u!114 &2909244574543829887
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -258,7 +258,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4118293565669824063}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5170c2f7adacfba4d8b687d60d936e07, type: 3}
+  m_Script: {fileID: 11500000, guid: 52304f39ee07c7b488c545de4c89afb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LoadingCanvas
   canvasGroup: {fileID: 7786513643118279107}
@@ -273,7 +273,7 @@ GameObject:
   - component: {fileID: 820087248280628796}
   - component: {fileID: 2299287944640640034}
   - component: {fileID: 2272663828514487221}
-  - component: {fileID: 2771234683064283971}
+  - component: {fileID: 204015829171177373}
   m_Layer: 5
   m_Name: SmartRotation
   m_TagString: Untagged
@@ -338,7 +338,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &2771234683064283971
+--- !u!114 &204015829171177373
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -347,7 +347,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6260841762308903473}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42363b79cb05b2e468098b68a401d540, type: 3}
+  m_Script: {fileID: 11500000, guid: 0440420d0c1e0794597c792c8853d864, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SmartRotation
   speed: 90
