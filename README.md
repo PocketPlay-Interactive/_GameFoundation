@@ -1,4 +1,4 @@
-# GameFoundation
+# GameFoundation for Unity
 
 Thư viện nền dùng chung cho các Unity project: helper, manager, pattern, save/load, security utilities và wrapper SDK. Mục tiêu là copy sang dự án mới nhanh, bật SDK bằng define khi cần, và vẫn compile được khi SDK chưa import.
 
