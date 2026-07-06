@@ -124,7 +124,7 @@ public static class LinqExtensions
     {
         for (int i = 0; i < _parent.transform.childCount; i++)
         {
-            action?.Invoke(_parent.GetChild(i));
+            action?.Invoke(_parent.GetChildTransform(i));
         }
     }
 
@@ -191,7 +191,7 @@ public static class LinqExtensions
         // Lặp qua tất cả các child và thêm vào mảng
         for (int i = 0; i < childCount; i++)
         {
-            children[i] = parent.GetChild(i);
+            children[i] = parent.GetChildTransform(i);
         }
 
         return children;

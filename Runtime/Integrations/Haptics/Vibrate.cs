@@ -9,7 +9,7 @@ public class Vibrate : GenericSingleton<Vibrate>
     {
         // Debug.Log($"[Vibrate] PlayHapticPulse intensity:{intensity} sharpness:{sharpness}");
         if (!IsVibrationEnabled) return;
-        if (RuntimeStorageData.Setting.Get("vibrate", true))
+        if (RuntimeStorageData.SETTING.Get("vibrate", true))
             MMVibrationManager.TransientHaptic(intensity, sharpness, true);
     }
 
@@ -17,7 +17,7 @@ public class Vibrate : GenericSingleton<Vibrate>
     {
         // Debug.Log($"[Vibrate] PlayHapticType type:{type}");
         if (!IsVibrationEnabled) return;
-        if (RuntimeStorageData.Setting.Get("vibrate", true))
+        if (RuntimeStorageData.SETTING.Get("vibrate", true))
             MMVibrationManager.Haptic(type, false, true);
     }
 
@@ -25,7 +25,7 @@ public class Vibrate : GenericSingleton<Vibrate>
     {
         // Debug.Log($"[Vibrate] PlayHapticContinuous intensity:{intensity} sharpness:{sharpness} duration:{duration}");
         if (!IsVibrationEnabled) return;
-        if (RuntimeStorageData.Setting.Get("vibrate", true))
+        if (RuntimeStorageData.SETTING.Get("vibrate", true))
             MMVibrationManager.ContinuousHaptic(intensity, sharpness, duration);
     }
 
@@ -33,7 +33,7 @@ public class Vibrate : GenericSingleton<Vibrate>
     {
         // Debug.Log("[Vibrate] PlaySelectionClick");
         if (!IsVibrationEnabled) return;
-        if (RuntimeStorageData.Setting.Get("vibrate", true))
+        if (RuntimeStorageData.SETTING.Get("vibrate", true))
             MMVibrationManager.Haptic(HapticTypes.Selection, false, true);
     }
 }

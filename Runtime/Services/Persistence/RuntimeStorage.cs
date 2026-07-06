@@ -17,8 +17,8 @@ public static class RuntimeStorageData
     }
 
     public static StatusGame _StatusGame = RuntimeStorageData.StatusGame.Playing;
-    public static SettingSerializable Setting;
-    public static PlayerSerializable Player;
+    public static SettingSerializable SETTING;
+    public static PlayerSerializable PLAYER;
 
     private static string _path = OptimizeComponent.GetStringOptimize(Application.persistentDataPath, "/");
     private static string _dataSetting = OptimizeComponent.GetStringOptimize(Application.persistentDataPath, "/", HashLib.GetHashStringAndDeviceID(StaticVariable.DATA_SETTING));
@@ -28,7 +28,7 @@ public static class RuntimeStorageData
     {
         get
         {
-            if (Setting == null || Player == null)
+            if (SETTING == null || PLAYER == null)
                 return false;
             return true;
         }
@@ -36,30 +36,30 @@ public static class RuntimeStorageData
 
     public static void ReadData()
     {
-        Setting = ReadData<SettingSerializable>(DATATYPE.SETTING) as SettingSerializable;
-        if (Setting == null)
+        SETTING = ReadData<SettingSerializable>(DATATYPE.SETTING) as SettingSerializable;
+        if (SETTING == null)
         {
-            Setting = ReadNew<SettingSerializable>(DATATYPE.SETTING) as SettingSerializable;
+            SETTING = ReadNew<SettingSerializable>(DATATYPE.SETTING) as SettingSerializable;
             Debug.LogWarning("Setting data was null, created new default setting.");
         }
-        Player = ReadData<PlayerSerializable>(DATATYPE.PLAYER) as PlayerSerializable;
-        if (Player == null)
+        PLAYER = ReadData<PlayerSerializable>(DATATYPE.PLAYER) as PlayerSerializable;
+        if (PLAYER == null)
         {
-            Player = ReadNew<PlayerSerializable>(DATATYPE.PLAYER) as PlayerSerializable;
+            PLAYER = ReadNew<PlayerSerializable>(DATATYPE.PLAYER) as PlayerSerializable;
             Debug.LogWarning("Player data was null, created new default player data.");
         }
     }
 
     public static void SaveAllData()
     {
-        SaveData(_dataSetting, Setting);
-        SaveData(_dataPlayer, Player);
+        SaveData(_dataSetting, SETTING);
+        SaveData(_dataPlayer, PLAYER);
     }
 
     public static bool CanShowAds()
     {
-        if (Player == null) return true;
-        return Player.CanShowAds();
+        if (PLAYER == null) return true;
+        return PLAYER.CanShowAds();
     }
 
     public static T ReadData<T>(DATATYPE dataType) where T : class, new()
@@ -191,12 +191,12 @@ public static class RuntimeStorageExtention
 {
     public static bool Has(string key)
     {
-        return !string.IsNullOrEmpty(RuntimeStorageData.Player.ExtensionData.Get(key));
+        return !string.IsNullOrEmpty(RuntimeStorageData.PLAYER.ExtensionData.Get(key));
     }
 
     public static void Delete(string key)
     {
-        // RuntimeStorageData.Player.ExtensionData.remo
+        // RuntimeStorageData.PLAYER.ExtensionData.remo
         LogSystem.LogError("This function is not yet available.");
     }
 
@@ -205,18 +205,18 @@ public static class RuntimeStorageExtention
         System.Type type = typeof(T);
 
         if (type == typeof(string))
-            return (T)(object)RuntimeStorageData.Player.ExtensionData.Get(key);
+            return (T)(object)RuntimeStorageData.PLAYER.ExtensionData.Get(key);
 
         if (type == typeof(int))
-            return (T)(object)RuntimeStorageData.Player.ExtensionData.GetInt(key);
+            return (T)(object)RuntimeStorageData.PLAYER.ExtensionData.GetInt(key);
 
         if (type == typeof(float))
-            return (T)(object)RuntimeStorageData.Player.ExtensionData.GetFloat(key);
+            return (T)(object)RuntimeStorageData.PLAYER.ExtensionData.GetFloat(key);
 
         if (type == typeof(bool))
-            return (T)(object)RuntimeStorageData.Player.ExtensionData.GetBool(key);
+            return (T)(object)RuntimeStorageData.PLAYER.ExtensionData.GetBool(key);
 
-        string json = RuntimeStorageData.Player.ExtensionData.Get(key);
+        string json = RuntimeStorageData.PLAYER.ExtensionData.Get(key);
 
         if (string.IsNullOrEmpty(json))
             return new T();
@@ -240,23 +240,23 @@ public static class RuntimeStorageExtention
         switch (data)
         {
             case string s:
-                RuntimeStorageData.Player.ExtensionData.Set(key, s);
+                RuntimeStorageData.PLAYER.ExtensionData.Set(key, s);
                 break;
 
             case int i:
-                RuntimeStorageData.Player.ExtensionData.SetInt(key, i);
+                RuntimeStorageData.PLAYER.ExtensionData.SetInt(key, i);
                 break;
 
             case float f:
-                RuntimeStorageData.Player.ExtensionData.SetFloat(key, f);
+                RuntimeStorageData.PLAYER.ExtensionData.SetFloat(key, f);
                 break;
 
             case bool b:
-                RuntimeStorageData.Player.ExtensionData.SetBool(key, b);
+                RuntimeStorageData.PLAYER.ExtensionData.SetBool(key, b);
                 break;
 
             default:
-                RuntimeStorageData.Player.ExtensionData.Set(
+                RuntimeStorageData.PLAYER.ExtensionData.Set(
                     key,
                     JsonUtility.ToJson(data)
                 );

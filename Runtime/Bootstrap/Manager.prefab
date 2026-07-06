@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7643055558205950407}
-  - component: {fileID: 2796265353164499477}
+  - component: {fileID: 7502614379250196245}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -31,9 +31,10 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1612346186588289092}
+  - {fileID: 8901359431319337626}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2796265353164499477
+--- !u!114 &7502614379250196245
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -54,7 +55,7 @@ MonoBehaviour:
   AutoHideLoadingAfterTimeout: 1
   MaxLoadingDuration: 15
   CurrentLoadingElapsed: 0
-  loadingCanvas: {fileID: 2909244574543829887}
+  loadingCanvas: {fileID: 4909262649744664235}
   extensionModules: []
   _hasInitialized: 0
 --- !u!1 &3977181263697738829
@@ -133,6 +134,37 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &4041994310102276609
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8901359431319337626}
+  m_Layer: 0
+  m_Name: Runtime
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8901359431319337626
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4041994310102276609}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7643055558205950407}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4118293565669824063
 GameObject:
   m_ObjectHideFlags: 0
@@ -146,7 +178,7 @@ GameObject:
   - component: {fileID: 7793805366007604150}
   - component: {fileID: 5776548151830148384}
   - component: {fileID: 7786513643118279107}
-  - component: {fileID: 2909244574543829887}
+  - component: {fileID: 4909262649744664235}
   m_Layer: 5
   m_Name: LoadingCanvas
   m_TagString: Untagged
@@ -249,7 +281,7 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &2909244574543829887
+--- !u!114 &4909262649744664235
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -273,7 +305,7 @@ GameObject:
   - component: {fileID: 820087248280628796}
   - component: {fileID: 2299287944640640034}
   - component: {fileID: 2272663828514487221}
-  - component: {fileID: 204015829171177373}
+  - component: {fileID: 7289208303967676272}
   m_Layer: 5
   m_Name: SmartRotation
   m_TagString: Untagged
@@ -338,7 +370,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &204015829171177373
+--- !u!114 &7289208303967676272
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

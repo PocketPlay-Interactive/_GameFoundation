@@ -9,7 +9,7 @@ public class Pooling : GenericSingleton<Pooling>
 
     public GameObject GetPrefab(string prefabName)
     {
-        var prefab = ResourceHandle.I.LoadPrefab(prefabName);
+        var prefab = ResourceHandle.Get().LoadPrefab(prefabName);
         if (prefab == null)
         {
             Debug.LogError($"Pooling: Prefab not found in Resources/Prefabs/{prefabName}");

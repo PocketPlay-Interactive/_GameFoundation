@@ -65,4 +65,12 @@ public class ResourceHandle : GenericSingleton<ResourceHandle>
             Debug.LogWarning($"[ResourceHandle] Không tìm thấy data: {dataFileName} trong folder Data (type: {typeof(T).Name})");
         return data;
     }
+
+    public T LoadPath<T>(string path) where T : Object
+    {
+        var data = Load<T>(path);
+        if (data == null)
+            Debug.LogWarning($"[ResourceHandle] Không tìm thấy data: {data} trong folder Data (type: {typeof(T).Name})");
+        return data;
+    }
 }

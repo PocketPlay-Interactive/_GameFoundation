@@ -5,7 +5,7 @@ public abstract class Singleton<T> : MonoBehaviour where T : Singleton<T>
     private static T m_Instance = null;
     static bool shuttingDown = false;
 
-    public static T I
+    private static T I
     {
         get
         {

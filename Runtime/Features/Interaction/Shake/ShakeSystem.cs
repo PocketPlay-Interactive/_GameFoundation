@@ -68,7 +68,7 @@ public class ShakeSystem : MonoBehaviour
         if (!enableShakeDetection) return;
         
         // Test shake trong Editor
-        if (InputManager.I.IsTestShakePressed)
+        if (InputManager.Get().IsTestShakePressed)
         {
             // Debug.Log("[ShakeSystem] Manual shake triggered (Editor test)");
             OnShake(shakeDetectionThreshold + 1f);

@@ -4,6 +4,14 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 
+
+public enum NetworkTimeStatus
+{
+    Success,
+    Failure,
+    Loading
+}
+
 public static class NetworkTime
 {
     private const string TimeAPI = "https://timeapi.io/api/v1/time/current/utc";
@@ -13,6 +21,51 @@ public static class NetworkTime
     private class WorldTimeResponse
     {
         public string utc_time;
+    }
+
+    public static async void GetNetworkTime(
+        Action<DateTime> onSuccess,
+        Action<Exception> onFailure = null)
+    {
+        try
+        {
+            using var request = UnityWebRequest.Get(TimeAPI);
+            await request.SendWebRequest();
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                throw new Exception(
+                    $"Could not get network time: {request.error}");
+            }
+
+            var response =
+                JsonUtility.FromJson<WorldTimeResponse>(
+                    request.downloadHandler.text);
+
+            if (response == null ||
+                string.IsNullOrWhiteSpace(response.utc_time))
+            {
+                throw new FormatException(
+                    "Network time response does not contain utc_time.");
+            }
+
+            if (!DateTimeOffset.TryParse(
+                    response.utc_time,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.AssumeUniversal |
+                    DateTimeStyles.AdjustToUniversal,
+                    out var utcTime))
+            {
+                throw new FormatException(
+                    $"Invalid utc_time value: {response.utc_time}");
+            }
+
+            onSuccess?.Invoke(ConvertUtcToLocalTime(utcTime.UtcDateTime));
+        }
+        catch (Exception exception)
+        {
+            onFailure?.Invoke(exception);
+        }
     }
 
     public static async UniTask<DateTime> GetTimeAsync()
@@ -68,7 +121,7 @@ public static class NetworkTime
         try
         {
             string cachedDateTimeString =
-                RuntimeStorageData.Player.ExtensionData.Get(TimeKey);
+                RuntimeStorageData.PLAYER.ExtensionData.Get(TimeKey);
 
             if (DateTime.TryParse(
                     cachedDateTimeString,
@@ -98,7 +151,7 @@ public static class NetworkTime
                 "o",
                 CultureInfo.InvariantCulture);
 
-        RuntimeStorageData.Player.ExtensionData.Set(
+        RuntimeStorageData.PLAYER.ExtensionData.Set(
             TimeKey,
             dateTimeString);
     }

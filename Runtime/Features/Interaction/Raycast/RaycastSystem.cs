@@ -33,7 +33,7 @@ public class RaycastSystem : Singleton<RaycastSystem>
 
     private void HandleRaycast()
     {
-        var input = InputManager.I;
+        var input = InputManager.Get();
         Vector2 inputPosition = input.TouchPosition;
 
         // Raycast Began
@@ -94,12 +94,12 @@ public class RaycastSystem : Singleton<RaycastSystem>
 
     public static void RegisterListener(IRaycastEventsListener listener)
     {
-        if (!I._eventListeners.Contains(listener))
-            I._eventListeners.Add(listener);
+        if (!Get()._eventListeners.Contains(listener))
+            Get()._eventListeners.Add(listener);
     }
 
     public static void UnregisterListener(IRaycastEventsListener listener)
     {
-        I?._eventListeners?.Remove(listener);
+        Get()._eventListeners?.Remove(listener);
     }
 }

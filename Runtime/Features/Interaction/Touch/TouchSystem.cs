@@ -19,7 +19,7 @@ public class TouchSystem : MonoBehaviour
             return;
         }
 
-        var input = InputManager.I;
+        var input = InputManager.Get();
 
         // Touch Began
         if (input.IsTouchPressed)

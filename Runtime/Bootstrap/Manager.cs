@@ -45,10 +45,10 @@ public class Manager : SingletonGlobal<Manager>
         base.Awake();
 
         RuntimeStorageData.ReadData();
-        if (RuntimeStorageData.Player.LastLoginDayOfMonth != DateTime.Now.Day)
+        if (RuntimeStorageData.PLAYER.LastLoginDayOfMonth != DateTime.Now.Day)
         {
-            RuntimeStorageData.Player.LastLoginDayOfMonth = DateTime.Now.Day;
-            RuntimeStorageData.Player.LoginDayCount += 1;
+            RuntimeStorageData.PLAYER.LastLoginDayOfMonth = DateTime.Now.Day;
+            RuntimeStorageData.PLAYER.LoginDayCount += 1;
         }
     }
 

@@ -17,7 +17,7 @@ public class MoveForward : MonoBehaviour
             if(time > timer)
             {
                 time = 0;
-                Pooling.I.PushToPool(this.gameObject);
+                Pooling.Get().PushToPool(this.gameObject);
             }    
         }    
     }

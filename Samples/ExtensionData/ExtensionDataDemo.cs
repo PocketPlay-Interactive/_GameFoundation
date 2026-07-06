@@ -31,7 +31,7 @@ public class ExtensionDataDemo : MonoBehaviour
 
     private static void SaveDemoData()
     {
-        ExtensionDataClass extensionData = RuntimeStorageData.Player.ExtensionData;
+        ExtensionDataClass extensionData = RuntimeStorageData.PLAYER.ExtensionData;
 
         extensionData.Set(PlayerNameKey, "Player One");
         extensionData.SetInt(ScoreKey, 1234);
@@ -44,7 +44,7 @@ public class ExtensionDataDemo : MonoBehaviour
 
     private static void LoadAndLogDemoData()
     {
-        ExtensionDataClass extensionData = RuntimeStorageData.Player.ExtensionData;
+        ExtensionDataClass extensionData = RuntimeStorageData.PLAYER.ExtensionData;
 
         string playerName = extensionData.Get(PlayerNameKey, "Unknown Player");
         int score = extensionData.GetInt(ScoreKey, 0);
@@ -67,7 +67,7 @@ public class ExtensionDataDemo : MonoBehaviour
         };
 
         string json = JsonUtility.ToJson(playerProfile);
-        RuntimeStorageData.Player.ExtensionData.Set(PlayerProfileJsonKey, json);
+        RuntimeStorageData.PLAYER.ExtensionData.Set(PlayerProfileJsonKey, json);
         RuntimeStorageData.SaveAllData();
 
         Debug.Log($"[ExtensionDataDemo] Saved JSON: {json}");
@@ -75,7 +75,7 @@ public class ExtensionDataDemo : MonoBehaviour
 
     private static void LoadAndLogJsonDemoData()
     {
-        string json = RuntimeStorageData.Player.ExtensionData.Get(PlayerProfileJsonKey);
+        string json = RuntimeStorageData.PLAYER.ExtensionData.Get(PlayerProfileJsonKey);
         PlayerProfileData playerProfile = string.IsNullOrEmpty(json)
             ? null
             : JsonUtility.FromJson<PlayerProfileData>(json);

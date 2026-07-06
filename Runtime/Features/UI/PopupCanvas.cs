@@ -8,15 +8,15 @@ using UnityEngine.Events;
 [RequireComponent(typeof(CanvasGroup))]
 public abstract class PopupCanvas : MonoBehaviour
 {
-    public virtual void Show(UnityAction _actionFirst, UnityAction _actionSecond, string[] msg)
+    public virtual void Show()
     {
         if (IsActive()) return;
-        Initialized(_actionFirst, _actionSecond, msg);
+        // Initialized(_PRIMARY_CALLBACK, _SECONDARY_CALLBACK, msg);
         gameObject.Show();
         OnShow();
     }
 
-    protected abstract void Initialized(UnityAction _actionFirst, UnityAction _actionSecond, string[] msg);
+    public abstract void Initialized(UnityAction _PRIMARY_CALLBACK, UnityAction _SECONDARY_CALLBACK, params string[] msg);
 
     public virtual void Hide()
     {

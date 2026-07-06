@@ -72,7 +72,7 @@ public class SoundManager : SingletonGlobal<SoundManager>
 
     public void SetMute()
     {
-        bool mute = !RuntimeStorageData.Setting.Get("sound", true);
+        bool mute = !RuntimeStorageData.SETTING.Get("sound", true);
         foreach (var src in audioSources)
             if (src) src.mute = mute;
         if (audioSourceSpecial) audioSourceSpecial.mute = mute;

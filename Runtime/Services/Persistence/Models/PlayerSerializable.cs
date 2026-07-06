@@ -342,6 +342,12 @@ public class ExtensionDataClass
         while (checksums.Count <= idx)
             checksums.Add("");
     }
+
+    public bool HasKey(string key, bool defaultValue = false)
+    {
+        int idx = keys.IndexOf(key);
+        return idx >= 0 && idx < values.Count;
+    }
 }
 
 

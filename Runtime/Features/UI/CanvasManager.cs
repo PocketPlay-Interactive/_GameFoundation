@@ -95,7 +95,7 @@ public class CanvasManager : Singleton<CanvasManager>
             {
                 if (popupRoot.PopupID == evt.PopupId)
                 {
-                    popupRoot.Popup.Show(null, null, null);
+                    popupRoot.Popup.Show();
                 }
                 else popupRoot.Popup.Hide();
             }
@@ -114,7 +114,7 @@ public class CanvasManager : Singleton<CanvasManager>
             {
                 if (popupRoot.PopupID == popupId)
                 {
-                    popupRoot.Popup.Show(null, null, null);
+                    popupRoot.Popup.Show();
                 }
                 else popupRoot.Popup.Hide();
             }
@@ -159,7 +159,7 @@ public class CanvasManager : Singleton<CanvasManager>
             {
                 if (popupRoot.PopupID == _debugPopupId)
                 {
-                    popupRoot.Popup.Show(null, null, null);
+                    popupRoot.Popup.Show();
                 }
                 else popupRoot.Popup.Hide();
             }

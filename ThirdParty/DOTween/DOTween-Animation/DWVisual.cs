@@ -30,7 +30,7 @@ public static class DWVisual
         if (outParent && popup.transform.childCount > 0)
         {
             popup.Show();
-            var child = popup.transform.GetChild(0).gameObject;
+            var child = popup.transform.GetChild(1).gameObject;
             rect = child.transform as RectTransform;
             cg = child.GetComponent<CanvasGroup>();
             if (cg == null) cg = child.AddComponent<CanvasGroup>();
