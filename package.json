@@ -1,7 +1,7 @@
 {
   "name": "com.dann.gamefoundation",
-  "version": "1.0.0",
-  "displayName": "Dann Game Foundation",
+  "version": "1.0.1",
+  "displayName": "Game Foundation",
   "description": "Shared foundation library for Unity projects, including helpers, managers, patterns, save/load, security utilities, SDK wrappers, optional features, and editor tools.",
   "unity": "2022.3",
   "documentationUrl": "https://github.com/PocketPlay-Interactive/_GameFoundation/blob/main/README.md",

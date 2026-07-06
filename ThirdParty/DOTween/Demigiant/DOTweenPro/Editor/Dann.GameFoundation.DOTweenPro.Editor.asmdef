@@ -1,0 +1,26 @@
+{
+  "name": "Dann.GameFoundation.DOTweenPro.Editor",
+  "rootNamespace": "DG.DOTweenEditor",
+  "references": [
+    "Dann.GameFoundation",
+    "UnityEngine.UI"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": [
+    "DemiLib.dll",
+    "DemiEditor.dll",
+    "DOTween.dll",
+    "DOTweenEditor.dll",
+    "DOTweenPro.dll",
+    "DOTweenProEditor.dll"
+  ],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
