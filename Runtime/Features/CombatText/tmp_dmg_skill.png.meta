@@ -1,0 +1,624 @@
+fileFormatVersion: 2
+guid: 149d60b76668b9746b91ae97293f063f
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -8694461099961553290
+    second: tmp_dmg_skill_0
+  - first:
+      213: -18708488885095819
+    second: tmp_dmg_skill_1
+  - first:
+      213: 4700291504612471673
+    second: tmp_dmg_skill_2
+  - first:
+      213: 9099862670857453795
+    second: tmp_dmg_skill_3
+  - first:
+      213: -6781004258536935424
+    second: tmp_dmg_skill_4
+  - first:
+      213: 2663565651914108043
+    second: tmp_dmg_skill_5
+  - first:
+      213: -4679317452734103198
+    second: tmp_dmg_skill_6
+  - first:
+      213: 1169181457493104337
+    second: tmp_dmg_skill_7
+  - first:
+      213: -5688111680400805079
+    second: tmp_dmg_skill_8
+  - first:
+      213: -8698646424274821905
+    second: tmp_dmg_skill_9
+  - first:
+      213: 5122109714856065834
+    second: tmp_dmg_skill_10
+  - first:
+      213: -9124592822163672903
+    second: tmp_dmg_skill_11
+  - first:
+      213: 5519162136355626752
+    second: tmp_dmg_skill_12
+  - first:
+      213: -5478107085097336277
+    second: tmp_dmg_skill_13
+  - first:
+      213: 6873314763911422621
+    second: tmp_dmg_skill_14
+  - first:
+      213: -2448503137616417436
+    second: tmp_dmg_skill_15
+  - first:
+      213: -3460932434133546759
+    second: tmp_dmg_skill_16
+  - first:
+      213: -7645550111080439549
+    second: tmp_dmg_skill_17
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: tmp_dmg_skill_0
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 184
+        width: 66
+        height: 84
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 67ee65fd1b1175780800000000000000
+      internalID: -8694461099961553290
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tmp_dmg_skill_1
+      rect:
+        serializedVersion: 2
+        x: 357
+        y: 192
+        width: 61
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 57238bd7ab88dbff0800000000000000
+      internalID: -18708488885095819
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tmp_dmg_skill_2
+      rect:
+        serializedVersion: 2
+        x: 429
+        y: 239
+        width: 56
+        height: 82
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9737631683aca3140800000000000000
+      internalID: 4700291504612471673
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tmp_dmg_skill_3
+      rect:
+        serializedVersion: 2
+        x: 161
+        y: 190
+        width: 41
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3e0cb41d2e4394e70800000000000000
+      internalID: 9099862670857453795
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tmp_dmg_skill_4
+      rect:
+        serializedVersion: 2
+        x: 283
+        y: 171
+        width: 64
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 000be7ddd8805e1a0800000000000000
+      internalID: -6781004258536935424
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tmp_dmg_skill_5
+      rect:
+        serializedVersion: 2
+        x: 437
+        y: 190
+        width: 62
+        height: 39
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b8ca54629d2e6f420800000000000000
+      internalID: 2663565651914108043
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tmp_dmg_skill_6
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 92
+        width: 70
+        height: 82
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2618f7e9199bf0fb0800000000000000
+      internalID: -4679317452734103198
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tmp_dmg_skill_7
+      rect:
+        serializedVersion: 2
+        x: 85
+        y: 98
+        width: 66
+        height: 84
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1d699db4754c93010800000000000000
+      internalID: 1169181457493104337
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tmp_dmg_skill_8
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 97
+        width: 67
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 923b5f64094cf01b0800000000000000
+      internalID: -5688111680400805079
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tmp_dmg_skill_9
+      rect:
+        serializedVersion: 2
+        x: 283
+        y: 99
+        width: 64
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fec906e1a23384780800000000000000
+      internalID: -8698646424274821905
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tmp_dmg_skill_10
+      rect:
+        serializedVersion: 2
+        x: 363
+        y: 98
+        width: 64
+        height: 84
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a2bb296c5a3651740800000000000000
+      internalID: 5122109714856065834
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tmp_dmg_skill_11
+      rect:
+        serializedVersion: 2
+        x: 437
+        y: 98
+        width: 62
+        height: 82
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9b0fad22c2fee5180800000000000000
+      internalID: -9124592822163672903
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tmp_dmg_skill_12
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 4
+        width: 83
+        height: 81
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 00f5343a8b0089c40800000000000000
+      internalID: 5519162136355626752
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tmp_dmg_skill_13
+      rect:
+        serializedVersion: 2
+        x: 109
+        y: 6
+        width: 87
+        height: 82
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b22093f51aad9f3b0800000000000000
+      internalID: -5478107085097336277
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tmp_dmg_skill_14
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 5
+        width: 69
+        height: 82
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d9263648c5be26f50800000000000000
+      internalID: 6873314763911422621
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tmp_dmg_skill_15
+      rect:
+        serializedVersion: 2
+        x: 285
+        y: 5
+        width: 68
+        height: 84
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 46da1fa7e5b250ed0800000000000000
+      internalID: -2448503137616417436
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tmp_dmg_skill_16
+      rect:
+        serializedVersion: 2
+        x: 363
+        y: 5
+        width: 66
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9f887d7b94c48ffc0800000000000000
+      internalID: -3460932434133546759
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: tmp_dmg_skill_17
+      rect:
+        serializedVersion: 2
+        x: 440
+        y: 5
+        width: 64
+        height: 83
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3012a9c8eac85e590800000000000000
+      internalID: -7645550111080439549
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      tmp_dmg_skill_0: -8694461099961553290
+      tmp_dmg_skill_1: -18708488885095819
+      tmp_dmg_skill_10: 5122109714856065834
+      tmp_dmg_skill_11: -9124592822163672903
+      tmp_dmg_skill_12: 5519162136355626752
+      tmp_dmg_skill_13: -5478107085097336277
+      tmp_dmg_skill_14: 6873314763911422621
+      tmp_dmg_skill_15: -2448503137616417436
+      tmp_dmg_skill_16: -3460932434133546759
+      tmp_dmg_skill_17: -7645550111080439549
+      tmp_dmg_skill_2: 4700291504612471673
+      tmp_dmg_skill_3: 9099862670857453795
+      tmp_dmg_skill_4: -6781004258536935424
+      tmp_dmg_skill_5: 2663565651914108043
+      tmp_dmg_skill_6: -4679317452734103198
+      tmp_dmg_skill_7: 1169181457493104337
+      tmp_dmg_skill_8: -5688111680400805079
+      tmp_dmg_skill_9: -8698646424274821905
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
