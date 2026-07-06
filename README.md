@@ -1,6 +1,6 @@
 # GameFoundation for Unity
 
-Thư viện nền dùng chung cho các Unity project: helper, manager, pattern, save/load, security utilities và wrapper SDK. Mục tiêu là copy sang dự án mới nhanh, bật SDK bằng define khi cần, và vẫn compile được khi SDK chưa import.
+Thư viện nền dùng chung cho các Unity project: helper, manager, pattern, save/load, security utilities và wrapper SDK. Package hỗ trợ cài đặt qua Unity Package Manager bằng Git URL, bật SDK bằng define khi cần, và vẫn compile được khi SDK chưa import.
 
 ## Cấu Trúc
 
@@ -17,7 +17,7 @@ Thư viện nền dùng chung cho các Unity project: helper, manager, pattern, 
 | `Samples~` | Scene và code mẫu, không thuộc runtime production. |
 
 ```text
-Assets/GameFoundation
+Packages/com.dann.gamefoundation
 |-- Runtime
 |   |-- Core
 |   |   |-- Diagnostics
@@ -92,11 +92,47 @@ Quy tắc dependency mong muốn:
 
 ## Cài Đặt
 
-1. Copy nguyên folder `Assets/GameFoundation` sang project Unity mới.
-2. Không cần copy `.meta` trong `Assets/GameFoundation`; để Unity của từng project tự sinh GUID riêng khi import.
-3. Mở Unity và đợi reimport xong.
-4. Tạo scene bootstrap theo mục [Tạo Scene Mới](#tạo-scene-mới).
-5. Chỉ bật define cho SDK đã import thật sự.
+### Qua Package Manager
+
+1. Mở `Window > Package Manager`.
+2. Chọn nút `+` rồi chọn `Add package from git URL...`.
+3. Nhập:
+
+```text
+https://github.com/PocketPlay-Interactive/_GameFoundation.git
+```
+
+Có thể thêm trực tiếp vào `Packages/manifest.json`:
+
+```json
+{
+  "dependencies": {
+    "com.dann.gamefoundation": "https://github.com/PocketPlay-Interactive/_GameFoundation.git"
+  }
+}
+```
+
+Nên khóa theo tag khi dùng trong production:
+
+```text
+https://github.com/PocketPlay-Interactive/_GameFoundation.git#v1.0.0
+```
+
+Sau khi Unity resolve package, chọn Game Foundation trong Package Manager để import nội dung ở mục Samples. Giữ toàn bộ `.meta` của package trong Git để GUID asset ổn định.
+
+### Qua Local Package
+
+Trong Package Manager, chọn `Add package from disk...` rồi chọn file `package.json` ở root repository.
+
+Sau khi cài đặt:
+
+1. Tạo scene bootstrap theo mục [Tạo Scene Mới](#tạo-scene-mới).
+2. Chỉ bật define cho SDK đã import thật sự.
+
+Package Manager tự resolve các dependency bắt buộc gồm Input System, TextMesh Pro,
+UGUI và các Unity built-in module được runtime sử dụng. Firebase, Google Mobile
+Ads, AppsFlyer, Unity IAP và JKit vẫn là integration tùy chọn; chỉ bật define
+tương ứng sau khi SDK đó đã được cài.
 
 ## Tạo Scene Mới
 
@@ -431,7 +467,7 @@ Quy tắc:
 - Source vendor không chỉnh sửa đặt trong `GameFoundation/ThirdParty`.
 - Public API mà gameplay gọi nên có fallback/no-op khi define tắt.
 - Config của từng game như ad unit id, product id, economy, level, remote flag nên nằm trong ScriptableObject hoặc folder `_Project`, không hard-code vào foundation.
-- Không commit `.meta` trong `Assets/GameFoundation` nếu folder này được dùng như source shared giữa nhiều project.
+- Khi phân phối qua UPM, phải commit toàn bộ `.meta` để giữ GUID asset ổn định.
 
 ## Scripting Define Symbols
 
@@ -542,7 +578,6 @@ bool hasInventory = RuntimeStorageExtention.Has("project.inventory");
 
 Yêu cầu:
 
-- Project đã import `Cysharp.Threading.Tasks` (UniTask).
 - `RuntimeStorageData.ReadData()` đã chạy. Trong scene bootstrap mặc định, `Manager.Awake()` thực hiện bước này.
 - Thiết bị cần network để lấy thời gian mới. Khi request lỗi, service dùng thời gian cache; nếu chưa có cache hợp lệ thì dùng `DateTime.UtcNow` của thiết bị.
 
@@ -550,17 +585,12 @@ Cách dùng:
 
 ```csharp
 using System;
-using Cysharp.Threading.Tasks;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class DailyRewardController : MonoBehaviour
 {
-    private void Start()
-    {
-        LoadNetworkTimeAsync().Forget();
-    }
-
-    private async UniTask LoadNetworkTimeAsync()
+    private async void Start()
     {
         DateTime localTime = await NetworkTime.GetTimeAsync();
         Debug.Log($"Current local time: {localTime:o}");
@@ -733,6 +763,9 @@ bool valid = MemoryChecksum.VerifyChecksum(value, checksum);
 ## ThirdParty
 
 Source nguyên bản của DOTween và NiceVibrations nằm trong `ThirdParty`. Không đặt code GameFoundation hoặc code project vào đây; khi update vendor nên thay nguyên package và kiểm tra lại integration tương ứng.
+
+Các thành phần trong `ThirdParty` giữ license và điều khoản phân phối riêng. Xem
+`Third Party Notices.md` trước khi public hoặc phân phối repository cho bên khác.
 
 Editor tool nằm trong `Editor`, tách khỏi runtime build. Scene/code demo của inspector helper nằm trong `Samples~`.
 

@@ -1,6 +1,6 @@
 using System;
 using System.Globalization;
-using Cysharp.Threading.Tasks;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -30,7 +30,7 @@ public static class NetworkTime
         try
         {
             using var request = UnityWebRequest.Get(TimeAPI);
-            await request.SendWebRequest();
+            await SendWebRequestAsync(request);
 
             if (request.result != UnityWebRequest.Result.Success)
             {
@@ -68,12 +68,12 @@ public static class NetworkTime
         }
     }
 
-    public static async UniTask<DateTime> GetTimeAsync()
+    public static async Task<DateTime> GetTimeAsync()
     {
         try
         {
             using var request = UnityWebRequest.Get(TimeAPI);
-            await request.SendWebRequest();
+            await SendWebRequestAsync(request);
 
             if (request.result != UnityWebRequest.Result.Success)
                 throw new Exception(
@@ -167,5 +167,13 @@ public static class NetworkTime
         return DateTime.SpecifyKind(
             normalizedUtcTime + gmtOffset,
             DateTimeKind.Unspecified);
+    }
+
+    private static Task SendWebRequestAsync(UnityWebRequest request)
+    {
+        var completionSource = new TaskCompletionSource<bool>();
+        UnityWebRequestAsyncOperation operation = request.SendWebRequest();
+        operation.completed += _ => completionSource.TrySetResult(true);
+        return completionSource.Task;
     }
 }

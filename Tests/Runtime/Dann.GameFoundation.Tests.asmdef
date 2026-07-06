@@ -1,0 +1,21 @@
+{
+  "name": "Dann.GameFoundation.Tests",
+  "rootNamespace": "Dann.GameFoundation.Tests",
+  "references": [
+    "Dann.GameFoundation"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [
+    "UNITY_INCLUDE_TESTS"
+  ],
+  "versionDefines": [],
+  "noEngineReferences": false,
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}
