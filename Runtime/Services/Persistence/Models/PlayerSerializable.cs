@@ -6,6 +6,7 @@ using UnityEngine;
 public class PlayerSerializable
 {
     // Mã hoá PlayerId
+    [SerializeField]
     private string playerIdObfuscated;
     public string PlayerId
     {
@@ -14,6 +15,7 @@ public class PlayerSerializable
     }
 
     // Mã hoá SelectedLanguage
+    [SerializeField]
     private string selectedLanguageObfuscated;
     public string SelectedLanguage
     {
@@ -22,6 +24,7 @@ public class PlayerSerializable
     }
 
     // Mã hoá OwnedProductIds (List<string>)
+    [SerializeField]
     private List<string> ownedProductIdsObfuscated = new List<string>();
     public List<string> OwnedProductIds
     {
@@ -45,7 +48,9 @@ public class PlayerSerializable
     }
 
     // GoldBalance
+    [SerializeField]
     private int goldBalanceObfuscated;
+    [SerializeField]
     private int goldBalanceChecksum;
     public int GoldBalance
     {
@@ -65,7 +70,9 @@ public class PlayerSerializable
     }
 
     // LastLoginDayOfMonth
+    [SerializeField]
     private int lastLoginDayOfMonthObfuscated;
+    [SerializeField]
     private int lastLoginDayOfMonthChecksum;
     public int LastLoginDayOfMonth
     {
@@ -85,7 +92,9 @@ public class PlayerSerializable
     }
 
     // LoginDayCount
+    [SerializeField]
     private int loginDayCountObfuscated;
+    [SerializeField]
     private int loginDayCountChecksum;
     public int LoginDayCount
     {
@@ -105,7 +114,9 @@ public class PlayerSerializable
     }
 
     // IsInitialLaunch
+    [SerializeField]
     private int isInitialLaunchObfuscated;
+    [SerializeField]
     private int isInitialLaunchChecksum;
     public bool IsInitialLaunch
     {
@@ -126,7 +137,9 @@ public class PlayerSerializable
     }
 
     // CurrentLevelIndex
+    [SerializeField]
     private int currentLevelIndexObfuscated;
+    [SerializeField]
     private int currentLevelIndexChecksum;
     public int CurrentLevelIndex
     {
