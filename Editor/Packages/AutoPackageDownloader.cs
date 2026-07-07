@@ -32,62 +32,62 @@ public static class AutoPackageDownloader
         EditorApplication.update += CheckAndInstall;
     }
 
-    [MenuItem("Packages/Download Git GameFoundation")]
-    public static void DownloadGameFoundationFromGit()
-    {
-        Dictionary<string, byte[]> localMetaFiles = null;
-        bool stashedMetaChanges = false;
+    // [MenuItem("Packages/Download Git GameFoundation")]
+    // public static void DownloadGameFoundationFromGit()
+    // {
+    //     Dictionary<string, byte[]> localMetaFiles = null;
+    //     bool stashedMetaChanges = false;
 
-        try
-        {
-            string targetPath = Path.Combine(Directory.GetCurrentDirectory(), GameFoundationAssetPath);
-            localMetaFiles = BackupLocalMetaFiles(targetPath);
+    //     try
+    //     {
+    //         string targetPath = Path.Combine(Directory.GetCurrentDirectory(), GameFoundationAssetPath);
+    //         localMetaFiles = BackupLocalMetaFiles(targetPath);
 
-            if (Directory.Exists(targetPath))
-            {
-                if (!Directory.Exists(Path.Combine(targetPath, ".git")))
-                {
-                    if (!EditorUtility.DisplayDialog(
-                            "Replace GameFoundation",
-                            "Assets/GameFoundation exists but is not a git repository. Replace it with the latest version cloned from git?",
-                            "Replace",
-                            "Cancel"))
-                    {
-                        Debug.Log("[AutoPackageDownloader] GameFoundation update canceled.");
-                        return;
-                    }
+    //         if (Directory.Exists(targetPath))
+    //         {
+    //             if (!Directory.Exists(Path.Combine(targetPath, ".git")))
+    //             {
+    //                 if (!EditorUtility.DisplayDialog(
+    //                         "Replace GameFoundation",
+    //                         "Assets/GameFoundation exists but is not a git repository. Replace it with the latest version cloned from git?",
+    //                         "Replace",
+    //                         "Cancel"))
+    //                 {
+    //                     Debug.Log("[AutoPackageDownloader] GameFoundation update canceled.");
+    //                     return;
+    //                 }
 
-                    CloneGameFoundation(targetPath, true);
-                }
-                else
-                {
-                    Debug.Log("[AutoPackageDownloader] Pulling latest GameFoundation from git...");
-                    stashedMetaChanges = StashLocalMetaChanges(targetPath);
-                    RunGitCommand("pull --ff-only", targetPath);
-                }
-            }
-            else
-            {
-                CloneGameFoundation(targetPath, false);
-            }
+    //                 CloneGameFoundation(targetPath, true);
+    //             }
+    //             else
+    //             {
+    //                 Debug.Log("[AutoPackageDownloader] Pulling latest GameFoundation from git...");
+    //                 stashedMetaChanges = StashLocalMetaChanges(targetPath);
+    //                 RunGitCommand("pull --ff-only", targetPath);
+    //             }
+    //         }
+    //         else
+    //         {
+    //             CloneGameFoundation(targetPath, false);
+    //         }
 
-            RestoreLocalMetaFiles(localMetaFiles);
-            DropStashedMetaChanges(targetPath, stashedMetaChanges);
-            stashedMetaChanges = false;
+    //         RestoreLocalMetaFiles(localMetaFiles);
+    //         DropStashedMetaChanges(targetPath, stashedMetaChanges);
+    //         stashedMetaChanges = false;
 
-            AssetDatabase.Refresh();
-            Debug.Log("[AutoPackageDownloader] GameFoundation is up to date.");
-        }
-        catch (System.Exception ex)
-        {
-            RestoreLocalMetaFiles(localMetaFiles);
+    //         AssetDatabase.Refresh();
+    //         Debug.Log("[AutoPackageDownloader] GameFoundation is up to date.");
+    //     }
+    //     catch (System.Exception ex)
+    //     {
+    //         RestoreLocalMetaFiles(localMetaFiles);
 
-            string targetPath = Path.Combine(Directory.GetCurrentDirectory(), GameFoundationAssetPath);
-            DropStashedMetaChanges(targetPath, stashedMetaChanges);
+    //         string targetPath = Path.Combine(Directory.GetCurrentDirectory(), GameFoundationAssetPath);
+    //         DropStashedMetaChanges(targetPath, stashedMetaChanges);
 
-            Debug.LogError("[AutoPackageDownloader] Failed to update GameFoundation: " + ex.Message);
-        }
-    }
+    //         Debug.LogError("[AutoPackageDownloader] Failed to update GameFoundation: " + ex.Message);
+    //     }
+    // }
 
     private static Dictionary<string, byte[]> BackupLocalMetaFiles(string targetPath)
     {
