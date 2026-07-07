@@ -196,8 +196,8 @@ public partial class AdManager : SingletonGlobal<AdManager>
         CaculaterCounterCollapseAd();
     }
 
-    void OnEnable() => GameEvent.OnIAPurchase += HandleIAPurchase;
-    void OnDisable() => GameEvent.OnIAPurchase -= HandleIAPurchase;
+    void OnEnable() => GameEvent.PurchaseCompleted += HandleIAPurchase;
+    void OnDisable() => GameEvent.PurchaseCompleted -= HandleIAPurchase;
 
     private void HandleIAPurchase(string productId)
     {

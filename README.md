@@ -10,7 +10,8 @@ Thư viện nền dùng chung cho các Unity project: helper, manager, pattern, 
 | `Runtime/Services` | Capability dùng chung cấp ứng dụng: persistence, audio, asset loading, pooling và network time. |
 | `Runtime/Features` | Feature Unity tùy chọn: UI, interaction, pathfinding, combat text và common behaviour. |
 | `Runtime/Bootstrap` | Composition root và loading flow của `Manager`. |
-| `Runtime/Integrations` | Adapter SDK/native API: ads, analytics, IAP, haptics và device API. |
+| `Advertising` | AdMob và native ad adapter, được compile vào runtime assembly qua asmref. |
+| `Runtime/Integrations` | Adapter SDK/native API: analytics, IAP, haptics và device API. |
 | `Runtime/Security` | Integrity, obfuscation và compatibility với save encryption cũ. |
 | `Editor` | Build tool, importer, inspector và data tool chỉ chạy trong Unity Editor. |
 | `ThirdParty` | Source vendor giữ tách biệt khỏi code GameFoundation. |
@@ -43,7 +44,6 @@ Packages/com.dann.gamefoundation
 |   |-- Bootstrap
 |   |-- Configuration
 |   |-- Integrations
-|   |   |-- Advertising
 |   |   |-- Analytics
 |   |   |-- Device
 |   |   |-- Haptics
@@ -52,6 +52,9 @@ Packages/com.dann.gamefoundation
 |       |-- Integrity
 |       |-- Legacy
 |       `-- Obfuscation
+|-- Advertising
+|   |-- GoogleMobileAds
+|   `-- JKit
 |-- Editor
 |-- ThirdParty
 |   |-- DOTween
@@ -649,12 +652,12 @@ public class MyRaycastHandler : MonoBehaviour, IRaycastEventsListener
 
 ## Integrations
 
-Adapter SDK và native API nằm trong `Runtime/Integrations`:
+Adapter SDK và native API nằm trong `Runtime/Integrations`, riêng advertising được tách ra folder `Advertising` ở package root:
 
 | Folder | Provider/chức năng |
 | --- | --- |
-| `Advertising/GoogleMobileAds` | AdMob và support component dùng Google Mobile Ads. |
-| `Advertising/JKit` | Native/collapse ad adapter dùng JKit. |
+| `/Advertising/GoogleMobileAds` | AdMob và support component dùng Google Mobile Ads. |
+| `/Advertising/JKit` | Native/collapse ad adapter dùng JKit. |
 | `Analytics/Firebase` | Firebase initialization và analytics. |
 | `Analytics/AppsFlyer` | AppsFlyer và ad revenue forwarding. |
 | `Purchasing/UnityIAP` | Unity In-App Purchasing. |
