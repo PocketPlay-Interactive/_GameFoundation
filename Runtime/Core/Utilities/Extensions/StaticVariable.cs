@@ -367,19 +367,6 @@ public static class StaticVariable
         return values[idx];
     }
 
-    /// <summary>
-    /// In-place Fisher-Yates shuffle.
-    /// </summary>
-    public static void Shuffle<T>(this IList<T> ts)
-    {
-        int count = ts.Count;
-        for (int i = 0; i < count - 1; ++i)
-        {
-            int r = UnityEngine.Random.Range(i, count);
-            (ts[i], ts[r]) = (ts[r], ts[i]);
-        }
-    }
-
     // --- Array helpers (kept API, reduced allocations where sensible) ---
     public static T[] Append<T>(this T[] array, T item)
     {
