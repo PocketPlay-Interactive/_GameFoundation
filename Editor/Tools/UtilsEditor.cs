@@ -3,7 +3,7 @@ using UnityEditor;
 
 public static class UtilsEditor
 {
-    [MenuItem("Utils/Repair Missing Scripts")]
+    [MenuItem("GameFoundation/Utils/Repair Missing Scripts")]
     public static void RemoveAllMissingScriptsInSelection()
     {
         int go_count = 0, components_count = 0, missing_count = 0;

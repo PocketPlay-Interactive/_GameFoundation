@@ -32,7 +32,7 @@ public class CameraToPNGEditor : EditorWindow
     private string lastSavedPath;
     private Vector2 scrollPosition;
 
-    [MenuItem("Tools/Capture/Camera to PNG")]
+    [MenuItem("GameFoundation/Tools/Capture/Camera to PNG")]
     public static void ShowWindow()
     {
         CameraToPNGEditor window = GetWindow<CameraToPNGEditor>();

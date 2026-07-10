@@ -13,7 +13,7 @@ public class PNGResizerTool : EditorWindow
     private bool trimTransparentPixels;
     private Vector2 scrollPosition;
 
-    [MenuItem("Utils/PNG Resizer")]
+    [MenuItem("GameFoundation/Utils/PNG Resizer")]
     public static void ShowWindow()
     {
         PNGResizerTool window = GetWindow<PNGResizerTool>("PNG Resizer");
