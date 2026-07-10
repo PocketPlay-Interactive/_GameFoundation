@@ -1,9 +1,10 @@
 {
   "name": "com.dann.gamefoundation",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "displayName": "Game Foundation",
   "description": "Shared foundation library for Unity projects, including helpers, managers, patterns, save/load, security utilities, SDK wrappers, optional features, and editor tools.",
   "unity": "2022.3",
+  "hideInEditor": false,
   "documentationUrl": "https://github.com/PocketPlay-Interactive/_GameFoundation/blob/main/README.md",
   "changelogUrl": "https://github.com/PocketPlay-Interactive/_GameFoundation/blob/main/CHANGELOG.md",
   "licensesUrl": "https://github.com/PocketPlay-Interactive/_GameFoundation/blob/main/LICENSE.md",
@@ -39,7 +40,7 @@
     {
       "displayName": "Game Foundation Samples",
       "description": "Sample scenes and code for using Game Foundation.",
-      "path": "Samples~"
+      "path": "Samples"
     }
   ]
 }
