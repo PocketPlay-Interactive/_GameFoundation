@@ -1,9 +1,9 @@
 # Game Foundation Documentation
 
 - [Package overview and installation](../README.md)
+- [Quick start](quick-start.md)
+- [SDK defines](sdk-defines.md)
+- [Samples guide](samples.md)
 - [Changelog](../CHANGELOG.md)
 - [License](../LICENSE.md)
-- [Third-party notices](../Third%20Party%20Notices.md)
-
-No PDF documentation was present in the repository when this package layout
-was prepared.
+- [Library notices](../Library%20Notices.md)

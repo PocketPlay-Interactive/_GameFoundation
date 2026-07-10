@@ -14,7 +14,7 @@ public class GameFoundationDefineSymbolsWindow : EditorWindow
         new DefineOption("FIREBASE", "Firebase Analytics"),
         new DefineOption("ADMOB", "Google Mobile Ads"),
         new DefineOption("ADMOB_TEST", "Google test ad unit id"),
-        new DefineOption("ADMOB_UMP_BACON", "Bacon UMP consent flow"),
+        new DefineOption("ADMOB_UMP_OMNI", "Omni UMP consent flow"),
         new DefineOption("USE_ADMOB_CUSTOM_PLUGIN", "Native ads/JKit plugin"),
         new DefineOption("APPFLYER", "AppsFlyer SDK"),
         new DefineOption("IAPPURCHASE_ENABLE", "Unity IAP"),
@@ -161,7 +161,7 @@ public class GameFoundationDefineSymbolsWindow : EditorWindow
             .Where(pair => pair.Value)
             .Select(pair => pair.Key)
             .Where(define => !string.IsNullOrWhiteSpace(define))
-            .Select(TrimDefine)
+            .Select(NormalizeDefine)
             .Distinct()
             .OrderBy(define => define)
             .ToArray();
@@ -182,6 +182,12 @@ public class GameFoundationDefineSymbolsWindow : EditorWindow
         return define.Trim();
     }
 
+    private static string NormalizeDefine(string define)
+    {
+        define = TrimDefine(define);
+        return define == "ADMOB_UMP_BACON" ? "ADMOB_UMP_OMNI" : define;
+    }
+
     private static string[] GetCurrentDefines()
     {
         string rawDefines = GetCurrentDefineString();
@@ -191,7 +197,7 @@ public class GameFoundationDefineSymbolsWindow : EditorWindow
 
         return rawDefines
             .Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
-            .Select(TrimDefine)
+            .Select(NormalizeDefine)
             .Where(define => !string.IsNullOrWhiteSpace(define))
             .Distinct()
             .OrderBy(define => define)

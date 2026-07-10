@@ -11,11 +11,12 @@ Thư viện nền dùng chung cho các Unity project: helper, manager, pattern, 
 | `Runtime/Features` | Feature Unity tùy chọn: UI, interaction, pathfinding, combat text và common behaviour. |
 | `Runtime/Bootstrap` | Composition root và loading flow của `Manager`. |
 | `Advertising` | AdMob và native ad adapter, được compile vào runtime assembly qua asmref. |
-| `Runtime/Integrations` | Adapter SDK/native API: analytics, IAP, haptics và device API. |
+| `Analytics` | Firebase và AppsFlyer analytics adapter, đặt ở package root. |
+| `Runtime/Integrations` | Adapter SDK/native API: IAP, haptics và device API. |
 | `Runtime/Security` | Integrity, obfuscation và compatibility với save encryption cũ. |
 | `Editor` | Build tool, importer, inspector và data tool chỉ chạy trong Unity Editor. |
-| `ThirdParty` | Source vendor giữ tách biệt khỏi code GameFoundation. |
-| `Samples~` | Scene và code mẫu, không thuộc runtime production. |
+| `Libraries` | Source vendor giữ tách biệt khỏi code GameFoundation. |
+| `Samples` | Scene và code mẫu, không thuộc runtime production. |
 
 ```text
 Packages/com.dann.gamefoundation
@@ -44,7 +45,6 @@ Packages/com.dann.gamefoundation
 |   |-- Bootstrap
 |   |-- Configuration
 |   |-- Integrations
-|   |   |-- Analytics
 |   |   |-- Device
 |   |   |-- Haptics
 |   |   `-- Purchasing
@@ -55,11 +55,14 @@ Packages/com.dann.gamefoundation
 |-- Advertising
 |   |-- GoogleMobileAds
 |   `-- JKit
+|-- Analytics
+|   |-- AppsFlyer
+|   `-- Firebases
 |-- Editor
-|-- ThirdParty
+|-- Libraries
 |   |-- DOTween
 |   `-- NiceVibrations
-`-- Samples~
+`-- Samples
 ```
 
 Không đổi tên file, class hoặc public API trong đợt tổ chức folder này. Code cũ tiếp tục gọi API bằng tên hiện có.
@@ -217,7 +220,7 @@ Trên object có script `Manager`:
 | AdMob | `AdManager` | `AdManager`, `AdmobInterstitalOpen`, `AdMobInterstital` và support component cần thiết | `ADMOB` |
 | AdMob test id | `AdManager` | `AdManager` | `ADMOB;ADMOB_TEST` |
 | Native ads/JKit | `AdManager` | `AdManager`, `AdmobNativeCollap`, `AdMobNativeInterstital` | `ADMOB;USE_ADMOB_CUSTOM_PLUGIN` |
-| Bacon UMP consent flow | Bật qua `Manager` | SDK/script `Bacon.UMP` phải tồn tại trong project | `ADMOB;ADMOB_UMP_BACON` |
+| Omni UMP consent flow | Bật qua `Manager` | SDK/script `Omni.UMP` phải tồn tại trong project | `ADMOB;ADMOB_UMP_OMNI` |
 | AppsFlyer | `AppflyerEventTracking` | `AppflyerEventTracking` | `APPFLYER` |
 | IAP | Không cần scene object | Gọi qua `InappPurchase.I` | `IAPPURCHASE_ENABLE` |
 | Audio dùng chung | `SoundManager`, `MusicManager` | `SoundManager`, `MusicManager` | Không cần |
@@ -466,8 +469,8 @@ Quy tắc:
 - Capability cấp ứng dụng đặt trong `GameFoundation/Runtime/Services`.
 - Component gameplay/UI tùy chọn đặt trong `GameFoundation/Runtime/Features`.
 - Thứ nào chỉ của một game đặt trong `Assets/_Project/GameFoundationExtensions`.
-- Adapter SDK/native API đặt trong `GameFoundation/Runtime/Integrations` và bọc bằng define.
-- Source vendor không chỉnh sửa đặt trong `GameFoundation/ThirdParty`.
+- Analytics adapter đặt trong `GameFoundation/Analytics`; SDK/native API còn lại đặt trong `GameFoundation/Runtime/Integrations` và bọc bằng define.
+- Source vendor không chỉnh sửa đặt trong `GameFoundation/Libraries`.
 - Public API mà gameplay gọi nên có fallback/no-op khi define tắt.
 - Config của từng game như ad unit id, product id, economy, level, remote flag nên nằm trong ScriptableObject hoặc folder `_Project`, không hard-code vào foundation.
 - Khi phân phối qua UPM, phải commit toàn bộ `.meta` để giữ GUID asset ổn định.
@@ -489,7 +492,7 @@ Nếu muốn chỉnh tay, vào `Project Settings > Player > Other Settings > Scr
 | `FIREBASE` | Đã import Firebase Unity SDK. |
 | `ADMOB` | Đã import Google Mobile Ads SDK. |
 | `ADMOB_TEST` | Muốn dùng test ad unit id của Google. |
-| `ADMOB_UMP_BACON` | Đã import flow UMP có API `Bacon.UMP`. |
+| `ADMOB_UMP_OMNI` | Đã import flow UMP có API `Omni.UMP`. |
 | `USE_ADMOB_CUSTOM_PLUGIN` | Đã import plugin native ads/JKit. |
 | `APPFLYER` | Đã import AppsFlyer SDK. |
 | `IAPPURCHASE_ENABLE` | Đã import Unity IAP. |
@@ -652,16 +655,16 @@ public class MyRaycastHandler : MonoBehaviour, IRaycastEventsListener
 
 ## Integrations
 
-Adapter SDK và native API nằm trong `Runtime/Integrations`, riêng advertising được tách ra folder `Advertising` ở package root:
+Analytics và advertising nằm ở package root; SDK/native API còn lại nằm trong `Runtime/Integrations`:
 
 | Folder | Provider/chức năng |
 | --- | --- |
 | `/Advertising/GoogleMobileAds` | AdMob và support component dùng Google Mobile Ads. |
 | `/Advertising/JKit` | Native/collapse ad adapter dùng JKit. |
-| `Analytics/Firebase` | Firebase initialization và analytics. |
+| `Analytics/Firebases` | Firebase initialization và analytics. |
 | `Analytics/AppsFlyer` | AppsFlyer và ad revenue forwarding. |
-| `Purchasing/UnityIAP` | Unity In-App Purchasing. |
-| `Device/Torch` | Android/iOS torch native bridge. |
+| `Runtime/Integrations/Purchasing/UnityIAP` | Unity In-App Purchasing. |
+| `Runtime/Integrations/Device/Torch` | Android/iOS torch native bridge. |
 | `Haptics` | Facade gọi haptic provider. |
 
 ### Firebase
@@ -763,14 +766,14 @@ bool valid = MemoryChecksum.VerifyChecksum(value, checksum);
 
 `MemoryChecksum` dùng device-bound HMAC cho value mới và vẫn chấp nhận legacy checksum khi đọc save cũ.
 
-## ThirdParty
+## Libraries
 
-Source nguyên bản của DOTween và NiceVibrations nằm trong `ThirdParty`. Không đặt code GameFoundation hoặc code project vào đây; khi update vendor nên thay nguyên package và kiểm tra lại integration tương ứng.
+Source nguyên bản của DOTween và NiceVibrations nằm trong `Libraries`. Không đặt code GameFoundation hoặc code project vào đây; khi update vendor nên thay nguyên package và kiểm tra lại integration tương ứng.
 
-Các thành phần trong `ThirdParty` giữ license và điều khoản phân phối riêng. Xem
-`Third Party Notices.md` trước khi public hoặc phân phối repository cho bên khác.
+Các thành phần trong `Libraries` giữ license và điều khoản phân phối riêng. Xem
+`Library Notices.md` trước khi public hoặc phân phối repository cho bên khác.
 
-Editor tool nằm trong `Editor`, tách khỏi runtime build. Scene/code demo của inspector helper nằm trong `Samples~`.
+Editor tool nằm trong `Editor`, tách khỏi runtime build. Scene/code demo của inspector helper nằm trong `Samples`.
 
 ## Kiểm Tra Sau Khi Import
 
@@ -787,9 +790,9 @@ Editor tool nằm trong `Editor`, tách khỏi runtime build. Scene/code demo c�
 
 Tắt define tương ứng hoặc import đúng SDK trước khi bật define.
 
-### Lỗi `Bacon` không tồn tại khi bật AdMob
+### Lỗi `Omni` không tồn tại khi bật AdMob
 
-Chỉ bật `ADMOB_UMP_BACON` khi project đã có SDK/script cung cấp `Bacon.UMP`. Nếu chỉ dùng Google Mobile Ads cơ bản, bật `ADMOB` là đủ.
+Chỉ bật `ADMOB_UMP_OMNI` khi project đã có SDK/script cung cấp `Omni.UMP`. Nếu chỉ dùng Google Mobile Ads cơ bản, bật `ADMOB` là đủ.
 
 ### Gameplay không tiếp tục sau ads
 

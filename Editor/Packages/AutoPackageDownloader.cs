@@ -11,6 +11,7 @@ public static class AutoPackageDownloader
 {
     private const string GameFoundationRepositoryUrlPrefsKey = "AutoPackageDownloader.GameFoundationRepositoryUrl";
     private const string GameFoundationAssetPath = "Assets/GameFoundation";
+    private const string DefaultGameFoundationRepositoryUrl = "https://github.com/PocketPlay-Interactive/_GameFoundation.git";
 
     // Danh sach cac package can tai.
     private static readonly string[] PackagesToInstall =
@@ -30,6 +31,21 @@ public static class AutoPackageDownloader
         Debug.Log("[AutoPackageDownloader] Checking installed packages...");
         _currentListRequest = Client.List(true);
         EditorApplication.update += CheckAndInstall;
+    }
+
+    [MenuItem("Packages/Upgrade GameFoundation")]
+    public static void UpgradeGameFoundation()
+    {
+        string repositoryUrl = EditorPrefs.GetString(
+            GameFoundationRepositoryUrlPrefsKey,
+            DefaultGameFoundationRepositoryUrl);
+
+        if (string.IsNullOrWhiteSpace(repositoryUrl))
+            repositoryUrl = DefaultGameFoundationRepositoryUrl;
+
+        Debug.Log("[AutoPackageDownloader] Upgrading GameFoundation: " + repositoryUrl);
+        _currentRequest = Client.Add(repositoryUrl);
+        EditorApplication.update += Progress;
     }
 
     // [MenuItem("Packages/Download Git GameFoundation")]
@@ -210,6 +226,7 @@ public static class AutoPackageDownloader
         if (_installQueue.Count == 0)
         {
             Debug.Log("[AutoPackageDownloader] All selected packages installed.");
+            _installQueue = null;
             return;
         }
 
@@ -230,7 +247,8 @@ public static class AutoPackageDownloader
             Debug.LogError($"[AutoPackageDownloader] Failed to install: {_currentRequest.Error.message}");
 
         EditorApplication.update -= Progress;
-        InstallNext();
+        if (_installQueue != null)
+            InstallNext();
     }
 
     private static string RunGitCommand(string arguments, string workingDirectory = null)

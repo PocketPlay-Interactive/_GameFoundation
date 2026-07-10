@@ -21,4 +21,4 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 This license applies only to the original Game Foundation code. Components
-under ThirdParty remain subject to their respective licenses and notices.
+under Libraries remain subject to their respective licenses and notices.

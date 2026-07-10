@@ -71,9 +71,9 @@ public class Manager : SingletonGlobal<Manager>
 #endif
 #if ADMOB
         yield return null;
-#if ADMOB_UMP_BACON
+#if ADMOB_UMP_OMNI
         bool umpCompleted = false;
-        yield return Bacon.UMP.Instance.DOGatherConsent(() => umpCompleted = true);
+        yield return Omni.UMP.Instance.DOGatherConsent(() => umpCompleted = true);
         yield return new WaitUntil(() => umpCompleted);
         FirebaseManager.I?.LogUMP("initialized_consent");
 #else
