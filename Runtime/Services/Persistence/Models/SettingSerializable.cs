@@ -37,6 +37,12 @@ public class SettingSerializable
     public void Set<T>(string key, T value)
     {
         EnsureLists();
+        if (typeof(T) == typeof(string))
+        {
+            SetObject(key, (object)value as string);
+            return;
+        }
+
         if (value is bool boolValue)
         {
             Set(key, boolValue);
@@ -44,16 +50,7 @@ public class SettingSerializable
         }
 
         key = key.ToLower();
-        string json = JsonUtility.ToJson(new ValueBox<T> { value = value });
-        int index = objectKeys.IndexOf(key);
-
-        if (index >= 0)
-            objectValues[index] = json;
-        else
-        {
-            objectKeys.Add(key);
-            objectValues.Add(json);
-        }
+        SetObject(key, JsonUtility.ToJson(new ValueBox<T> { value = value }));
     }
 
     public bool Get(string key, bool defaultValue = false)
@@ -82,7 +79,11 @@ public class SettingSerializable
 
         try
         {
-            return JsonUtility.FromJson<ValueBox<T>>(objectValues[index]).value;
+            string json = objectValues[index];
+            if (json.Contains("\"value\""))
+                return JsonUtility.FromJson<ValueBox<T>>(json).value;
+
+            return JsonUtility.FromJson<T>(json);
         }
         catch
         {
@@ -124,6 +125,20 @@ public class SettingSerializable
         key = key.ToLower();
         if (!keys.Contains(key))
             Set(key, value);
+    }
+
+    private void SetObject(string key, string value)
+    {
+        key = key.ToLower();
+        int index = objectKeys.IndexOf(key);
+
+        if (index >= 0)
+            objectValues[index] = value;
+        else
+        {
+            objectKeys.Add(key);
+            objectValues.Add(value);
+        }
     }
 
     private void EnsureLists()

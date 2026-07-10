@@ -204,34 +204,7 @@ public static class RuntimeStorageExtention
 
     public static T Load<T>(string key) where T : new()
     {
-        System.Type type = typeof(T);
-
-        if (type == typeof(string))
-            return (T)(object)RuntimeStorageData.PLAYER.ExtensionData.Get(key);
-
-        if (type == typeof(int))
-            return (T)(object)RuntimeStorageData.PLAYER.ExtensionData.GetInt(key);
-
-        if (type == typeof(float))
-            return (T)(object)RuntimeStorageData.PLAYER.ExtensionData.GetFloat(key);
-
-        if (type == typeof(bool))
-            return (T)(object)RuntimeStorageData.PLAYER.ExtensionData.GetBool(key);
-
-        string json = RuntimeStorageData.PLAYER.ExtensionData.Get(key);
-
-        if (string.IsNullOrEmpty(json))
-            return new T();
-
-        try
-        {
-            T data = JsonUtility.FromJson<T>(json);
-            return data ?? new T();
-        }
-        catch
-        {
-            return new T();
-        }
+        return RuntimeStorageData.PLAYER.ExtensionData.Get(key, new T());
     }
 
     public static void Save<T>(string key, T data)
@@ -239,32 +212,7 @@ public static class RuntimeStorageExtention
         if (data == null)
             throw new System.ArgumentNullException(nameof(data));
 
-        switch (data)
-        {
-            case string s:
-                RuntimeStorageData.PLAYER.ExtensionData.Set(key, s);
-                break;
-
-            case int i:
-                RuntimeStorageData.PLAYER.ExtensionData.SetInt(key, i);
-                break;
-
-            case float f:
-                RuntimeStorageData.PLAYER.ExtensionData.SetFloat(key, f);
-                break;
-
-            case bool b:
-                RuntimeStorageData.PLAYER.ExtensionData.SetBool(key, b);
-                break;
-
-            default:
-                RuntimeStorageData.PLAYER.ExtensionData.Set(
-                    key,
-                    JsonUtility.ToJson(data)
-                );
-                break;
-        }
-
+        RuntimeStorageData.PLAYER.ExtensionData.Set(key, data);
         RuntimeStorageData.SaveAllData();
     }
 }

@@ -338,6 +338,64 @@ public class ExtensionDataClass
         return GetInt(key, defaultValue ? 1 : 0) != 0;
     }
 
+    public void Set<T>(string key, T value)
+    {
+        if (typeof(T) == typeof(string))
+        {
+            Set(key, (object)value as string);
+            return;
+        }
+
+        switch (value)
+        {
+            case int i:
+                SetInt(key, i);
+                break;
+            case float f:
+                SetFloat(key, f);
+                break;
+            case bool b:
+                SetBool(key, b);
+                break;
+            default:
+                Set(key, JsonUtility.ToJson(new ValueBox<T> { value = value }));
+                break;
+        }
+    }
+
+    public T Get<T>(string key, T defaultValue = default(T))
+    {
+        Type type = typeof(T);
+
+        if (type == typeof(string))
+            return (T)(object)Get(key, (object)defaultValue as string);
+
+        if (type == typeof(int))
+            return (T)(object)GetInt(key, defaultValue is int intValue ? intValue : 0);
+
+        if (type == typeof(float))
+            return (T)(object)GetFloat(key, defaultValue is float floatValue ? floatValue : 0f);
+
+        if (type == typeof(bool))
+            return (T)(object)GetBool(key, defaultValue is bool boolValue && boolValue);
+
+        string json = Get(key);
+        if (string.IsNullOrEmpty(json))
+            return defaultValue;
+
+        try
+        {
+            if (json.Contains("\"value\""))
+                return JsonUtility.FromJson<ValueBox<T>>(json).value;
+
+            return JsonUtility.FromJson<T>(json);
+        }
+        catch
+        {
+            return defaultValue;
+        }
+    }
+
     public Dictionary<string, string> ToDictionary()
     {
         var dict = new Dictionary<string, string>();
@@ -360,6 +418,12 @@ public class ExtensionDataClass
     {
         int idx = keys.IndexOf(key);
         return idx >= 0 && idx < values.Count;
+    }
+
+    [Serializable]
+    private class ValueBox<T>
+    {
+        public T value;
     }
 }
 
