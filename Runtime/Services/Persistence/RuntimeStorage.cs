@@ -42,6 +42,8 @@ public static class RuntimeStorageData
             SETTING = ReadNew<SettingSerializable>(DATATYPE.SETTING) as SettingSerializable;
             Debug.LogWarning("Setting data was null, created new default setting.");
         }
+        SETTING.EnsureDefaults();
+
         PLAYER = ReadData<PlayerSerializable>(DATATYPE.PLAYER) as PlayerSerializable;
         if (PLAYER == null)
         {

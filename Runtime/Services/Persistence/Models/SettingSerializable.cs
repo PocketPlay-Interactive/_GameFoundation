@@ -11,10 +11,7 @@ public class SettingSerializable
 
     public SettingSerializable()
     {
-        // Khởi tạo mặc định nếu muốn
-        Set("MUSIC", true);
-        Set("SOUND", true);
-        Set("VIBRATE", true);
+        EnsureDefaults();
     }
 
     public void Set(string key, bool value)
@@ -40,8 +37,15 @@ public class SettingSerializable
             int index = keys.IndexOf(key);
             return values[index];
         }
-        Set(key, defaultValue);
+
         return defaultValue;
+    }
+
+    public void EnsureDefaults()
+    {
+        AddDefault("MUSIC", true);
+        AddDefault("SOUND", true);
+        AddDefault("VIBRATE", true);
     }
 
     public bool HasKey(string key)
@@ -52,9 +56,16 @@ public class SettingSerializable
 
     public void LogAllSettings()
     {
-        for (int i = 0; i < keys.Count; i++)
+        for (int i = 0; i < keys.Count && i < values.Count; i++)
         {
             Debug.Log($"Setting - Key: {keys[i]}, Value: {values[i]}");
         }
+    }
+
+    private void AddDefault(string key, bool value)
+    {
+        key = key.ToLower();
+        if (!keys.Contains(key))
+            Set(key, value);
     }
 }
