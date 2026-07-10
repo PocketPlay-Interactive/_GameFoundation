@@ -193,7 +193,7 @@ public static class RuntimeStorageExtention
 {
     public static bool Has(string key)
     {
-        return !string.IsNullOrEmpty(RuntimeStorageData.PLAYER.ExtensionData.Get(key));
+        return RuntimeStorageData.PLAYER.ExtensionData.HasKey(key);
     }
 
     public static void Delete(string key)
@@ -202,9 +202,9 @@ public static class RuntimeStorageExtention
         LogSystem.LogError("This function is not yet available.");
     }
 
-    public static T Load<T>(string key) where T : new()
+    public static T Load<T>(string key, T defaultValue = default(T))
     {
-        return RuntimeStorageData.PLAYER.ExtensionData.Get(key, new T());
+        return RuntimeStorageData.PLAYER.ExtensionData.Get(key, defaultValue);
     }
 
     public static void Save<T>(string key, T data)

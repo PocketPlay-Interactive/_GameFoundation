@@ -210,176 +210,52 @@ public class ExtensionDataClass
     public List<string> values = new List<string>();
     public List<string> checksums = new List<string>(); // Lưu checksum cho số
 
-    // Set string (mã hoá)
-    public void Set(string key, string value)
-    {
-        string obfuscated = MemoryObfuscation.ObfuscateString(value);
-        string checksum = MemoryChecksum.GenerateChecksum(obfuscated).ToString();
-        int idx = keys.IndexOf(key);
-        if (idx >= 0)
-        {
-            EnsureValueSlots(idx);
-            values[idx] = obfuscated;
-            checksums[idx] = checksum;
-        }
-        else
-        {
-            keys.Add(key);
-            values.Add(obfuscated);
-            checksums.Add(checksum);
-        }
-    }
-
-    // Get string (giải mã)
-    public string Get(string key, string defaultValue = null)
-    {
-        int idx = keys.IndexOf(key);
-        if (idx >= 0 && idx < values.Count)
-        {
-            if (idx < checksums.Count && !string.IsNullOrEmpty(checksums[idx]))
-            {
-                if (!int.TryParse(checksums[idx], out int checksum) ||
-                    !MemoryChecksum.VerifyChecksum(values[idx], checksum))
-                    return defaultValue;
-            }
-
-            return MemoryObfuscation.DeobfuscateString(values[idx]);
-        }
-
-        return defaultValue;
-    }
-
-    // Set int (mã hoá + checksum)
-    public void SetInt(string key, int value)
-    {
-        int obfuscated = MemoryObfuscation.ObfuscateInt(value);
-        int checksum = MemoryChecksum.GenerateChecksum(value);
-        string obfStr = obfuscated.ToString();
-        string checksumStr = checksum.ToString();
-        int idx = keys.IndexOf(key);
-        if (idx >= 0)
-        {
-            EnsureValueSlots(idx);
-            values[idx] = obfStr;
-            checksums[idx] = checksumStr;
-        }
-        else
-        {
-            keys.Add(key);
-            values.Add(obfStr);
-            checksums.Add(checksumStr);
-        }
-    }
-
-    // Get int (giải mã + kiểm tra)
-    public int GetInt(string key, int defaultValue = 0)
-    {
-        int idx = keys.IndexOf(key);
-        if (idx >= 0 && idx < values.Count && idx < checksums.Count)
-        {
-            if (!int.TryParse(values[idx], out int obfuscated) ||
-                !int.TryParse(checksums[idx], out int checksum))
-                return defaultValue;
-
-            int realValue = MemoryObfuscation.DeobfuscateInt(obfuscated);
-            if (MemoryChecksum.VerifyChecksum(realValue, checksum))
-                return realValue;
-        }
-        return defaultValue;
-    }
-
-    // Set float (mã hoá + checksum)
-    public void SetFloat(string key, float value)
-    {
-        int obfuscated = MemoryObfuscation.ObfuscateFloat(value);
-        int checksum = MemoryChecksum.GenerateChecksum(obfuscated);
-        string obfStr = obfuscated.ToString();
-        string checksumStr = checksum.ToString();
-        int idx = keys.IndexOf(key);
-        if (idx >= 0)
-        {
-            EnsureValueSlots(idx);
-            values[idx] = obfStr;
-            checksums[idx] = checksumStr;
-        }
-        else
-        {
-            keys.Add(key);
-            values.Add(obfStr);
-            checksums.Add(checksumStr);
-        }
-    }
-
-    // Get float (giải mã + kiểm tra)
-    public float GetFloat(string key, float defaultValue = 0f)
-    {
-        int idx = keys.IndexOf(key);
-        if (idx >= 0 && idx < values.Count && idx < checksums.Count)
-        {
-            if (!int.TryParse(values[idx], out int obfuscated) ||
-                !int.TryParse(checksums[idx], out int checksum))
-                return defaultValue;
-
-            if (MemoryChecksum.VerifyChecksum(obfuscated, checksum))
-                return MemoryObfuscation.DeobfuscateFloat(obfuscated);
-        }
-        return defaultValue;
-    }
-
-    // Set bool (mã hoá + checksum)
-    public void SetBool(string key, bool value)
-    {
-        SetInt(key, value ? 1 : 0);
-    }
-
-    // Get bool (giải mã + kiểm tra)
-    public bool GetBool(string key, bool defaultValue = false)
-    {
-        return GetInt(key, defaultValue ? 1 : 0) != 0;
-    }
-
     public void Set<T>(string key, T value)
     {
+        EnsureLists();
+
         if (typeof(T) == typeof(string))
         {
-            Set(key, (object)value as string);
+            SetString(key, (object)value as string);
             return;
         }
 
         switch (value)
         {
             case int i:
-                SetInt(key, i);
+                SetIntValue(key, i);
                 break;
             case float f:
-                SetFloat(key, f);
+                SetFloatValue(key, f);
                 break;
             case bool b:
-                SetBool(key, b);
+                SetIntValue(key, b ? 1 : 0);
                 break;
             default:
-                Set(key, JsonUtility.ToJson(new ValueBox<T> { value = value }));
+                SetString(key, JsonUtility.ToJson(new ValueBox<T> { value = value }));
                 break;
         }
     }
 
     public T Get<T>(string key, T defaultValue = default(T))
     {
+        EnsureLists();
+
         Type type = typeof(T);
 
         if (type == typeof(string))
-            return (T)(object)Get(key, (object)defaultValue as string);
+            return (T)(object)GetString(key, (object)defaultValue as string);
 
         if (type == typeof(int))
-            return (T)(object)GetInt(key, defaultValue is int intValue ? intValue : 0);
+            return (T)(object)GetIntValue(key, defaultValue is int intValue ? intValue : 0);
 
         if (type == typeof(float))
-            return (T)(object)GetFloat(key, defaultValue is float floatValue ? floatValue : 0f);
+            return (T)(object)GetFloatValue(key, defaultValue is float floatValue ? floatValue : 0f);
 
         if (type == typeof(bool))
-            return (T)(object)GetBool(key, defaultValue is bool boolValue && boolValue);
+            return (T)(object)(GetIntValue(key, defaultValue is bool boolValue && boolValue ? 1 : 0) != 0);
 
-        string json = Get(key);
+        string json = GetString(key);
         if (string.IsNullOrEmpty(json))
             return defaultValue;
 
@@ -398,11 +274,100 @@ public class ExtensionDataClass
 
     public Dictionary<string, string> ToDictionary()
     {
+        EnsureLists();
+
         var dict = new Dictionary<string, string>();
         int count = Math.Min(keys.Count, values.Count);
         for (int i = 0; i < count; i++)
             dict[keys[i]] = values[i];
         return dict;
+    }
+
+    public bool HasKey(string key)
+    {
+        EnsureLists();
+
+        int idx = keys.IndexOf(key);
+        return idx >= 0 && idx < values.Count;
+    }
+
+    private void SetString(string key, string value)
+    {
+        string obfuscated = MemoryObfuscation.ObfuscateString(value);
+        SetRaw(key, obfuscated, MemoryChecksum.GenerateChecksum(obfuscated).ToString());
+    }
+
+    private string GetString(string key, string defaultValue = null)
+    {
+        int idx = keys.IndexOf(key);
+        if (idx < 0 || idx >= values.Count)
+            return defaultValue;
+
+        if (idx < checksums.Count && !string.IsNullOrEmpty(checksums[idx]))
+        {
+            if (!int.TryParse(checksums[idx], out int checksum) ||
+                !MemoryChecksum.VerifyChecksum(values[idx], checksum))
+                return defaultValue;
+        }
+
+        return MemoryObfuscation.DeobfuscateString(values[idx]);
+    }
+
+    private void SetIntValue(string key, int value)
+    {
+        int obfuscated = MemoryObfuscation.ObfuscateInt(value);
+        SetRaw(key, obfuscated.ToString(), MemoryChecksum.GenerateChecksum(value).ToString());
+    }
+
+    private int GetIntValue(string key, int defaultValue = 0)
+    {
+        int idx = keys.IndexOf(key);
+        if (idx < 0 || idx >= values.Count || idx >= checksums.Count)
+            return defaultValue;
+
+        if (!int.TryParse(values[idx], out int obfuscated) ||
+            !int.TryParse(checksums[idx], out int checksum))
+            return defaultValue;
+
+        int realValue = MemoryObfuscation.DeobfuscateInt(obfuscated);
+        return MemoryChecksum.VerifyChecksum(realValue, checksum) ? realValue : defaultValue;
+    }
+
+    private void SetFloatValue(string key, float value)
+    {
+        int obfuscated = MemoryObfuscation.ObfuscateFloat(value);
+        SetRaw(key, obfuscated.ToString(), MemoryChecksum.GenerateChecksum(obfuscated).ToString());
+    }
+
+    private float GetFloatValue(string key, float defaultValue = 0f)
+    {
+        int idx = keys.IndexOf(key);
+        if (idx < 0 || idx >= values.Count || idx >= checksums.Count)
+            return defaultValue;
+
+        if (!int.TryParse(values[idx], out int obfuscated) ||
+            !int.TryParse(checksums[idx], out int checksum))
+            return defaultValue;
+
+        return MemoryChecksum.VerifyChecksum(obfuscated, checksum)
+            ? MemoryObfuscation.DeobfuscateFloat(obfuscated)
+            : defaultValue;
+    }
+
+    private void SetRaw(string key, string value, string checksum)
+    {
+        int idx = keys.IndexOf(key);
+        if (idx >= 0)
+        {
+            EnsureValueSlots(idx);
+            values[idx] = value;
+            checksums[idx] = checksum;
+            return;
+        }
+
+        keys.Add(key);
+        values.Add(value);
+        checksums.Add(checksum);
     }
 
     private void EnsureValueSlots(int idx)
@@ -414,10 +379,11 @@ public class ExtensionDataClass
             checksums.Add("");
     }
 
-    public bool HasKey(string key, bool defaultValue = false)
+    private void EnsureLists()
     {
-        int idx = keys.IndexOf(key);
-        return idx >= 0 && idx < values.Count;
+        if (keys == null) keys = new List<string>();
+        if (values == null) values = new List<string>();
+        if (checksums == null) checksums = new List<string>();
     }
 
     [Serializable]
@@ -429,14 +395,14 @@ public class ExtensionDataClass
 
 
 // ExtensionData.Set("username", "player1");
-// string name = ExtensionData.Get("username");
+// string name = ExtensionData.Get<string>("username");
 
-// ExtensionData.SetInt("score", 1234);
-// int score = ExtensionData.GetInt("score");
+// ExtensionData.Set("score", 1234);
+// int score = ExtensionData.Get<int>("score");
 
-// ExtensionData.SetFloat("speed", 2.5f);
-// float speed = ExtensionData.GetFloat("speed");
+// ExtensionData.Set("speed", 2.5f);
+// float speed = ExtensionData.Get<float>("speed");
 
-// ExtensionData.SetBool("isVip", true);
-// bool isVip = ExtensionData.GetBool("isVip");
+// ExtensionData.Set("isVip", true);
+// bool isVip = ExtensionData.Get<bool>("isVip");
 

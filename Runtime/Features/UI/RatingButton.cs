@@ -5,8 +5,8 @@ public class RatingButton : MonoBehaviour,IPointerClickHandler
 {
     public static bool Rated
     {
-        get { return RuntimeStorageData.PLAYER.ExtensionData.GetBool(nameof(Rated)); }
-        private set { RuntimeStorageData.PLAYER.ExtensionData.SetBool(nameof(Rated), value); RuntimeStorageData.SaveAllData(); }
+        get { return RuntimeStorageData.PLAYER.ExtensionData.Get<bool>(nameof(Rated)); }
+        private set { RuntimeStorageData.PLAYER.ExtensionData.Set(nameof(Rated), value); RuntimeStorageData.SaveAllData(); }
     }
 
     public void OnPointerClick(PointerEventData eventData)

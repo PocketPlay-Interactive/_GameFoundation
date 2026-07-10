@@ -121,7 +121,7 @@ public static class NetworkTime
         try
         {
             string cachedDateTimeString =
-                RuntimeStorageData.PLAYER.ExtensionData.Get(TimeKey);
+                RuntimeStorageData.PLAYER.ExtensionData.Get<string>(TimeKey);
 
             if (DateTime.TryParse(
                     cachedDateTimeString,
