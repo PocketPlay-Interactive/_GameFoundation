@@ -167,9 +167,9 @@ public static class EventBusExtensions
         return _touchEndedEvent;
     }
 
-    public static PhoneShakeEvent PhoneShakeEvent(float magnitude)
+    public static DeviceMotionEvent DeviceMotionEvent(DeviceMotionType type, float magnitude)
     {
-        return new PhoneShakeEvent { Magnitude = magnitude };
+        return new DeviceMotionEvent { Type = type, Magnitude = magnitude };
     }
 }
 
@@ -180,7 +180,8 @@ public class PopupEvent { public string PopupId; }
 public class TouchBeganEvent { public Vector2 Position; }
 public class TouchHoldEvent { public Vector2 Position; }
 public class TouchEndedEvent { public Vector2 Position; }
-public class PhoneShakeEvent { public float Magnitude; }
+public enum DeviceMotionType { Shake, Tilt, Inertia }
+public class DeviceMotionEvent { public DeviceMotionType Type; public float Magnitude; }
 public class PurchaseCompletedEvent { public string ProductId; }
 
 /*

@@ -118,7 +118,7 @@ public class ShakeSystem : MonoBehaviour
     private void OnShake(float magnitude)
     {
         if (isDebug) Debug.Log($"[ShakeSystem] ✅ SHAKE DETECTED! Magnitude: {magnitude:F2}");
-        EventBus.Publish(EventBusExtensions.PhoneShakeEvent(magnitude));
+        EventBus.Publish(EventBusExtensions.DeviceMotionEvent(DeviceMotionType.Shake, magnitude));
     }
     
     // Context Menu để test (không cần phím)

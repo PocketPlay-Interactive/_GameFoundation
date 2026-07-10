@@ -8,6 +8,7 @@ All notable changes to this package are documented in this file.
 
 - Added generic `Set<T>` and `Get<T>` persistence APIs for player extension data.
 - Added generic setting value support while preserving bool settings.
+- Added shared `DeviceMotionEvent` for shake, tilt, and inertia-style device motion.
 - Refactored player persistence obfuscation/checksum helpers to reduce duplicate code.
 
 ### Fixed
