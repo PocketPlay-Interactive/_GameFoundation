@@ -196,12 +196,12 @@ public partial class AdManager : SingletonGlobal<AdManager>
         CaculaterCounterCollapseAd();
     }
 
-    void OnEnable() => GameEvent.PurchaseCompleted += HandleIAPurchase;
-    void OnDisable() => GameEvent.PurchaseCompleted -= HandleIAPurchase;
+    void OnEnable() => EventBus.Subscribe<PurchaseCompletedEvent>(HandleIAPurchase);
+    void OnDisable() => EventBus.Unsubscribe<PurchaseCompletedEvent>(HandleIAPurchase);
 
-    private void HandleIAPurchase(string productId)
+    private void HandleIAPurchase(PurchaseCompletedEvent @event)
     {
-        Debug.Log("Handling IAP purchase for product ID: " + productId);
+        Debug.Log("Handling IAP purchase for product ID: " + @event.ProductId);
         HideBanner();
         HideCollapseAd();
 

@@ -4,6 +4,9 @@ using UnityEngine.InputSystem;
 
 public class ShakeSystem : MonoBehaviour
 {
+    public const string DetectionKey = "set_shake_detection";
+    public const string ThresholdKey = "set_shake_threshold";
+
     [Header("Shake Detection Settings")]
     [SerializeField] private bool enableShakeDetection = true;
     [SerializeField] private float shakeDetectionThreshold = 1.0f;
@@ -45,7 +48,7 @@ public class ShakeSystem : MonoBehaviour
 
     void OnMessage(GameMessageEvent @event)
     {
-        if (@event.Key == Config.SHAKE_DETECTION_KEY)
+        if (@event.Key == DetectionKey)
         {
             if (@event.Value is bool enabled)
             {
@@ -53,7 +56,7 @@ public class ShakeSystem : MonoBehaviour
                 if (isDebug) Debug.Log($"[ShakeSystem] Shake detection set to {enabled}");
             }
         }
-        else if (@event.Key == Config.SHAKE_THRESHOLD_KEY)
+        else if (@event.Key == ThresholdKey)
         {
             if (@event.Value is float threshold)
             {

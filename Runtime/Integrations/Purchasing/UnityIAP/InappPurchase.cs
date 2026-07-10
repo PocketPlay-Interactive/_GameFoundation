@@ -62,7 +62,7 @@ public class InappPurchase : GenericSingleton<InappPurchase>
             var product = order.CartOrdered.Items().First()?.Product;
             Debug.Log($"[InappPurchase] Confirmed purchase found: {product.definition.id}");
             RuntimeStorageData.Player.AddProduct(product.definition.id);
-            GameEvent.NotifyPurchaseCompleted(product.definition.id);
+            EventBus.Publish(new PurchaseCompletedEvent { ProductId = product.definition.id });
         }
 
         RuntimeStorageData.Player.LogAllProducts();
@@ -139,7 +139,7 @@ public class InappPurchase : GenericSingleton<InappPurchase>
                 return;
             }
             RuntimeStorageData.Player.AddProduct(productId);
-            GameEvent.NotifyPurchaseCompleted(productId);
+            EventBus.Publish(new PurchaseCompletedEvent { ProductId = productId });
         };
 
 // #if UNITY_EDITOR

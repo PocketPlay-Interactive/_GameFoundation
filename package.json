@@ -1,6 +1,6 @@
 {
   "name": "com.dann.gamefoundation",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "displayName": "Game Foundation",
   "description": "Shared foundation library for Unity projects, including helpers, managers, patterns, save/load, security utilities, SDK wrappers, optional features, and editor tools.",
   "unity": "2022.3",

@@ -43,7 +43,6 @@ Packages/com.dann.gamefoundation
 |   |   |-- Pathfinding
 |   |   `-- UI
 |   |-- Bootstrap
-|   |-- Configuration
 |   |-- Integrations
 |   |   |-- Device
 |   |   |-- Haptics
@@ -92,7 +91,7 @@ Quy tắc dependency mong muốn:
 - Integration nên được bọc sau interface/facade có fallback khi define tắt.
 - Bootstrap (`Manager`) là composition root, được phép nối Core, Services và Integrations với nhau; không lấy dependency của `Manager` làm lý do đưa mọi thứ vào Core.
 
-`Runtime/Configuration` và `Runtime/Features/Common` hiện giữ lại các class cũ chưa đủ tổng quát để đưa vào Core. Với project mới, product ID, gameplay event và economy config vẫn nên đặt trong `Assets/_Project` hoặc ScriptableObject riêng.
+Với project mới, product ID, gameplay event và economy config nên đặt trong `Assets/_Project` hoặc ScriptableObject riêng.
 
 `Runtime/Security/Legacy/HashLib.cs` tồn tại để tương thích save hiện tại. Phần TripleDES/MD5 trong đó là legacy compatibility, không nên dùng làm primitive bảo mật mới.
 

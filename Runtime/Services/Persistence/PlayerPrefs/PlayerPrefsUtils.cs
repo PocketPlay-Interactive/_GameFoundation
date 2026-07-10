@@ -2,10 +2,11 @@ using UnityEngine;
 
 /// <summary>
 /// Tiện ích mở rộng cho PlayerPrefs: hỗ trợ bool, int, float, string.
-/// Có kiểm tra anti-cheat nếu ENABLE_ANTI_CHEAT = true trong Config.
+/// Có kiểm tra anti-cheat nếu EnableAntiCheat = true.
 /// </summary>
 public static class PlayerPrefsUtils
 {
+    private const bool EnableAntiCheat = true;
     private const string ChecksumSuffix = "_checksum";
     private const string ObfuscationKeySuffix = "_obfkey";
 
@@ -13,7 +14,7 @@ public static class PlayerPrefsUtils
     public static void SetBool(string key, bool value) => SetInt(key, value ? 1 : 0);
     public static bool GetBool(string key, bool defaultValue = false)
     {
-        if (Config.ENABLE_ANTI_CHEAT &&
+        if (EnableAntiCheat &&
             PlayerPrefs.HasKey(key) &&
             !PlayerPrefs.HasKey(key + ChecksumSuffix) &&
             !PlayerPrefs.HasKey(key + ObfuscationKeySuffix))
@@ -25,7 +26,7 @@ public static class PlayerPrefsUtils
     // Int với anti-cheat
     public static void SetInt(string key, int value)
     {
-        if (Config.ENABLE_ANTI_CHEAT)
+        if (EnableAntiCheat)
         {
             int valueKey = MemoryObfuscation.GenerateKey();
             int obfuscated = MemoryObfuscation.ObfuscateInt(value, valueKey);
@@ -42,7 +43,7 @@ public static class PlayerPrefsUtils
 
     public static int GetInt(string key, int defaultValue = 0)
     {
-        if (Config.ENABLE_ANTI_CHEAT)
+        if (EnableAntiCheat)
         {
             if (!PlayerPrefs.HasKey(key))
                 return defaultValue;
@@ -66,7 +67,7 @@ public static class PlayerPrefsUtils
     // Float với anti-cheat
     public static void SetFloat(string key, float value)
     {
-        if (Config.ENABLE_ANTI_CHEAT)
+        if (EnableAntiCheat)
         {
             int valueKey = MemoryObfuscation.GenerateKey();
             int obfuscated = MemoryObfuscation.ObfuscateFloat(value, valueKey);
@@ -83,7 +84,7 @@ public static class PlayerPrefsUtils
 
     public static float GetFloat(string key, float defaultValue = 0f)
     {
-        if (Config.ENABLE_ANTI_CHEAT)
+        if (EnableAntiCheat)
         {
             if (!PlayerPrefs.HasKey(key))
                 return defaultValue;
@@ -106,7 +107,7 @@ public static class PlayerPrefsUtils
     // String (không anti-cheat)
     public static void SetString(string key, string value)
     {
-        if (Config.ENABLE_ANTI_CHEAT)
+        if (EnableAntiCheat)
         {
             int valueKey = MemoryObfuscation.GenerateKey();
             string obfuscated = MemoryObfuscation.ObfuscateString(value, valueKey);
@@ -123,7 +124,7 @@ public static class PlayerPrefsUtils
     
     public static string GetString(string key, string defaultValue = "")
     {
-        if (Config.ENABLE_ANTI_CHEAT)
+        if (EnableAntiCheat)
         {
             if (!PlayerPrefs.HasKey(key))
                 return defaultValue;

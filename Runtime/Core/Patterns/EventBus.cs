@@ -167,21 +167,9 @@ public static class EventBusExtensions
         return _touchEndedEvent;
     }
 
-    private static readonly PhoneShakeEvent _phoneShakeEvent = new PhoneShakeEvent();
     public static PhoneShakeEvent PhoneShakeEvent(float magnitude)
     {
-        _phoneShakeEvent.Magnitude = magnitude;
-        return _phoneShakeEvent;
-    }
-
-    private static readonly SystemControlEvent _systemControlEvent = new SystemControlEvent();
-    public static SystemControlEvent SystemControlEvent(SystemType system, bool? enabled = null, float? value = null, object customData = null)
-    {
-        _systemControlEvent.System = system;
-        _systemControlEvent.SetEnabled = enabled;
-        _systemControlEvent.SetValue = value;
-        _systemControlEvent.CustomData = customData;
-        return _systemControlEvent;
+        return new PhoneShakeEvent { Magnitude = magnitude };
     }
 }
 
@@ -193,24 +181,7 @@ public class TouchBeganEvent { public Vector2 Position; }
 public class TouchHoldEvent { public Vector2 Position; }
 public class TouchEndedEvent { public Vector2 Position; }
 public class PhoneShakeEvent { public float Magnitude; }
-
-public enum SystemType
-{
-    Shake,
-    Touch,
-    Raycast,
-    Audio,
-    Vibration,
-    Flash
-}
-
-public class SystemControlEvent 
-{ 
-    public SystemType System;
-    public bool? SetEnabled;
-    public float? SetValue;
-    public object CustomData;
-}
+public class PurchaseCompletedEvent { public string ProductId; }
 
 /*
 -------------------------
