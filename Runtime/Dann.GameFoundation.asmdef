@@ -2,6 +2,7 @@
   "name": "Dann.GameFoundation",
   "rootNamespace": "Dann.GameFoundation",
   "references": [
+    "EditorCools.Runtime",
     "MoreMountains.NiceVibrations",
     "MoreMountains.NiceVibrations.Haptics",
     "Unity.InputSystem",
