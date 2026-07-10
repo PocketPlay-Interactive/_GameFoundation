@@ -2,6 +2,19 @@
 
 All notable changes to this package are documented in this file.
 
+## [1.0.14] - 2026-07-10
+
+### Changed
+
+- Added generic `Set<T>` and `Get<T>` persistence APIs for player extension data.
+- Added generic setting value support while preserving bool settings.
+- Refactored player persistence obfuscation/checksum helpers to reduce duplicate code.
+
+### Fixed
+
+- Fixed setting defaults being overwritten by implicit `false` values during reads.
+- Ensured rating state writes are persisted immediately.
+
 ## [1.0.12] - 2026-07-10
 
 ### Changed
