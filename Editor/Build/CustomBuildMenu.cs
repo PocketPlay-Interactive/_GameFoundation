@@ -37,7 +37,7 @@ public sealed class CustomBuildMenu : EditorWindow
 
     private static string SigningPrefsPrefix => $"CustomBuildMenu.{Hash128.Compute(Application.dataPath)}.AndroidSigning.";
 
-    [MenuItem("Build/Build & Store Settings...")]
+    [MenuItem("GameFoundation/Build/Build & Store Settings")]
     public static void ShowWindow()
     {
         CustomBuildMenu window = GetWindow<CustomBuildMenu>();

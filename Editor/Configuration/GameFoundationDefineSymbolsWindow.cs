@@ -24,13 +24,17 @@ public class GameFoundationDefineSymbolsWindow : EditorWindow
     private Vector2 scrollPosition;
     private string customDefine = "";
 
-    [MenuItem("GameFoundation/Define Symbols")]
+    private static readonly Color AccentColor = new Color(0.25f, 0.58f, 0.96f);
+    private static readonly Color EnabledColor = new Color(0.25f, 0.72f, 0.46f);
+    private static readonly Color DisabledColor = new Color(0.55f, 0.57f, 0.62f);
+
+    [MenuItem("GameFoundation/Configuration/SDK Defines")]
     public static void ShowWindow()
     {
-        var window = GetWindow<GameFoundationDefineSymbolsWindow>("GF Defines");
+        var window = GetWindow<GameFoundationDefineSymbolsWindow>();
+        window.titleContent = new GUIContent("SDK Defines");
 
-        window.minSize = new Vector2(600, 400);
-        window.maxSize = new Vector2(1200, 800);
+        window.minSize = new Vector2(620, 520);
     }
 
     private void OnEnable()
@@ -53,92 +57,170 @@ public class GameFoundationDefineSymbolsWindow : EditorWindow
 
     private void DrawHeader()
     {
-        EditorGUILayout.LabelField("GameFoundation Define Symbols", EditorStyles.boldLabel);
-        EditorGUILayout.HelpBox(
-            "Toggle SDK defines for the selected build target group. Click Apply once after changing.",
-            MessageType.Info);
+        Rect rect = GUILayoutUtility.GetRect(0f, 92f, GUILayout.ExpandWidth(true));
+        EditorGUI.DrawRect(rect, EditorGUIUtility.isProSkin
+            ? new Color(0.09f, 0.13f, 0.19f)
+            : new Color(0.13f, 0.27f, 0.44f));
+        EditorGUI.DrawRect(new Rect(rect.x, rect.yMax - 3f, rect.width, 3f), AccentColor);
 
-        EditorGUILayout.LabelField("Selected Target", GetSelectedTargetName());
-        EditorGUILayout.Space(6);
+        var titleStyle = new GUIStyle(EditorStyles.boldLabel)
+        {
+            fontSize = 20,
+            normal = { textColor = Color.white }
+        };
+        var subtitleStyle = new GUIStyle(EditorStyles.miniLabel)
+        {
+            fontSize = 11,
+            normal = { textColor = new Color(0.74f, 0.82f, 0.92f) }
+        };
+
+        GUI.Label(new Rect(rect.x + 18f, rect.y + 14f, rect.width - 240f, 28f), "SDK Defines", titleStyle);
+        GUI.Label(new Rect(rect.x + 19f, rect.y + 43f, rect.width - 260f, 18f),
+            "Toggle optional GameFoundation SDK integrations for the selected build target", subtitleStyle);
+        GUI.Label(new Rect(rect.x + 19f, rect.y + 63f, rect.width - 38f, 18f),
+            "Selected Target: " + GetSelectedTargetName(), subtitleStyle);
+
+        var buttonStyle = new GUIStyle(GUI.skin.button)
+        {
+            fixedHeight = 28f,
+            fontStyle = FontStyle.Bold
+        };
+        if (GUI.Button(new Rect(rect.xMax - 214f, rect.y + 18f, 88f, 28f), "Refresh", buttonStyle))
+            RefreshStates();
+
+        if (GUI.Button(new Rect(rect.xMax - 116f, rect.y + 18f, 98f, 28f), "Player Settings", buttonStyle))
+            SettingsService.OpenProjectSettings("Project/Player");
     }
 
     private void DrawPresetDefines()
     {
-        EditorGUILayout.LabelField("SDK Defines", EditorStyles.boldLabel);
-
-        foreach (var option in DefineOptions)
+        EditorGUILayout.Space(12);
+        using (new EditorGUILayout.VerticalScope(CardStyle))
         {
-            bool current = states.TryGetValue(option.Symbol, out bool value) && value;
+            DrawSectionHeader("SDK Integrations", "Enable only after importing the matching SDK package.");
 
-            EditorGUILayout.BeginHorizontal();
-            states[option.Symbol] = EditorGUILayout.ToggleLeft(option.Symbol, current, GUILayout.Width(210));
-            EditorGUILayout.LabelField(option.Description);
-            EditorGUILayout.EndHorizontal();
+            for (int i = 0; i < DefineOptions.Length; i++)
+            {
+                var option = DefineOptions[i];
+                bool current = states.TryGetValue(option.Symbol, out bool value) && value;
+                Rect rowRect = GUILayoutUtility.GetRect(0f, 34f, GUILayout.ExpandWidth(true));
+                bool alternate = i % 2 != 0;
+                EditorGUI.DrawRect(rowRect, EditorGUIUtility.isProSkin
+                    ? (alternate ? new Color(0.145f, 0.15f, 0.17f) : new Color(0.17f, 0.18f, 0.20f))
+                    : (alternate ? new Color(0.94f, 0.95f, 0.97f) : new Color(0.98f, 0.98f, 0.99f)));
+
+                states[option.Symbol] = GUI.Toggle(
+                    new Rect(rowRect.x + 10f, rowRect.y + 7f, 210f, 20f),
+                    current,
+                    option.Symbol);
+                GUI.Label(new Rect(rowRect.x + 226f, rowRect.y + 8f, rowRect.width - 336f, 18f),
+                    option.Description,
+                    EditorStyles.label);
+                DrawBadge(new Rect(rowRect.xMax - 88f, rowRect.y + 7f, 74f, 20f), current ? "ENABLED" : "OFF", current ? EnabledColor : DisabledColor);
+            }
+
+            EditorGUILayout.Space(8);
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                if (GUILayout.Button("Enable All", GUILayout.Height(28)))
+                    SetAllPresetStates(true);
+
+                if (GUILayout.Button("Disable All", GUILayout.Height(28)))
+                    SetAllPresetStates(false);
+            }
         }
+    }
 
+    private static void DrawSectionHeader(string title, string subtitle)
+    {
+        Rect headerRect = GUILayoutUtility.GetRect(0f, 42f, GUILayout.ExpandWidth(true));
+        EditorGUI.DrawRect(headerRect, EditorGUIUtility.isProSkin
+            ? new Color(0.16f, 0.18f, 0.22f)
+            : new Color(0.88f, 0.92f, 0.97f));
+        EditorGUI.DrawRect(new Rect(headerRect.x, headerRect.y, 4f, headerRect.height), AccentColor);
+
+        var titleStyle = new GUIStyle(EditorStyles.boldLabel) { fontSize = 15 };
+        var subtitleStyle = new GUIStyle(EditorStyles.miniLabel);
+        GUI.Label(new Rect(headerRect.x + 14f, headerRect.y + 7f, headerRect.width - 28f, 18f), title, titleStyle);
+        GUI.Label(new Rect(headerRect.x + 14f, headerRect.y + 24f, headerRect.width - 28f, 16f), subtitle, subtitleStyle);
         EditorGUILayout.Space(8);
-        EditorGUILayout.BeginHorizontal();
-
-        if (GUILayout.Button("Enable All"))
-            SetAllPresetStates(true);
-
-        if (GUILayout.Button("Disable All"))
-            SetAllPresetStates(false);
-
-        if (GUILayout.Button("Refresh"))
-            RefreshStates();
-
-        EditorGUILayout.EndHorizontal();
     }
 
     private void DrawCustomDefineTools()
     {
-        EditorGUILayout.Space(14);
-        EditorGUILayout.LabelField("Custom Define", EditorStyles.boldLabel);
-
-        EditorGUILayout.BeginHorizontal();
-        customDefine = EditorGUILayout.TextField(customDefine);
-
-        using (new EditorGUI.DisabledScope(string.IsNullOrWhiteSpace(customDefine)))
+        EditorGUILayout.Space(12);
+        using (new EditorGUILayout.VerticalScope(CardStyle))
         {
-            if (GUILayout.Button("Add", GUILayout.Width(70)))
+            DrawSectionHeader("Custom Define", "Add project-specific symbols without leaving this window.");
+
+            EditorGUILayout.BeginHorizontal();
+            customDefine = EditorGUILayout.TextField(customDefine);
+
+            using (new EditorGUI.DisabledScope(string.IsNullOrWhiteSpace(customDefine)))
             {
-                states[TrimDefine(customDefine)] = true;
-                customDefine = "";
+                if (GUILayout.Button("Add", GUILayout.Width(78)))
+                {
+                    states[NormalizeDefine(customDefine)] = true;
+                    customDefine = "";
+                }
+
+                if (GUILayout.Button("Remove", GUILayout.Width(78)))
+                {
+                    states[NormalizeDefine(customDefine)] = false;
+                    customDefine = "";
+                }
             }
 
-            if (GUILayout.Button("Remove", GUILayout.Width(70)))
-            {
-                states[TrimDefine(customDefine)] = false;
-                customDefine = "";
-            }
+            EditorGUILayout.EndHorizontal();
         }
-
-        EditorGUILayout.EndHorizontal();
     }
 
     private void DrawCurrentDefines()
     {
-        EditorGUILayout.Space(14);
-        EditorGUILayout.LabelField("Current Defines", EditorStyles.boldLabel);
-
-        string[] defines = GetCurrentDefines();
-        string defineText = defines.Length == 0 ? "(none)" : string.Join("; ", defines);
-        EditorGUILayout.TextArea(defineText, GUILayout.MinHeight(54));
+        EditorGUILayout.Space(12);
+        using (new EditorGUILayout.VerticalScope(CardStyle))
+        {
+            DrawSectionHeader("Current Defines", "The exact value stored in Player Settings after apply.");
+            string[] defines = GetCurrentDefines();
+            string defineText = defines.Length == 0 ? "(none)" : string.Join("; ", defines);
+            EditorGUILayout.TextArea(defineText, GUILayout.MinHeight(60));
+        }
     }
 
     private void DrawFooter()
     {
-        EditorGUILayout.Space(8);
+        EditorGUILayout.Space(12);
         EditorGUILayout.BeginHorizontal();
 
-        if (GUILayout.Button("Apply Defines", GUILayout.Height(28)))
+        GUI.backgroundColor = EnabledColor;
+        if (GUILayout.Button("Apply Defines", GUILayout.Height(34)))
             ApplyStates();
-
-        if (GUILayout.Button("Open Player Settings", GUILayout.Height(28)))
-            SettingsService.OpenProjectSettings("Project/Player");
+        GUI.backgroundColor = Color.white;
 
         EditorGUILayout.EndHorizontal();
+    }
+
+    private static void DrawBadge(Rect rect, string text, Color color)
+    {
+        EditorGUI.DrawRect(rect, color);
+        var style = new GUIStyle(EditorStyles.miniBoldLabel)
+        {
+            alignment = TextAnchor.MiddleCenter,
+            normal = { textColor = Color.white }
+        };
+        GUI.Label(rect, text, style);
+    }
+
+    private static GUIStyle CardStyle
+    {
+        get
+        {
+            return new GUIStyle(EditorStyles.helpBox)
+            {
+                padding = new RectOffset(12, 12, 12, 12),
+                margin = new RectOffset(12, 12, 0, 0)
+            };
+        }
     }
 
     private void RefreshStates()

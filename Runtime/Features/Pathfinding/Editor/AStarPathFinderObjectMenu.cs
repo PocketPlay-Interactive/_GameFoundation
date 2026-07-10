@@ -14,7 +14,7 @@ public class AStarPathFinderObjectMenu : EditorWindow
     private string resultMessage;
     private MessageType resultMessageType = MessageType.Info;
 
-    [MenuItem("Pathfinding/Editor")]
+    [MenuItem("GameFoundation/Tools/Pathfinding Connector")]
     public static void ShowWindow()
     {
         var window = GetWindow<AStarPathFinderObjectMenu>();

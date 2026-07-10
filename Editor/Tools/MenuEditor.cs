@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 public class MenuEditor
 {
-    [MenuItem("GameFoundation/Tools/Deletes/ALL DATA")]
+    [MenuItem("GameFoundation/Tools/Delete Saved Data")]
     public static void DeleteAllData()
     {
         RuntimeStorageData.DeleteData(RuntimeStorageData.DATATYPE.PLAYER);

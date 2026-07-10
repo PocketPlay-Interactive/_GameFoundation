@@ -2,6 +2,14 @@
 
 All notable changes to this package are documented in this file.
 
+## [1.0.12] - 2026-07-10
+
+### Changed
+
+- Moved EditorCools runtime attributes and editor drawers under `Libraries/EditorCools`.
+- Updated GameFoundation editor menu paths and removed custom Git URL configuration.
+- Refreshed the SDK Defines editor window UI.
+
 ## [1.0.10] - 2026-07-10
 
 ### Changed
@@ -14,7 +22,7 @@ All notable changes to this package are documented in this file.
 
 ### Added
 
-- Added package upgrade menu at `Packages/Upgrade GameFoundation`.
+- Added package upgrade menu at `GameFoundation/Packages/Upgrade Game Foundation`.
 - Added documentation pages for quick start, SDK defines, and samples.
 - Added README files for package samples.
 

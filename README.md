@@ -23,7 +23,6 @@ Packages/com.dann.gamefoundation
 |-- Runtime
 |   |-- Core
 |   |   |-- Diagnostics
-|   |   |-- EditorAttributes
 |   |   |-- Extensibility
 |   |   |-- IO
 |   |   |-- Patterns
@@ -60,6 +59,7 @@ Packages/com.dann.gamefoundation
 |-- Editor
 |-- Libraries
 |   |-- DOTween
+|   |-- EditorCools
 |   `-- NiceVibrations
 `-- Samples
 ```
@@ -479,7 +479,7 @@ Quy tắc:
 Có thể bật/tắt define bằng editor window:
 
 ```text
-Unity menu > GameFoundation > Define Symbols
+Unity menu > GameFoundation > Configuration > SDK Defines
 ```
 
 Window này đọc define của selected build target hiện tại, cho tick/bỏ tick các SDK define thường dùng, rồi bấm `Apply Defines` để lưu.
@@ -767,7 +767,7 @@ bool valid = MemoryChecksum.VerifyChecksum(value, checksum);
 
 ## Libraries
 
-Source nguyên bản của DOTween và NiceVibrations nằm trong `Libraries`. Không đặt code GameFoundation hoặc code project vào đây; khi update vendor nên thay nguyên package và kiểm tra lại integration tương ứng.
+Source nguyên bản của DOTween, EditorCools và NiceVibrations nằm trong `Libraries`. Không đặt code GameFoundation hoặc code project vào đây; khi update vendor nên thay nguyên package và kiểm tra lại integration tương ứng.
 
 Các thành phần trong `Libraries` giữ license và điều khoản phân phối riêng. Xem
 `Library Notices.md` trước khi public hoặc phân phối repository cho bên khác.

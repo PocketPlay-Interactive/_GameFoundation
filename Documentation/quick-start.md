@@ -31,5 +31,5 @@ EventBus.Publish(new GameMessageEvent { Message = "hello" });
 - `Runtime`: core runtime, services, features, integrations.
 - `Advertising`: AdMob and native ad adapters.
 - `Analytics`: Firebase and AppsFlyer adapters.
-- `Libraries`: bundled vendor libraries.
+- `Libraries`: bundled libraries and editor helper packages.
 - `Samples`: example scenes and scripts.

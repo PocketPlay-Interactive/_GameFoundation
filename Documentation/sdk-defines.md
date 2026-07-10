@@ -12,6 +12,6 @@ Do not enable a define until the matching SDK exists in the Unity project.
 | `APPFLYER` | AppsFlyer Unity SDK | AppsFlyer event/ad revenue forwarding |
 | `IAPPURCHASE_ENABLE` | Unity IAP | `InappPurchase` |
 
-Use `GameFoundation/Define Symbols` to toggle these defines.
+Use `GameFoundation/Configuration/SDK Defines` to toggle these defines.
 
 Legacy projects that still have `ADMOB_UMP_BACON` are normalized to `ADMOB_UMP_OMNI` by the define window.
