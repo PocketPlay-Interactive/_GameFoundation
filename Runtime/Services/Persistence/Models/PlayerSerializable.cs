@@ -54,18 +54,10 @@ public class PlayerSerializable
     private int goldBalanceChecksum;
     public int GoldBalance
     {
-        get
-        {
-            int realValue = MemoryObfuscation.DeobfuscateInt(goldBalanceObfuscated);
-            if (MemoryChecksum.VerifyChecksum(realValue, goldBalanceChecksum))
-                return realValue;
-            else
-                return 0;
-        }
+        get => ReadSecureInt(goldBalanceObfuscated, goldBalanceChecksum);
         set
         {
-            goldBalanceObfuscated = MemoryObfuscation.ObfuscateInt(value);
-            goldBalanceChecksum = MemoryChecksum.GenerateChecksum(value);
+            WriteSecureInt(value, out goldBalanceObfuscated, out goldBalanceChecksum);
         }
     }
 
@@ -76,18 +68,10 @@ public class PlayerSerializable
     private int lastLoginDayOfMonthChecksum;
     public int LastLoginDayOfMonth
     {
-        get
-        {
-            int realValue = MemoryObfuscation.DeobfuscateInt(lastLoginDayOfMonthObfuscated);
-            if (MemoryChecksum.VerifyChecksum(realValue, lastLoginDayOfMonthChecksum))
-                return realValue;
-            else
-                return 0;
-        }
+        get => ReadSecureInt(lastLoginDayOfMonthObfuscated, lastLoginDayOfMonthChecksum);
         set
         {
-            lastLoginDayOfMonthObfuscated = MemoryObfuscation.ObfuscateInt(value);
-            lastLoginDayOfMonthChecksum = MemoryChecksum.GenerateChecksum(value);
+            WriteSecureInt(value, out lastLoginDayOfMonthObfuscated, out lastLoginDayOfMonthChecksum);
         }
     }
 
@@ -98,18 +82,10 @@ public class PlayerSerializable
     private int loginDayCountChecksum;
     public int LoginDayCount
     {
-        get
-        {
-            int realValue = MemoryObfuscation.DeobfuscateInt(loginDayCountObfuscated);
-            if (MemoryChecksum.VerifyChecksum(realValue, loginDayCountChecksum))
-                return realValue;
-            else
-                return 0;
-        }
+        get => ReadSecureInt(loginDayCountObfuscated, loginDayCountChecksum);
         set
         {
-            loginDayCountObfuscated = MemoryObfuscation.ObfuscateInt(value);
-            loginDayCountChecksum = MemoryChecksum.GenerateChecksum(value);
+            WriteSecureInt(value, out loginDayCountObfuscated, out loginDayCountChecksum);
         }
     }
 
@@ -120,20 +96,8 @@ public class PlayerSerializable
     private int isInitialLaunchChecksum;
     public bool IsInitialLaunch
     {
-        get
-        {
-            int realValue = MemoryObfuscation.DeobfuscateInt(isInitialLaunchObfuscated);
-            if (MemoryChecksum.VerifyChecksum(realValue, isInitialLaunchChecksum))
-                return realValue != 0;
-            else
-                return false;
-        }
-        set
-        {
-            int intValue = value ? 1 : 0;
-            isInitialLaunchObfuscated = MemoryObfuscation.ObfuscateInt(intValue);
-            isInitialLaunchChecksum = MemoryChecksum.GenerateChecksum(intValue);
-        }
+        get => ReadSecureInt(isInitialLaunchObfuscated, isInitialLaunchChecksum) != 0;
+        set => WriteSecureInt(value ? 1 : 0, out isInitialLaunchObfuscated, out isInitialLaunchChecksum);
     }
 
     // CurrentLevelIndex
@@ -143,18 +107,10 @@ public class PlayerSerializable
     private int currentLevelIndexChecksum;
     public int CurrentLevelIndex
     {
-        get
-        {
-            int realValue = MemoryObfuscation.DeobfuscateInt(currentLevelIndexObfuscated);
-            if (MemoryChecksum.VerifyChecksum(realValue, currentLevelIndexChecksum))
-                return realValue;
-            else
-                return 0;
-        }
+        get => ReadSecureInt(currentLevelIndexObfuscated, currentLevelIndexChecksum);
         set
         {
-            currentLevelIndexObfuscated = MemoryObfuscation.ObfuscateInt(value);
-            currentLevelIndexChecksum = MemoryChecksum.GenerateChecksum(value);
+            WriteSecureInt(value, out currentLevelIndexObfuscated, out currentLevelIndexChecksum);
         }
     }
 
@@ -200,6 +156,18 @@ public class PlayerSerializable
             foreach (var p in pkgs)
                 Debug.Log($"[InappPurchase] Owned product: {p}");
         }
+    }
+
+    private static int ReadSecureInt(int obfuscated, int checksum)
+    {
+        int value = MemoryObfuscation.DeobfuscateInt(obfuscated);
+        return MemoryChecksum.VerifyChecksum(value, checksum) ? value : 0;
+    }
+
+    private static void WriteSecureInt(int value, out int obfuscated, out int checksum)
+    {
+        obfuscated = MemoryObfuscation.ObfuscateInt(value);
+        checksum = MemoryChecksum.GenerateChecksum(value);
     }
 }
 
@@ -286,9 +254,7 @@ public class ExtensionDataClass
     public bool HasKey(string key)
     {
         EnsureLists();
-
-        int idx = keys.IndexOf(key);
-        return idx >= 0 && idx < values.Count;
+        return TryGetIndex(key, out _);
     }
 
     private void SetString(string key, string value)
@@ -299,8 +265,7 @@ public class ExtensionDataClass
 
     private string GetString(string key, string defaultValue = null)
     {
-        int idx = keys.IndexOf(key);
-        if (idx < 0 || idx >= values.Count)
+        if (!TryGetIndex(key, out int idx))
             return defaultValue;
 
         if (idx < checksums.Count && !string.IsNullOrEmpty(checksums[idx]))
@@ -321,12 +286,7 @@ public class ExtensionDataClass
 
     private int GetIntValue(string key, int defaultValue = 0)
     {
-        int idx = keys.IndexOf(key);
-        if (idx < 0 || idx >= values.Count || idx >= checksums.Count)
-            return defaultValue;
-
-        if (!int.TryParse(values[idx], out int obfuscated) ||
-            !int.TryParse(checksums[idx], out int checksum))
+        if (!TryGetSecureInt(key, out int obfuscated, out int checksum))
             return defaultValue;
 
         int realValue = MemoryObfuscation.DeobfuscateInt(obfuscated);
@@ -341,12 +301,7 @@ public class ExtensionDataClass
 
     private float GetFloatValue(string key, float defaultValue = 0f)
     {
-        int idx = keys.IndexOf(key);
-        if (idx < 0 || idx >= values.Count || idx >= checksums.Count)
-            return defaultValue;
-
-        if (!int.TryParse(values[idx], out int obfuscated) ||
-            !int.TryParse(checksums[idx], out int checksum))
+        if (!TryGetSecureInt(key, out int obfuscated, out int checksum))
             return defaultValue;
 
         return MemoryChecksum.VerifyChecksum(obfuscated, checksum)
@@ -368,6 +323,23 @@ public class ExtensionDataClass
         keys.Add(key);
         values.Add(value);
         checksums.Add(checksum);
+    }
+
+    private bool TryGetIndex(string key, out int idx)
+    {
+        idx = keys.IndexOf(key);
+        return idx >= 0 && idx < values.Count;
+    }
+
+    private bool TryGetSecureInt(string key, out int obfuscated, out int checksum)
+    {
+        obfuscated = 0;
+        checksum = 0;
+
+        return TryGetIndex(key, out int idx) &&
+            idx < checksums.Count &&
+            int.TryParse(values[idx], out obfuscated) &&
+            int.TryParse(checksums[idx], out checksum);
     }
 
     private void EnsureValueSlots(int idx)
