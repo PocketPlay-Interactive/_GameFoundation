@@ -4,12 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public enum Scene
-{
-    Loading,
-    Ingame,
-}
-
 [DefaultExecutionOrder(-100)]
 public class Manager : SingletonGlobal<Manager>
 {
