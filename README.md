@@ -19,8 +19,6 @@
 
 ---
 
-# GameFoundation for Unity
-
 **Game Foundation** là package nền tảng nội bộ dùng chung cho nhiều Unity project của PocketPlay Interactive.
 
 Package gom các phần lặp lại giữa dự án: bootstrap, helper, manager, pattern, save/load, security utilities, SDK wrapper, optional feature và editor tool. Mục tiêu là giảm code copy-paste, chuẩn hóa workflow, dựng project mới nhanh hơn và vẫn giữ khả năng mở rộng theo từng game.
@@ -30,6 +28,7 @@ Package gom các phần lặp lại giữa dự án: bootstrap, helper, manager,
 - [Overview](#overview)
 - [Core Modules](#core-modules)
 - [Architecture](#architecture)
+- [Documentation](#documentation)
 - [Cấu Trúc](#cấu-trúc)
 - [Cài Đặt](#cài-đặt)
 - [Tạo Scene Mới](#tạo-scene-mới)
@@ -47,6 +46,15 @@ Game Foundation cung cấp một lớp nền dùng lại được cho gameplay, 
 - Cho phép project riêng mở rộng qua module thay vì sửa trực tiếp foundation.
 - Giữ SDK tùy chọn sau define để project chưa import SDK vẫn compile được.
 
+Quy ước tên:
+
+| Loại | Tên dùng trong repo |
+| --- | --- |
+| Tên hiển thị | `Game Foundation` |
+| Tên module/API | `GameFoundation` |
+| Package ID | `com.dann.gamefoundation` |
+| Chủ sở hữu | `PocketPlay Interactive` |
+
 ## Core Modules
 
 | Module | Purpose |
@@ -59,6 +67,10 @@ Game Foundation cung cấp một lớp nền dùng lại được cho gameplay, 
 | Security | Integrity, memory obfuscation và legacy save compatibility. |
 | Editor | Build tool, importer, inspector và data tool cho developer workflow. |
 | Libraries | Source vendor giữ riêng khỏi code GameFoundation. |
+
+<p align="center">
+  <img src="Documentation/Images/banner_2.png" alt="Game Foundation Core Modules" width="100%">
+</p>
 
 ## Architecture
 
@@ -81,6 +93,19 @@ Design principles:
 - Modular over tightly coupled.
 - Practical over overengineered.
 - Project-specific code stays in `Assets/_Project`.
+
+<p align="center">
+  <img src="Documentation/Images/banner_3.png" alt="Game Foundation Architecture" width="100%">
+</p>
+
+## Documentation
+
+| Guide | Nội dung |
+| --- | --- |
+| [Documentation Index](Documentation/index.md) | Điểm vào tài liệu package. |
+| [Quick Start](Documentation/quick-start.md) | Cài package và tạo scene đầu tiên. |
+| [SDK Defines](Documentation/sdk-defines.md) | Define cho Firebase, AdMob, AppsFlyer, IAP và plugin tùy chọn. |
+| [Samples](Documentation/samples.md) | Cách import và dùng sample scene/code. |
 
 ## Cấu Trúc
 
@@ -146,6 +171,12 @@ Packages/com.dann.gamefoundation
 
 Không đổi tên file, class hoặc public API trong đợt tổ chức folder này. Code cũ tiếp tục gọi API bằng tên hiện có.
 
+Một số tên như `RuntimeStorageExtention`, `AdmobInterstitalOpen`, `AdMobInterstital`, `AdmobNativeCollap`, `Firebases` và `EditorCools` là tên legacy đang tồn tại trong code. Tài liệu giữ nguyên tên API/path để người dùng tìm đúng symbol; không rename nếu chưa có migration riêng.
+
+<p align="center">
+  <img src="Documentation/Images/banner_4.png" alt="Game Foundation Package Structure" width="100%">
+</p>
+
 ### Quy Tắc Phân Loại
 
 Không phân loại theo tên class có chữ `Manager` hay không. Phân loại theo trách nhiệm và chiều dependency:
@@ -184,7 +215,7 @@ Với project mới, product ID, gameplay event và economy config nên đặt t
 3. Nhập:
 
 ```text
-https://github.com/PocketPlay-Interactive/_GameFoundation.git
+git+ssh://git@github.com/PocketPlay-Interactive/_GameFoundation.git
 ```
 
 Có thể thêm trực tiếp vào `Packages/manifest.json`:
@@ -192,12 +223,12 @@ Có thể thêm trực tiếp vào `Packages/manifest.json`:
 ```json
 {
   "dependencies": {
-    "com.dann.gamefoundation": "https://github.com/PocketPlay-Interactive/_GameFoundation.git"
+    "com.dann.gamefoundation": "git+ssh://git@github.com/PocketPlay-Interactive/_GameFoundation.git#v1.0.0"
   }
 }
 ```
 
-Nên khóa theo tag khi dùng trong production:
+SSH là cách khuyến nghị cho repository private. Nếu máy đã cấu hình Git credential cho GitHub HTTPS, có thể dùng:
 
 ```text
 https://github.com/PocketPlay-Interactive/_GameFoundation.git#v1.0.0
