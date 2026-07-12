@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace Dann.GameFoundation
 {
+     [ExtensionModuleNotice("It is mandatory to drag the prefab into AdvertisingAdController.")]
     public abstract class AdvertisingProviderBase : MonoBehaviour, IAdvertisingProvider
     {
         [SerializeField] private string providerName;

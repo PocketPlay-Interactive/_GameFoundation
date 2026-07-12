@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Dann.GameFoundation
 {
+     [ExtensionModuleNotice("It is mandatory to drag prefabs into AdvertisingService..")]
     public class AdvertisingAdController : MonoBehaviour
     {
         [SerializeField] private AdvertisingAdType adType = AdvertisingAdType.None;
