@@ -1,26 +1,86 @@
 <p align="center">
-  <img src="Documentation~/Images/banner.png" alt="Game Foundation" width="100%">
+  <img src="Documentation/Images/banner.svg" alt="Game Foundation Banner" width="100%">
 </p>
 
 <h1 align="center">Game Foundation</h1>
 
 <p align="center">
   Bộ nền tảng dùng chung cho các dự án Unity của PocketPlay Interactive.
+  <br/>
+  Tập trung vào khả năng tái sử dụng, mở rộng và tăng tốc phát triển game.
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Unity-6000.0-black?logo=unity">
-  <img src="https://img.shields.io/badge/UPM-Git%20Package-blue">
-  <img src="https://img.shields.io/github/v/release/PocketPlay-Interactive/_GameFoundation">
-  <img src="https://img.shields.io/github/license/PocketPlay-Interactive/_GameFoundation">
-  <img src="https://img.shields.io/github/last-commit/PocketPlay-Interactive/_GameFoundation">
+  <img src="https://img.shields.io/badge/Unity-2022.3+-000000?logo=unity&logoColor=white">
+  <img src="https://img.shields.io/badge/UPM-Git%20Package-2C8EBB">
+  <img src="https://img.shields.io/badge/Platform-Internal-6A5ACD">
+  <img src="https://img.shields.io/badge/Status-Active-2EA44F">
 </p>
 
 ---
 
 # GameFoundation for Unity
 
-Thư viện nền dùng chung cho các Unity project: helper, manager, pattern, save/load, security utilities và wrapper SDK. Package hỗ trợ cài đặt qua Unity Package Manager bằng Git URL, bật SDK bằng define khi cần, và vẫn compile được khi SDK chưa import.
+**Game Foundation** là package nền tảng nội bộ dùng chung cho nhiều Unity project của PocketPlay Interactive.
+
+Package gom các phần lặp lại giữa dự án: bootstrap, helper, manager, pattern, save/load, security utilities, SDK wrapper, optional feature và editor tool. Mục tiêu là giảm code copy-paste, chuẩn hóa workflow, dựng project mới nhanh hơn và vẫn giữ khả năng mở rộng theo từng game.
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Core Modules](#core-modules)
+- [Architecture](#architecture)
+- [Cấu Trúc](#cấu-trúc)
+- [Cài Đặt](#cài-đặt)
+- [Tạo Scene Mới](#tạo-scene-mới)
+- [Mở Rộng Cho Dự Án Mới](#mở-rộng-cho-dự-án-mới)
+- [Scripting Define Symbols](#scripting-define-symbols)
+- [Roadmap](#roadmap)
+- [Troubleshooting](#troubleshooting)
+
+## Overview
+
+Game Foundation cung cấp một lớp nền dùng lại được cho gameplay, service cấp ứng dụng, integration SDK và tooling trong Unity Editor.
+
+- Giảm lặp code giữa các dự án.
+- Chuẩn hóa bootstrap scene, save data, audio, UI và SDK define.
+- Cho phép project riêng mở rộng qua module thay vì sửa trực tiếp foundation.
+- Giữ SDK tùy chọn sau define để project chưa import SDK vẫn compile được.
+
+## Core Modules
+
+| Module | Purpose |
+| --- | --- |
+| Core | Pattern, contract, utility, diagnostics, threading và I/O nền. |
+| Services | Save/load, audio, asset loading, pooling và network time. |
+| Features | UI, interaction, pathfinding, combat text và common behaviour tùy chọn. |
+| Bootstrap | Composition root, loading flow và extension module init qua `Manager`. |
+| Integrations | SDK/native adapter như IAP, haptics, device API, ads và analytics. |
+| Security | Integrity, memory obfuscation và legacy save compatibility. |
+| Editor | Build tool, importer, inspector và data tool cho developer workflow. |
+| Libraries | Source vendor giữ riêng khỏi code GameFoundation. |
+
+## Architecture
+
+```mermaid
+flowchart TD
+    Project[Game Project] --> Bootstrap[Bootstrap / Manager]
+    Bootstrap --> Features[Runtime / Features]
+    Bootstrap --> Services[Runtime / Services]
+    Bootstrap --> Integrations[SDK Integrations]
+    Features --> Services
+    Services --> Core[Runtime / Core]
+    Integrations --> Core
+    Project --> ProjectExt[Assets / _Project / GameFoundationExtensions]
+    ProjectExt --> Bootstrap
+```
+
+Design principles:
+
+- Reusable over duplicated.
+- Modular over tightly coupled.
+- Practical over overengineered.
+- Project-specific code stays in `Assets/_Project`.
 
 ## Cấu Trúc
 
@@ -793,6 +853,16 @@ Các thành phần trong `Libraries` giữ license và điều khoản phân ph�
 `Library Notices.md` trước khi public hoặc phân phối repository cho bên khác.
 
 Editor tool nằm trong `Editor`, tách khỏi runtime build. Scene/code demo của inspector helper nằm trong `Samples`.
+
+## Roadmap
+
+- [x] UPM package structure.
+- [x] Bootstrap scene flow với `Manager` và extension modules.
+- [x] Save/load foundation qua `RuntimeStorageData` và `ExtensionData`.
+- [x] Optional SDK integrations qua scripting define symbols.
+- [ ] Tài liệu chi tiết cho từng module lớn.
+- [ ] Sample scene chuẩn cho bootstrap, save, UI và ads flow.
+- [ ] Test coverage cho các service cốt lõi.
 
 ## Kiểm Tra Sau Khi Import
 
