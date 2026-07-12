@@ -1,12 +1,15 @@
+using UnityEngine;
+
 namespace Dann.GameFoundation
 {
     public sealed class BannerAdvertisingController : AdvertisingAdController
     {
-        [UnityEngine.SerializeField] private float reloadInterval = 30f;
+        [SerializeField] private float reloadInterval = 30f;
 
-        private bool isVisible;
-        private bool showWhenLoaded;
-        private float shownTime = -1f;
+        [Header("Private Profile")]
+        [SerializeField] private bool isVisible;
+        [SerializeField] private bool showWhenLoaded;
+        [SerializeField] private float shownTime = -1f;
 
         public override AdvertisingAdType AdType => AdvertisingAdType.Banner;
 

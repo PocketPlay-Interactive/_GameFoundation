@@ -8,6 +8,9 @@ namespace Dann.GameFoundation
         {
             AdState = AdvertisingAdState.Unavailable;
             LoadedProvider = null;
+
+            if (Mode == AdvertisingMediationMode.Waterfall)
+                AdvanceProvider();
         }
     }
 }

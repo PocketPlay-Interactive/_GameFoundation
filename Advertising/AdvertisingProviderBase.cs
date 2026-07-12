@@ -9,6 +9,7 @@ namespace Dann.GameFoundation
         [SerializeField] private string androidAdUnitId;
         [SerializeField] private string iosAdUnitId;
         [SerializeField] private string editorAdUnitId;
+        [SerializeField] protected int retryAttempt = 0;
 
         public string ProviderName => string.IsNullOrEmpty(providerName) ? GetType().Name : providerName;
 
