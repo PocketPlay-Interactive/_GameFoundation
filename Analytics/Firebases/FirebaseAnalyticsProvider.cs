@@ -65,5 +65,10 @@ namespace Dann.GameFoundation
         public void Flush()
         {
         }
+
+        public void TrackRevenue(string where, string id, string monetization, string currency, double revenue) 
+        {
+            
+        }
     }
 }

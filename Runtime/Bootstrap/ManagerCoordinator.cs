@@ -49,12 +49,12 @@ public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
         yield return new WaitUntil(() => umpCompleted);
         FirebaseManager.I?.LogUMP("initialized_consent");
 #else
-        FirebaseManager.I?.LogUMP("skipped_consent");
+        AnalyticsService.Get().TrackEvent($"ump_consent_skipped_consent");
 #endif
 
-        yield return AdManager.I.InitializeAsync();
-        yield return new WaitUntil(() => Manager.I.IsAdvertisementReady);
-        LogSystem.LogSuccess($"[ManagerCoordinator] ADMOB SDK INITIALIZED: {Manager.I.IsAdvertisementReady}");
+        yield return AdManager.Get().InitializeAsync();
+        yield return new WaitUntil(() => Manager.Get().IsAdvertisementReady);
+        LogSystem.LogSuccess($"[ManagerCoordinator] ADMOB SDK INITIALIZED: {Manager.Get().IsAdvertisementReady}");
 #endif
 
         yield break;
@@ -63,14 +63,14 @@ public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
     protected virtual void HandleFoundationReady()
     {
 #if ADMOB
-        AdManager.I?.InitializedAllOfAds();
+        AdManager.Get()?.InitializedAllOfAds();
 #endif
     }
 
     protected virtual void HandleApplicationResumed()
     {
 #if ADMOB
-        AdManager.I?.CheckingOpenAd();
+        AdManager.Get()?.CheckingOpenAd();
 #endif
     }
 }

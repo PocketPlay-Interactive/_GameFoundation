@@ -1,4 +1,6 @@
 using UnityEngine;
+using Dann.GameFoundation;
+
 #if ADMOB && USE_ADMOB_CUSTOM_PLUGIN
 using JKit.Monetize.Ads;
 #endif
@@ -94,7 +96,12 @@ public partial class AdManager
         bannerAd.OnAdClicked += () => { BannerAdState = AdState.NotAvailable; };
         bannerAd.OnAdPaid += (AdValue adValue) =>
         {
-            FirebaseManager.I.TrackingAdsEvent("paid_ads_banner", "value", (adValue.Value / (double)1000000).ToString());
+            // FirebaseManager.I.TrackingAdsEvent("paid_ads_banner", "value", (adValue.Value / (double)1000000).ToString());
+            AnalyticsService.Get().TrackRevenue("paid_ads_banner",
+                                                "banner",
+                                                "admob",
+                                                adValue.CurrencyCode.ToString(),
+                                                (adValue.Value / 1000000.0));
         };
 #endif
     }

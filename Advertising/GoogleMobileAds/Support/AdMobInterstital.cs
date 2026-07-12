@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.Events;
 using static AdManager;
+using Dann.GameFoundation;
+
 #if ADMOB
 using GoogleMobileAds.Api;
 #endif
@@ -31,7 +33,7 @@ public class AdMobInterstital : MonoBehaviour
         }
 
         var adRequest = new AdRequest();
-        InterstitialAd.Load(AdManager.I._adUnitInterId, adRequest, (InterstitialAd ad, LoadAdError error) =>
+        InterstitialAd.Load(AdManager.Get()._adUnitInterId, adRequest, (InterstitialAd ad, LoadAdError error) =>
         {
             if (error != null || ad == null)
             {
@@ -57,23 +59,23 @@ public class AdMobInterstital : MonoBehaviour
                 _interstitialAd.CanShowAd())
             {
                 InterstitalAdShowState = AdShowState.Pending;
-                AdManager.I.ResetOpenAdInterval();
+                AdManager.Get().ResetOpenAdInterval();
 
                 ActionOnAfterInterstitalAd = () =>
                 {
-                    AdManager.I.OnCloseAd();
+                    AdManager.Get().OnCloseAd();
                     Concurrency.Instance().Enqueue(() =>
                     {
-                        AdManager.I.HideLoadingAdPanel();
+                        AdManager.Get().HideLoadingAdPanel();
                         InterstitalAdShowState = AdShowState.None;
                         CALLBACK_EVENT?.Invoke();
                     }, 0.5f);
                 };
 
-                AdManager.I.ShowLoadingAdPanel();
+                AdManager.Get().ShowLoadingAdPanel();
                 Concurrency.Instance().Enqueue(() =>
                 {
-                    AdManager.I.OnShowAd();
+                    AdManager.Get().OnShowAd();
                     _interstitialAd.Show();
                 }, 0.5f);
             }
@@ -88,8 +90,11 @@ public class AdMobInterstital : MonoBehaviour
     {
         _interstitialAd.OnAdPaid += (AdValue adValue) =>
         {
-            FirebaseManager.I.TrackingAdsEvent("paid_ads_interstitial", $"interstitial_{this.interstitial_placement_id}", (adValue.Value / (double)1000000).ToString());
-            AppflyerEventTracking.I.LogAdRevenue(adValue);
+            AnalyticsService.Get().TrackRevenue("paid_ads_interstitial",
+                                                "interstitial",
+                                                "admob",
+                                                adValue.CurrencyCode.ToString(),
+                                                (adValue.Value / 1000000.0));
         };
 
         _interstitialAd.OnAdFullScreenContentClosed += () =>

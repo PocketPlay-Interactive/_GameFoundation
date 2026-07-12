@@ -1,5 +1,7 @@
 using System.Collections;
 using UnityEngine;
+using Dann.GameFoundation;
+
 #if ADMOB
 using GoogleMobileAds.Api;
 #endif
@@ -37,7 +39,7 @@ public class AdmobInterstitalOpen : MonoBehaviour
 
         yield return new WaitForSeconds(1.5f);
         // Kiểm tra MobileAds đã init chưa
-        if (!Manager.I.IsAdvertisementReady)
+        if (!Manager.Get().IsAdvertisementReady)
         {
             // if (IsDebugerMode) Debug.LogWarning("MobileAds not initialized yet");
             SafeFinalizeAdSequence();
@@ -45,12 +47,12 @@ public class AdmobInterstitalOpen : MonoBehaviour
         }
         
         _isLoadingInterstitialOpen = true;
-        FirebaseManager.I?.TrackingEvent("ad_interstitial_open_request");   
+        AnalyticsService.Get()?.TrackEvent("ad_interstitial_open_request");   
         // if (IsDebugerMode) Debug.Log($"[{this.GetType().ToString()}] Promise show interstitial open Ad");
         var adRequest = new AdRequest();
-        InterstitialAd.Load(AdManager.I._adUnitInterOpenId, adRequest, (ad, error) =>
+        InterstitialAd.Load(AdManager.Get()._adUnitInterOpenId, adRequest, (ad, error) =>
         {
-            FirebaseManager.I?.TrackingEvent("ad_interstitial_open_loaded_attempt");
+            AnalyticsService.Get()?.TrackEvent("ad_interstitial_open_loaded_attempt");
             Concurrency.Instance().Enqueue(() => OnInterstitialOpenAdLoadCallback(ad, error));
         });
     }
@@ -59,21 +61,17 @@ public class AdmobInterstitalOpen : MonoBehaviour
     {
         _isLoadingInterstitialOpen = false;
 
-        FirebaseManager.I?.TrackingEvent("ad_interstitial_open_loaded_callback");
+        AnalyticsService.Get()?.TrackEvent("ad_interstitial_open_loaded_callback");
         if (error != null || ad == null)
         {
-            // if (IsDebugerMode) Debug.Log($"[{this.GetType().ToString()}] interstitial ad failed to load with error: {error}");
+            
             SafeFinalizeAdSequence();
             return;
         }
-
-        // if (IsDebugerMode) Debug.Log($"[{this.GetType().ToString()}] Interstitial ad loaded with response: {ad.GetResponseInfo()}");
-        FirebaseManager.I?.TrackingEvent("ad_interstitial_open_loaded");
             
         DestroyInterstitialOpenAd();
         _interstitialOpenAd = ad;
         RegisterInterstitialOpenCallbacks();
-        FirebaseManager.I?.TrackingEvent("ad_interstitial_open_show");
         _hasShownInterstitialOpen = true;
     }
 
@@ -88,8 +86,11 @@ public class AdmobInterstitalOpen : MonoBehaviour
 
     private void OnInterstitialOpenAdPaid(AdValue adValue)
     {
-        FirebaseManager.I?.TrackingAdsEvent("paid_ads_interstitial", "interstitial_open", (adValue.Value / 1000000.0).ToString());
-        AppflyerEventTracking.I.LogAdRevenue(adValue);
+        AnalyticsService.Get().TrackRevenue("paid_ads_interstitial",
+                                            "interstitial_open",
+                                            "admob",
+                                            adValue.CurrencyCode.ToString(),
+                                            (adValue.Value / 1000000.0));
     }
 
     private void OnInterstitialOpenAdClosed()
@@ -99,7 +100,7 @@ public class AdmobInterstitalOpen : MonoBehaviour
         {
             Debug.Log("[AdManager] Processing interstitial open ad closed");
             _isShowingInterstitialOpen = false;
-            AdManager.I.OnCloseAd();
+            AdManager.Get().OnCloseAd();
             DestroyInterstitialOpenAd();
             SafeFinalizeAdSequence();
         });
@@ -113,7 +114,7 @@ public class AdmobInterstitalOpen : MonoBehaviour
         {
             Debug.Log("[AdManager] Processing interstitial open ad failed to show");
             _isShowingInterstitialOpen = false;
-            AdManager.I.OnCloseAd();
+            AdManager.Get().OnCloseAd();
             DestroyInterstitialOpenAd();
             SafeFinalizeAdSequence();
         });
@@ -149,18 +150,14 @@ public class AdmobInterstitalOpen : MonoBehaviour
         }
 
         _isShowingInterstitialOpen = true;            
-        FirebaseManager.I?.TrackingEvent("ad_interstitial_open_showing");
-        AdManager.I.OnShowAd();
-
-        FirebaseManager.I?.TrackingEvent("ad_interstitial_open_show_attempt");
+        AdManager.Get().OnShowAd();
         _interstitialOpenAd.Show();
-        FirebaseManager.I?.TrackingEvent("ad_interstitial_open_shown");
     }
 
     private bool CanShowInterstitialOpenAd()
     {
-        if (Manager.I == null) return false;
-        return Manager.I.AlwayShowInterstitialAd == true || Manager.I.IsCanShowAdOpen() == true;
+        if (Manager.Get() == null) return false;
+        return Manager.Get().AlwayShowInterstitialAd == true || Manager.Get().IsCanShowAdOpen() == true;
     }
 
     private void DestroyInterstitialOpenAd()
@@ -175,7 +172,7 @@ public class AdmobInterstitalOpen : MonoBehaviour
     private void SafeFinalizeAdSequence()
     {
         Debug.Log("[AdManager] SafeFinalizeAdSequence called");
-        Concurrency.Instance().Enqueue(() => Manager.I?.FinalizeAdSequence());
+        Concurrency.Instance().Enqueue(() => Manager.Get()?.FinalizeAdSequence());
     }
 
     private bool IsLowEndDevice()

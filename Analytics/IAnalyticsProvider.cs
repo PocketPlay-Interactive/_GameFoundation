@@ -19,5 +19,7 @@ namespace Dann.GameFoundation
         void SetUserProperty(string key, string value);
 
         void Flush();
+
+        public void TrackRevenue(string where, string id, string monetization, string currency, double revenue);
     }
 }

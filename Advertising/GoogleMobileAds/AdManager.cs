@@ -128,15 +128,12 @@ public partial class AdManager : SingletonGlobal<AdManager>
         yield return new WaitForEndOfFrame();
         MobileAds.Initialize(initStatus =>
         {
-            Manager.I.NotifyAdvertisementReady();
             Debug.Log("AdMob initialization completed.");
-            FirebaseManager.I.TrackingEvent("ad_mob_initialized");
             if (RuntimeStorageData.CanShowAds() == true)
             {
-                FirebaseManager.I.TrackingEvent("ad_mob_show_interstitial_open");
                 Concurrency.Instance().Enqueue(() => this.interstitialAdmobOpenSupport.PromiseShowInterstitialOpenAd());
             }
-            else Manager.I?.FinalizeAdSequence();
+            else Manager.Get().FinalizeAdSequence();
         }); 
         Debug.Log("Waiting for AdMob initialization...");    
     }

@@ -83,9 +83,29 @@ namespace Dann.GameFoundation
             }
         }
 
-        public void TrackRevenue()
+        public void TrackRevenue(string where, string id, string monetization, string currency, double revenue)
         {
+            if (string.IsNullOrWhiteSpace(where))
+            {
+                Debug.LogWarning("Analytics event name is empty.");
+                return;
+            }
 
+            foreach (IAnalyticsProvider provider in providers)
+            {
+                try
+                {
+                    if (!provider.IsInitialized)
+                        continue;
+
+                    provider.TrackRevenue(where, id, monetization, currency, revenue);
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogError(
+                        $"Analytics event failed on {provider.ProviderName}: {where}\n{exception}");
+                }
+            }
         }
 
         public void SetUserId(string userId)

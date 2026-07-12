@@ -1,4 +1,5 @@
 #if ADMOB
+using Dann.GameFoundation;
 using GoogleMobileAds.Api;
 #endif
 using System;
@@ -62,8 +63,11 @@ public partial class AdManager
     {
         appOpenAd.OnAdPaid += (AdValue adValue) =>
         {
-            FirebaseManager.I.TrackingAdsEvent("paid_ads_open", "app_open", (adValue.Value / (double)1000000).ToString());
-            AppflyerEventTracking.I.LogAdRevenue(adValue);
+            AnalyticsService.Get().TrackRevenue("paid_ads_open",
+                                                "ads_open",
+                                                "admob",
+                                                adValue.CurrencyCode.ToString(),
+                                                (adValue.Value / 1000000.0));
         };
 
         appOpenAd.OnAdFullScreenContentClosed += () =>
