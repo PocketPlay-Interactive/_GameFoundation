@@ -27,7 +27,7 @@ public class FirebaseManager : SingletonGlobal<FirebaseManager>
             if (dependencyStatus == Firebase.DependencyStatus.Available)
             {
                 app = Firebase.FirebaseApp.DefaultInstance;
-                Manager.I.IsFirebaseInitialized = true;
+                Manager.I.NotifyFirebaseInitialized();
                 LogSystem.LogSuccess("FIREBASE INITIALIZED");
             }
             else

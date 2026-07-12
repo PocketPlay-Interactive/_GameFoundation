@@ -128,7 +128,7 @@ public partial class AdManager : SingletonGlobal<AdManager>
         yield return new WaitForEndOfFrame();
         MobileAds.Initialize(initStatus =>
         {
-            Manager.I.IsAdvertisementReady = true;
+            Manager.I.NotifyAdvertisementReady();
             Debug.Log("AdMob initialization completed.");
             FirebaseManager.I.TrackingEvent("ad_mob_initialized");
             if (RuntimeStorageData.CanShowAds() == true)

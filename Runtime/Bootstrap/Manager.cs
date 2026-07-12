@@ -36,7 +36,14 @@ public class Manager : SingletonGlobal<Manager>
     private bool hasAdCallbackCompleted = false;
     [Header("SDK Initialization State")]
     public bool _hasInitialized = false;
+    private bool hasSdkInitializationHandler = false;
     public event Action OnAdCallbackCompleted;
+    public event Func<IEnumerator> OnSdkInitializationRequested;
+    public event Action OnFirebaseInitialized;
+    public event Action OnAdvertisementReady;
+    public event Action OnInAppPurchaseInitialized;
+    public event Action OnFoundationReady;
+    public event Action OnApplicationResumed;
 
     protected override void Awake()
     {
@@ -56,41 +63,33 @@ public class Manager : SingletonGlobal<Manager>
     {
         Time.timeScale = 1;
         ShowLoading();
-#if IAPPURCHASE_ENABLE
-        InappPurchase.I.InitializePurchasing();
-#endif
-        StartCoroutine(InitializeSDK());
+        StartCoroutine(InitializeBootstrap());
     }
 
-    private IEnumerator InitializeSDK()
+    private IEnumerator InitializeBootstrap()
     {
-#if FIREBASE
-        yield return FirebaseManager.I.InitializeAsync();
-        yield return new WaitUntil(() => IsFirebaseInitialized == true);
-        LogSystem.LogSuccess($"[Manager] FIREBASE SDK INITIALIZED: {IsFirebaseInitialized}");
-#endif
-#if ADMOB
-        yield return null;
-#if ADMOB_UMP_OMNI
-        bool umpCompleted = false;
-        yield return Omni.UMP.Instance.DOGatherConsent(() => umpCompleted = true);
-        yield return new WaitUntil(() => umpCompleted);
-        FirebaseManager.I?.LogUMP("initialized_consent");
-#else
-        FirebaseManager.I?.LogUMP("skipped_consent");
-#endif
-
-        yield return AdManager.I.InitializeAsync();
-        yield return new WaitUntil(() => IsAdvertisementReady == true);
-        LogSystem.LogSuccess($"[Manager] ADMOB SDK INITIALIZED: {IsAdvertisementReady}");
-#endif
-
+        yield return InitializeSdkThroughCoordinator();
         yield return InitializeExtensionModules();
 
 #if !ADMOB
         yield return null;
         FinalizeAdSequence();
+#else
+        if (!hasSdkInitializationHandler)
+            FinalizeAdSequence();
 #endif
+    }
+
+    private IEnumerator InitializeSdkThroughCoordinator()
+    {
+        var handlers = OnSdkInitializationRequested?.GetInvocationList();
+        hasSdkInitializationHandler = handlers != null;
+        if (!hasSdkInitializationHandler) yield break;
+
+        foreach (Func<IEnumerator> handler in handlers)
+        {
+            yield return handler();
+        }
     }
 
     private IEnumerator InitializeExtensionModules()
@@ -138,6 +137,11 @@ public class Manager : SingletonGlobal<Manager>
     }
 
     public LoadingCanvas LoadingUI() => loadingCanvas;
+
+    public void NotifyFirebaseInitialized() => OnFirebaseInitialized?.Invoke();
+    public void NotifyAdvertisementReady() => OnAdvertisementReady?.Invoke();
+    public void NotifyInAppPurchaseInitialized() => OnInAppPurchaseInitialized?.Invoke();
+
     public bool IsCanShowAdOpen()
     {
         if (CurrentLoadingElapsed >= MaxLoadingDuration)
@@ -153,14 +157,13 @@ public class Manager : SingletonGlobal<Manager>
         _hasInitialized = true;
         CurrentLoadingElapsed = 14.0f;
         OnAdCallbackCompleted?.Invoke();
-
-        AdManager.I?.InitializedAllOfAds();
+        OnFoundationReady?.Invoke();
     }
 
     private void OnApplicationPause(bool pause)
     {
         RuntimeStorageData.SaveAllData();
-        if (!pause) AdManager.I?.CheckingOpenAd();
+        if (!pause) OnApplicationResumed?.Invoke();
     }
 
     private void OnApplicationQuit()
