@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Dann.GameFoundation
@@ -6,104 +7,112 @@ namespace Dann.GameFoundation
     public sealed class AdvertisingService : SingletonGlobal<AdvertisingService>
     {
         [Header("Ad Controllers")]
-        [SerializeField] private BannerAdvertisingController banner;
-        [SerializeField] private InterstitialAdvertisingController interstitial;
-        [SerializeField] private RewardedVideoAdvertisingController rewardedVideo;
-        [SerializeField] private RewardedInterstitialAdvertisingController rewardedInterstitial;
-        [SerializeField] private AppOpenAdvertisingController appOpen;
-        [SerializeField] private NativeAdvertisingController native;
-        [SerializeField] private MRECAdvertisingController mrec;
+        [SerializeField] private AdvertisingAdController[] ads;
 
         private const float UpdateInterval = 1f;
+        private readonly Dictionary<AdvertisingAdType, AdvertisingAdController> adsByType = new();
         private float nextUpdateTime;
 
         public bool IsInitialized { get; private set; }
 
-        public bool IsBannerLoaded => banner != null && banner.IsLoaded;
-        public bool IsInterstitialLoaded => interstitial != null && interstitial.IsLoaded;
-        public bool IsRewardedVideoLoaded => rewardedVideo != null && rewardedVideo.IsLoaded;
-        public bool IsRewardedInterstitialLoaded => rewardedInterstitial != null && rewardedInterstitial.IsLoaded;
-        public bool IsAppOpenLoaded => appOpen != null && appOpen.IsLoaded;
-        public bool IsNativeLoaded => native != null && native.IsLoaded;
-        public bool IsMRECLoaded => mrec != null && mrec.IsLoaded;
+        public bool IsLoaded(AdvertisingAdType adType, params string[] parameters) =>
+            TryGetAd(adType, out AdvertisingAdController ad) && ad.IsLoaded;
 
         public void Initialize()
         {
-            FindControllers();
+            BuildAdMap();
             BuildProviders();
             InitializeProviders();
 
             IsInitialized = true;
         }
 
-        public void LoadBanner() => banner?.Load();
-        public void ShowBanner(Action<bool> completed = null) => banner?.Show(completed);
-        public void HideBanner() => banner?.Hide();
-
-        public void LoadInterstitial() => interstitial?.Load();
-        public void ShowInterstitial(Action<bool> completed = null) => interstitial?.Show(completed);
-
-        public void LoadRewardedVideo() => rewardedVideo?.Load();
-        public void ShowRewardedVideo(Action<bool> completed = null) => rewardedVideo?.Show(completed);
-
-        public void LoadRewardedInterstitial() => rewardedInterstitial?.Load();
-        public void ShowRewardedInterstitial(Action<bool> completed = null) => rewardedInterstitial?.Show(completed);
-
-        public void LoadAppOpen() => appOpen?.Load();
-        public void ShowAppOpen(Action<bool> completed = null) => appOpen?.Show(completed);
-
-        public void LoadNative() => native?.Load();
-        public void ShowNative(Action<bool> completed = null) => native?.Show(completed);
-        public void HideNative() => native?.Hide();
-
-        public void LoadMREC() => mrec?.Load();
-        public void ShowMREC(Action<bool> completed = null) => mrec?.Show(completed);
-        public void HideMREC() => mrec?.Hide();
-
-        private void FindControllers()
+        public void Load(AdvertisingAdType adType, params string[] parameters)
         {
-            if (banner == null)
-                banner = GetComponentInChildren<BannerAdvertisingController>(true);
+            if (TryGetAd(adType, out AdvertisingAdController ad))
+                ad.Load();
+        }
 
-            if (interstitial == null)
-                interstitial = GetComponentInChildren<InterstitialAdvertisingController>(true);
+        public void Show(AdvertisingAdType adType, Action<bool> completed = null, params string[] parameters)
+        {
+            if (TryGetAd(adType, out AdvertisingAdController ad))
+                ad.Show(completed);
+            else
+                completed?.Invoke(false);
+        }
 
-            if (rewardedVideo == null)
-                rewardedVideo = GetComponentInChildren<RewardedVideoAdvertisingController>(true);
+        public void Hide(AdvertisingAdType adType, params string[] parameters)
+        {
+            if (TryGetAd(adType, out AdvertisingAdController ad))
+                ad.Hide();
+        }
 
-            if (rewardedInterstitial == null)
-                rewardedInterstitial = GetComponentInChildren<RewardedInterstitialAdvertisingController>(true);
+        public void LoadBanner() => Load(AdvertisingAdType.Banner);
+        public void ShowBanner(Action<bool> completed = null) => Show(AdvertisingAdType.Banner, completed);
+        public void HideBanner() => Hide(AdvertisingAdType.Banner);
 
-            if (appOpen == null)
-                appOpen = GetComponentInChildren<AppOpenAdvertisingController>(true);
+        public void LoadInterstitial() => Load(AdvertisingAdType.Interstitial);
+        public void ShowInterstitial(Action<bool> completed = null) => Show(AdvertisingAdType.Interstitial, completed);
 
-            if (native == null)
-                native = GetComponentInChildren<NativeAdvertisingController>(true);
+        public void LoadRewardedVideo() => Load(AdvertisingAdType.RewardedVideo);
+        public void ShowRewardedVideo(Action<bool> completed = null) => Show(AdvertisingAdType.RewardedVideo, completed);
 
-            if (mrec == null)
-                mrec = GetComponentInChildren<MRECAdvertisingController>(true);
+        public void LoadRewardedInterstitial() => Load(AdvertisingAdType.RewardedInterstitial);
+        public void ShowRewardedInterstitial(Action<bool> completed = null) => Show(AdvertisingAdType.RewardedInterstitial, completed);
+
+        public void LoadAppOpen() => Load(AdvertisingAdType.AppOpen);
+        public void ShowAppOpen(Action<bool> completed = null) => Show(AdvertisingAdType.AppOpen, completed);
+
+        public void LoadNative() => Load(AdvertisingAdType.Native);
+        public void ShowNative(Action<bool> completed = null) => Show(AdvertisingAdType.Native, completed);
+        public void HideNative() => Hide(AdvertisingAdType.Native);
+
+        public void LoadMREC() => Load(AdvertisingAdType.MREC);
+        public void ShowMREC(Action<bool> completed = null) => Show(AdvertisingAdType.MREC, completed);
+        public void HideMREC() => Hide(AdvertisingAdType.MREC);
+
+        private void BuildAdMap()
+        {
+            adsByType.Clear();
+
+            if (ads == null)
+                return;
+
+            for (int i = 0; i < ads.Length; i++)
+            {
+                AdvertisingAdController ad = ads[i];
+
+                if (ad == null || ad.AdType == AdvertisingAdType.None)
+                    continue;
+
+                if (adsByType.ContainsKey(ad.AdType))
+                {
+                    Debug.LogWarning($"Duplicate advertising controller ignored: {ad.AdType}");
+                    continue;
+                }
+
+                adsByType.Add(ad.AdType, ad);
+            }
+        }
+
+        private bool TryGetAd(AdvertisingAdType adType, out AdvertisingAdController ad)
+        {
+            if (adsByType.Count == 0)
+                BuildAdMap();
+
+            return adsByType.TryGetValue(adType, out ad);
         }
 
         private void BuildProviders()
         {
-            banner?.BuildProviders();
-            interstitial?.BuildProviders();
-            rewardedVideo?.BuildProviders();
-            rewardedInterstitial?.BuildProviders();
-            appOpen?.BuildProviders();
-            native?.BuildProviders();
-            mrec?.BuildProviders();
+            foreach (AdvertisingAdController ad in adsByType.Values)
+                ad.BuildProviders();
         }
 
         private void InitializeProviders()
         {
-            banner?.InitializeProviders();
-            interstitial?.InitializeProviders();
-            rewardedVideo?.InitializeProviders();
-            rewardedInterstitial?.InitializeProviders();
-            appOpen?.InitializeProviders();
-            native?.InitializeProviders();
-            mrec?.InitializeProviders();
+            foreach (AdvertisingAdController ad in adsByType.Values)
+                ad.InitializeProviders();
         }
 
         private void Update()
@@ -111,13 +120,8 @@ namespace Dann.GameFoundation
             if (Time.time < nextUpdateTime) return;
             nextUpdateTime = Time.time + UpdateInterval;
 
-            banner?.ExecuteUpdate();
-            interstitial?.ExecuteUpdate();
-            rewardedVideo?.ExecuteUpdate();
-            rewardedInterstitial?.ExecuteUpdate();
-            appOpen?.ExecuteUpdate();
-            native?.ExecuteUpdate();
-            mrec?.ExecuteUpdate();
+            foreach (AdvertisingAdController ad in adsByType.Values)
+                ad.ExecuteUpdate();
         }
     }
 }

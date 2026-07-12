@@ -22,7 +22,7 @@ namespace Dann.GameFoundation
         private int loadVersion;
         private bool isShowing;
 
-        public abstract AdvertisingAdType AdType { get; }
+        public AdvertisingAdType AdType = AdvertisingAdType.None;
 
         public AdvertisingAdState AdState => adState;
 
