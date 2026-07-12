@@ -36,7 +36,6 @@ public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
         Debug.Log("Initialized AnalyticsServices");
         AnalyticsService.Get().Initialize();
         yield return new WaitUntil(() => AnalyticsService.Get().IsInitialized);
-        LogSystem.LogSuccess($"[ManagerCoordinator] Analytics Service: {AnalyticsService.Get().IsInitialized}");
 #endif
 
 #if ADMOB
@@ -50,7 +49,6 @@ public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
 
         AdvertisingService.Get().Initialize();
         yield return new WaitUntil(() => AdvertisingService.Get().IsInitialized);
-        LogSystem.LogSuccess($"[ManagerCoordinator] Advertising Service: {AdvertisingService.Get().IsInitialized}");
 #endif
 
         yield break;

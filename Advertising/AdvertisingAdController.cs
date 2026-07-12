@@ -8,6 +8,7 @@ namespace Dann.GameFoundation
     {
         [SerializeField] private AdvertisingAdType adType = AdvertisingAdType.None;
         [SerializeField] private AdvertisingMediationMode mode = AdvertisingMediationMode.Waterfall;
+        [SerializeField] private bool autoReload = true;
         [SerializeField] private List<AdvertisingProviderBase> providers = new();
         private IAdvertisingProvider loadedProvider;
         private int providerIndex;
@@ -16,6 +17,12 @@ namespace Dann.GameFoundation
         public virtual AdvertisingAdType AdType => adType;
 
         public AdvertisingMediationMode Mode => mode;
+
+        public bool AutoReload
+        {
+            get => autoReload;
+            set => autoReload = value;
+        }
 
         public AdvertisingAdState AdState
         {
@@ -60,7 +67,7 @@ namespace Dann.GameFoundation
 
         public virtual void ExecuteUpdate()
         {
-            if (!isShowing && (AdState == AdvertisingAdState.Unavailable || mode == AdvertisingMediationMode.Parallel))
+            if (autoReload && !isShowing && (AdState == AdvertisingAdState.Unavailable || mode == AdvertisingMediationMode.Parallel))
                 Load();
         }
 

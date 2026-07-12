@@ -5,6 +5,7 @@
     "EditorCools.Runtime",
     "MoreMountains.NiceVibrations",
     "MoreMountains.NiceVibrations.Haptics",
+    "UniTask",
     "Unity.InputSystem",
     "Unity.TextMeshPro",
     "UnityEngine.UI"

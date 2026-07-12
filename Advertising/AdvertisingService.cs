@@ -1,5 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace Dann.GameFoundation
@@ -51,7 +53,13 @@ namespace Dann.GameFoundation
             BuildAdMap();
             BuildProviders();
             InitializeProviders();
-            IsInitialized = true;
+
+            PromiseAdvertisingOnStartup(
+                shown => {
+                    IsInitialized = true;
+                    Manager.Get().FinalizeAdSequence();
+                },
+                () => IsInitialized = true).Forget();
         }
 
         public void Load(AdvertisingAdType adType, params string[] parameters)
@@ -66,6 +74,37 @@ namespace Dann.GameFoundation
                 ad.Show(completed, parameters != null && parameters.Length > 0 ? parameters[0] : null);
             else
                 completed?.Invoke(false);
+        }
+
+        public async UniTaskVoid PromiseAdvertisingOnStartup(Action<bool> completed, Action timedOut = null, float timeoutSeconds = 15f, string providerName = null)
+        {
+            (bool isTimeout, bool shown) = await PromiseAdvertisingOnStartup(providerName)
+                .TimeoutWithoutException(TimeSpan.FromSeconds(timeoutSeconds));
+
+            if (isTimeout)
+                timedOut?.Invoke();
+            else
+                completed?.Invoke(shown);
+        }
+
+        public async UniTask<bool> PromiseAdvertisingOnStartup(string providerName = null, CancellationToken cancellationToken = default)
+        {
+            if (PromiseAdvertising == null)
+                return false;
+
+            PromiseAdvertising.Load();
+            await UniTask.WaitUntil(() => PromiseAdvertising == null || PromiseAdvertising.IsLoaded, cancellationToken: cancellationToken);
+
+            if (PromiseAdvertising == null)
+                return false;
+
+            UniTaskCompletionSource<bool> completion = new();
+            using (cancellationToken.RegisterWithoutCaptureExecutionContext(() => completion.TrySetCanceled(cancellationToken)))
+            {
+                PromiseAdvertising.Show(shown => completion.TrySetResult(shown), providerName);
+                bool shown = await completion.Task;
+                return shown;
+            }
         }
 
         public void Hide(AdvertisingAdType adType, params string[] parameters)
@@ -130,16 +169,24 @@ namespace Dann.GameFoundation
         {
             foreach (AdvertisingAdController ad in adsByType.Values)
                 ad.BuildProviders();
+
+            if (PromiseAdvertising != null && !adsByType.ContainsValue(PromiseAdvertising))
+                PromiseAdvertising.BuildProviders();
         }
 
         private void InitializeProviders()
         {
             foreach (AdvertisingAdController ad in adsByType.Values)
                 ad.InitializeProviders();
+
+            if (PromiseAdvertising != null && !adsByType.ContainsValue(PromiseAdvertising))
+                PromiseAdvertising.InitializeProviders();
         }
 
         private void Update()
         {
+            if (IsInitialized == false) return;
+
             if (Time.time < nextUpdateTime) return;
             nextUpdateTime = Time.time + UpdateInterval;
 
