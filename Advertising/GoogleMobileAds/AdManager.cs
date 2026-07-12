@@ -133,7 +133,7 @@ public partial class AdManager : SingletonGlobal<AdManager>
             {
                 Concurrency.Instance().Enqueue(() => this.interstitialAdmobOpenSupport.PromiseShowInterstitialOpenAd());
             }
-            else Manager.Get().FinalizeAdSequence();
+            else Manager.Get()?.FinalizeAdSequence();
         }); 
         Debug.Log("Waiting for AdMob initialization...");    
     }
