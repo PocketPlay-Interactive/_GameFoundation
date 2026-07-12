@@ -1,13 +1,13 @@
-﻿using DG.Tweening;
+using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
-public class MusicManager : SingletonGlobal<MusicManager>
+public class MusicManager : SingletonGlobal<MusicManager>, IGameFoundationModule
 {
     public enum Music
     {
         NONE,
-        // Thêm các loại nhạc khác ở đây
     }
 
     [System.Serializable]
@@ -19,24 +19,28 @@ public class MusicManager : SingletonGlobal<MusicManager>
 
     [SerializeField] private MusicTable[] musics;
     [SerializeField] private AudioSource audioSource;
-    private Dictionary<Music, AudioClip> musicDics = new();
 
-    protected override void Awake()
+    private readonly Dictionary<Music, AudioClip> musicDics = new Dictionary<Music, AudioClip>();
+    private const string SettingKeyMusic = "MUSIC";
+    private bool isInitialized;
+
+    public int Order => -50;
+
+    public IEnumerator Initialize()
     {
-        base.Awake();
-        musicDics.Clear();
-        foreach (var m in musics)
-            if (m.clip && !musicDics.ContainsKey(m.music))
-                musicDics.Add(m.music, m.clip);
+        EnsureInitialized();
+        SetMute();
+        yield break;
     }
 
     public void PlayMusic(Music music, float volume = 1.0f, bool loop = true)
     {
+        EnsureInitialized();
         if (!musicDics.TryGetValue(music, out var clip) || clip == null)
             return;
 
         if (audioSource.isPlaying && audioSource.clip == clip)
-            return; // Đã phát đúng nhạc này rồi
+            return;
 
         audioSource.Stop();
         audioSource.clip = clip;
@@ -47,30 +51,86 @@ public class MusicManager : SingletonGlobal<MusicManager>
 
     public void StopMusic()
     {
+        EnsureInitialized();
         audioSource.Stop();
     }
 
     public void PauseMusic()
     {
+        EnsureInitialized();
         audioSource.Pause();
     }
 
     public void ResumeMusic()
     {
+        EnsureInitialized();
         audioSource.UnPause();
     }
 
     public void SetMute(bool isMute)
     {
+        EnsureInitialized();
         audioSource.mute = isMute;
+    }
+
+    public void SetMute()
+    {
+        SetMute(!RuntimeStorageData.SETTING.Get(SettingKeyMusic, true));
     }
 
     public void SetVolume(float toVolume, float duration = 1f)
     {
-        DOTween.To(() => audioSource.volume, x => audioSource.volume = x, toVolume, duration);
+        EnsureInitialized();
+        DOTween.Kill(audioSource);
+        DOTween.To(() => audioSource.volume, x => audioSource.volume = x, toVolume, duration).SetTarget(audioSource);
     }
 
-    public bool IsPlaying => audioSource.isPlaying;
-    public float CurrentVolume => audioSource.volume;
-    public AudioClip CurrentClip => audioSource.clip;
+    public bool IsPlaying
+    {
+        get
+        {
+            EnsureInitialized();
+            return audioSource.isPlaying;
+        }
+    }
+
+    public float CurrentVolume
+    {
+        get
+        {
+            EnsureInitialized();
+            return audioSource.volume;
+        }
+    }
+
+    public AudioClip CurrentClip
+    {
+        get
+        {
+            EnsureInitialized();
+            return audioSource.clip;
+        }
+    }
+
+    private void EnsureInitialized()
+    {
+        if (isInitialized) return;
+        isInitialized = true;
+
+        if (!audioSource)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+            audioSource.playOnAwake = false;
+            audioSource.loop = true;
+        }
+
+        musicDics.Clear();
+        if (musics == null) return;
+
+        foreach (var m in musics)
+        {
+            if (m.clip && !musicDics.ContainsKey(m.music))
+                musicDics.Add(m.music, m.clip);
+        }
+    }
 }

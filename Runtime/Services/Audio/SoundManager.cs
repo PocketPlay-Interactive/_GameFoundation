@@ -1,9 +1,10 @@
-﻿using System;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 
-public class SoundManager : SingletonGlobal<SoundManager>
+public class SoundManager : SingletonGlobal<SoundManager>, IGameFoundationModule
 {
     public enum Sound
     {
@@ -22,85 +23,66 @@ public class SoundManager : SingletonGlobal<SoundManager>
 
     [SerializeField] private SoundTable[] sounds;
     [SerializeField] private AudioSource audioSourceSpecial;
-    [SerializeField] private int audioSourceCount = 20; // Tăng lên 20 AudioSource để xử lý súng bắn nhanh
-    
-    private List<AudioSource> audioSources = new List<AudioSource>();
-    private int currentAudioSourceIndex = 0;
-    
-    private Dictionary<Sound, AudioClip[]> soundDics = new();
-    private Dictionary<Sound, float> lastPlayTime = new();
+    [SerializeField] private int audioSourceCount = 20;
     [SerializeField] private float minIntervalSameSound = 0.05f;
+    [SerializeField] private bool overrideAudioVoiceConfig = false;
 
-    protected override void Awake()
-    {
-        base.Awake();
-        
-        // Tăng số lượng virtual voices lên tối đa
-        var config = AudioSettings.GetConfiguration();
-        config.numVirtualVoices = 512;
-        config.numRealVoices = 32; // Số voices thật sự được phát (hardware limit)
-        AudioSettings.Reset(config);
-        
-        foreach (var s in sounds)
-        {
-            if (s.clips != null && s.clips.Length > 0)
-            {
-                if (!soundDics.ContainsKey(s.sound))
-                    soundDics.Add(s.sound, s.clips);
-            }
-        }
-        
-        // Tạo nhiều AudioSource để phân tải PlayOneShot
-        for (int i = 0; i < audioSourceCount; i++)
-        {
-            GameObject go = new GameObject($"AudioSource_{i}");
-            go.transform.SetParent(transform);
-            AudioSource src = go.AddComponent<AudioSource>();
-            src.playOnAwake = false;
-            src.loop = false;
-            src.priority = 128; // Priority thấp nhất để không bị giới hạn
-            audioSources.Add(src);
-        }
-        
-        Debug.Log($"[SoundManager] Initialized with {audioSourceCount} AudioSources");
-    }
+    private readonly List<AudioSource> audioSources = new List<AudioSource>();
+    private readonly Dictionary<Sound, AudioClip[]> soundDics = new Dictionary<Sound, AudioClip[]>();
+    private readonly Dictionary<Sound, float> lastPlayTime = new Dictionary<Sound, float>();
+    private const string SettingKeySound = "SOUND";
+    private int currentAudioSourceIndex;
+    private bool isInitialized;
 
-    private void Start()
+    public int Order => -50;
+
+    public IEnumerator Initialize()
     {
-        DOVirtual.DelayedCall(0.5f, () => SetMute());
+        EnsureInitialized();
+        SetMute();
+        yield break;
     }
 
     public void SetMute()
     {
-        bool mute = !RuntimeStorageData.SETTING.Get("sound", true);
+        EnsureInitialized();
+        bool mute = !RuntimeStorageData.SETTING.Get(SettingKeySound, true);
+
         foreach (var src in audioSources)
             if (src) src.mute = mute;
+
         if (audioSourceSpecial) audioSourceSpecial.mute = mute;
     }
 
     public void VolumeChange(float toVolume)
     {
+        EnsureInitialized();
+
         foreach (var src in audioSources)
-        {
             if (src)
-                DOTween.To(() => src.volume, x => src.volume = x, toVolume, 1f);
-        }
+            {
+                DOTween.Kill(src);
+                DOTween.To(() => src.volume, x => src.volume = x, toVolume, 1f).SetTarget(src);
+            }
+
         if (audioSourceSpecial)
-            DOTween.To(() => audioSourceSpecial.volume, x => audioSourceSpecial.volume = x, toVolume, 1f);
+        {
+            DOTween.Kill(audioSourceSpecial);
+            DOTween.To(() => audioSourceSpecial.volume, x => audioSourceSpecial.volume = x, toVolume, 1f).SetTarget(audioSourceSpecial);
+        }
     }
 
     public void PlayOnShot(Sound sound, float volume = 1f)
     {
+        EnsureInitialized();
         if (!soundDics.TryGetValue(sound, out var clips) || clips.Length == 0) return;
 
-        // Giảm spam cho UI sounds
         float now = Time.unscaledTime;
         if (lastPlayTime.TryGetValue(sound, out float last) && now - last < minIntervalSameSound)
             return;
-        lastPlayTime[sound] = now;
 
-        var clip = clips[UnityEngine.Random.Range(0, clips.Length)];
-        PlayClipDirect(clip, volume);
+        lastPlayTime[sound] = now;
+        PlayClipDirect(clips[UnityEngine.Random.Range(0, clips.Length)], volume);
     }
 
     public void PlayOnShot(AudioClip clip, float volume = 1f)
@@ -110,14 +92,15 @@ public class SoundManager : SingletonGlobal<SoundManager>
 
     public void PlaySpecialSound(Sound sound, float volume = 1.0f)
     {
+        EnsureInitialized();
         if (!soundDics.TryGetValue(sound, out var clips) || clips.Length == 0) return;
+
         var clip = clips[UnityEngine.Random.Range(0, clips.Length)];
-        if (audioSourceSpecial && clip)
-        {
-            audioSourceSpecial.volume = volume;
-            audioSourceSpecial.clip = clip;
-            audioSourceSpecial.Play();
-        }
+        if (!audioSourceSpecial || !clip) return;
+
+        audioSourceSpecial.volume = volume;
+        audioSourceSpecial.clip = clip;
+        audioSourceSpecial.Play();
     }
 
     public void StopSpecialSound()
@@ -127,20 +110,21 @@ public class SoundManager : SingletonGlobal<SoundManager>
 
     public AudioClip GetRandomClip(Sound sound)
     {
+        EnsureInitialized();
+
         if (soundDics.TryGetValue(sound, out var clips) && clips.Length > 0)
             return clips[UnityEngine.Random.Range(0, clips.Length)];
+
         return null;
     }
 
     public AudioClip ConvertToClip(Sound sound) => GetRandomClip(sound);
 
-    // Thay vì dùng PlayOneShot (tạo voice mới mỗi lần)
-    // Dùng Play() với AudioSource riêng biệt (1 AudioSource = 1 voice)
     public void PlayClipDirect(AudioClip clip, float volume = 1f)
     {
+        EnsureInitialized();
         if (clip == null || audioSources.Count == 0) return;
-        
-        // Tìm AudioSource đang KHÔNG phát (available)
+
         AudioSource availableSrc = null;
         foreach (var src in audioSources)
         {
@@ -150,21 +134,57 @@ public class SoundManager : SingletonGlobal<SoundManager>
                 break;
             }
         }
-        
-        // Nếu không có AudioSource rảnh, dùng round-robin (ghi đè cũ)
+
         if (availableSrc == null)
         {
             availableSrc = audioSources[currentAudioSourceIndex];
             currentAudioSourceIndex = (currentAudioSourceIndex + 1) % audioSources.Count;
         }
-        
-        if (availableSrc != null)
+
+        if (availableSrc == null) return;
+
+        availableSrc.clip = clip;
+        availableSrc.volume = volume;
+        availableSrc.Play();
+    }
+
+    private void EnsureInitialized()
+    {
+        if (isInitialized) return;
+        isInitialized = true;
+
+        if (overrideAudioVoiceConfig)
         {
-            // Dùng Play() thay vì PlayOneShot()
-            // Play() chỉ tạo 1 voice cho mỗi AudioSource
-            availableSrc.clip = clip;
-            availableSrc.volume = volume;
-            availableSrc.Play();
+            var config = AudioSettings.GetConfiguration();
+            config.numVirtualVoices = 512;
+            config.numRealVoices = 32;
+            AudioSettings.Reset(config);
         }
+
+        soundDics.Clear();
+        if (sounds != null)
+        {
+            foreach (var s in sounds)
+            {
+                if (s.clips != null && s.clips.Length > 0 && !soundDics.ContainsKey(s.sound))
+                    soundDics.Add(s.sound, s.clips);
+            }
+        }
+
+        audioSources.Clear();
+        int count = Mathf.Max(1, audioSourceCount);
+        for (int i = 0; i < count; i++)
+        {
+            GameObject go = new GameObject($"AudioSource_{i}");
+            go.transform.SetParent(transform);
+
+            AudioSource src = go.AddComponent<AudioSource>();
+            src.playOnAwake = false;
+            src.loop = false;
+            src.priority = 128;
+            audioSources.Add(src);
+        }
+
+        Debug.Log($"[SoundManager] Initialized with {count} AudioSources");
     }
 }

@@ -173,7 +173,7 @@ public sealed class RuntimeStorageDataWindow : EditorWindow
             DrawTableRow("PlayerId", view.Player.PlayerId);
             DrawTableRow("SelectedLanguage", view.Player.SelectedLanguage);
             DrawTableRow("GoldBalance", view.Player.GoldBalance.ToString());
-            DrawTableRow("LastLoginDayOfMonth", view.Player.LastLoginDayOfMonth.ToString());
+            DrawTableRow("LastLogin", view.Player.LastLogin.ToString("O"));
             DrawTableRow("LoginDayCount", view.Player.LoginDayCount.ToString());
             DrawTableRow("IsInitialLaunch", view.Player.IsInitialLaunch.ToString());
             DrawTableRow("CurrentLevelIndex", view.Player.CurrentLevelIndex.ToString());
