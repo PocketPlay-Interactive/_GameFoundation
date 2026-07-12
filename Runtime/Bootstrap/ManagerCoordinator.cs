@@ -50,9 +50,9 @@ public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
         AnalyticsService.Get().TrackEvent($"ump_consent_skipped_consent");
 #endif
 
-        // yield return AdManager.Get().InitializeAsync();
-        yield return new WaitUntil(() => Manager.Get().IsAdvertisementReady);
-        LogSystem.LogSuccess($"[ManagerCoordinator] ADMOB SDK INITIALIZED: {Manager.Get().IsAdvertisementReady}");
+        AdvertisingService.Get().Initialize();
+        yield return new WaitUntil(() => AdvertisingService.Get().IsInitialized);
+        LogSystem.LogSuccess($"[ManagerCoordinator] ADMOB SDK INITIALIZED: {AdvertisingService.Get().IsInitialized}");
 #endif
 
         yield break;

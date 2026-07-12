@@ -44,6 +44,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f7a0b2c9d344e1a8b6c3d2e1f9a7027, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Dann.GameFoundation::Dann.GameFoundation.RewardedInterstitialAdvertisingController
-  adType: 0
+  adType: 4
   adState: 0
-  providerPrefabs: []

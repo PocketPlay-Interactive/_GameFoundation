@@ -52,7 +52,7 @@ namespace Dann.GameFoundation
 
             try
             {
-                LoadedProvider.Show(LoadedRequest, shown =>
+                LoadedProvider.Show(AdType, shown =>
                 {
                     IsShowing = false;
 

@@ -44,6 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1c3e5f7b9d04e2c8a6f1b3d5e7c0920, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Dann.GameFoundation::Dann.GameFoundation.MRECAdvertisingController
-  adType: 0
+  adType: 7
   adState: 0
-  providerPrefabs: []
+  reloadInterval: 30

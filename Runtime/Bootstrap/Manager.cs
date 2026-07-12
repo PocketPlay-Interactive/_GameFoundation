@@ -7,9 +7,6 @@ using UnityEngine;
 [DefaultExecutionOrder(-100)]
 public class Manager : SingletonGlobal<Manager>
 {
-    [Header("Sdk State")]
-    public bool IsAdvertisementReady = false;
-
     [Header("Intertitial Ad Open")]
     public bool AlwayShowInterstitialAd = true;
 

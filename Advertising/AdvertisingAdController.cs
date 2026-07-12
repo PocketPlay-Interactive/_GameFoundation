@@ -6,20 +6,12 @@ namespace Dann.GameFoundation
 {
     public class AdvertisingAdController : MonoBehaviour
     {
-        [SerializeField] private string placementId;
         [SerializeField] private AdvertisingAdType adType = AdvertisingAdType.None;
         [SerializeField] private AdvertisingAdState adState = AdvertisingAdState.Unavailable;
-        [SerializeField] private AdvertisingAdUnit[] adUnits;
-        [SerializeField] private GameObject[] providerPrefabs;
-
         private readonly List<IAdvertisingProvider> providers = new();
         private IAdvertisingProvider loadedProvider;
-        private AdvertisingAdRequest loadedRequest;
         private int providerIndex;
-        private int adUnitIndex;
         private bool isShowing;
-
-        public string PlacementId => string.IsNullOrEmpty(placementId) ? AdType.ToString() : placementId;
 
         public virtual AdvertisingAdType AdType => adType;
 
@@ -38,8 +30,6 @@ namespace Dann.GameFoundation
             get => loadedProvider;
             set => loadedProvider = value;
         }
-
-        protected AdvertisingAdRequest LoadedRequest => loadedRequest;
 
         protected int ProviderIndex
         {
@@ -61,29 +51,22 @@ namespace Dann.GameFoundation
 
         public void BuildProviders()
         {
-            if (providers.Count > 0 || providerPrefabs == null)
+            if (providers.Count > 0)
                 return;
 
-            foreach (GameObject providerPrefab in providerPrefabs)
+            MonoBehaviour[] components = GetComponentsInChildren<MonoBehaviour>(true);
+
+            foreach (MonoBehaviour component in components)
             {
-                if (providerPrefab == null)
+                if (component is not IAdvertisingProvider provider)
                     continue;
 
-                GameObject providerObject = Instantiate(providerPrefab, transform);
-                MonoBehaviour[] components = providerObject.GetComponentsInChildren<MonoBehaviour>(true);
-
-                foreach (MonoBehaviour component in components)
-                {
-                    if (component is not IAdvertisingProvider provider)
-                        continue;
-
-                    if (!provider.Supports(AdType))
-                        continue;
-
-                    if (!providers.Contains(provider))
-                        providers.Add(provider);
-                }
+                if (!providers.Contains(provider))
+                    providers.Add(provider);
             }
+
+            if (providers.Count == 0)
+                Debug.LogWarning($"Advertising controller has no providers: {AdType}", this);
         }
 
         public void InitializeProviders()
@@ -104,8 +87,14 @@ namespace Dann.GameFoundation
 
         public virtual void Load()
         {
-            if (isShowing || adState != AdvertisingAdState.Unavailable || providers.Count == 0)
+            if (isShowing || adState != AdvertisingAdState.Unavailable)
                 return;
+
+            if (providers.Count == 0)
+            {
+                Debug.LogWarning($"Advertising load skipped, no providers: {AdType}", this);
+                return;
+            }
 
             IAdvertisingProvider provider = GetCurrentProvider();
 
@@ -137,7 +126,7 @@ namespace Dann.GameFoundation
 
             try
             {
-                loadedProvider.Show(loadedRequest, shown =>
+                loadedProvider.Show(AdType, shown =>
                 {
                     isShowing = false;
                     OnShowCompleted(loadedProvider, shown);
@@ -161,7 +150,7 @@ namespace Dann.GameFoundation
 
             try
             {
-                loadedProvider.Hide(loadedRequest);
+                loadedProvider.Hide(AdType);
             }
             catch (Exception exception)
             {
@@ -172,19 +161,14 @@ namespace Dann.GameFoundation
 
         protected void LoadProvider(IAdvertisingProvider provider)
         {
-            if (provider == null || !provider.IsInitialized || !provider.Supports(AdType))
+            if (provider == null || !provider.IsInitialized)
                 return;
 
             adState = AdvertisingAdState.Loading;
-            AdvertisingAdRequest request = CreateRequest(provider);
 
             try
             {
-                provider.Load(request, state =>
-                {
-                    loadedRequest = request;
-                    OnProviderLoaded(provider, state);
-                });
+                provider.Load(AdType, state => OnProviderLoaded(provider, state));
             }
             catch (Exception exception)
             {
@@ -200,14 +184,14 @@ namespace Dann.GameFoundation
             loadedProvider = state == AdvertisingAdState.Ready ? provider : null;
 
             if (state == AdvertisingAdState.Unavailable)
-                AdvanceRequest();
+                AdvanceProvider();
         }
 
         protected virtual void OnShowCompleted(IAdvertisingProvider provider, bool shown)
         {
             adState = AdvertisingAdState.Unavailable;
             loadedProvider = null;
-            AdvanceRequest();
+            AdvanceProvider();
         }
 
         protected IAdvertisingProvider GetCurrentProvider()
@@ -215,11 +199,8 @@ namespace Dann.GameFoundation
             if (providers.Count == 0)
                 return null;
 
-            if (adUnits != null && adUnits.Length > 0)
-                return GetCurrentProviderByAdUnit();
-
             IAdvertisingProvider provider = providers[PositiveModulo(providerIndex, providers.Count)];
-            return provider.IsInitialized && provider.Supports(AdType) ? provider : null;
+            return provider.IsInitialized ? provider : null;
         }
 
         protected void AdvanceProvider()
@@ -230,56 +211,6 @@ namespace Dann.GameFoundation
                 return;
 
             providerIndex = PositiveModulo(providerIndex + 1, providers.Count);
-        }
-
-        protected void AdvanceRequest()
-        {
-            loadedProvider = null;
-
-            if (adUnits != null && adUnits.Length > 0)
-            {
-                adUnitIndex = PositiveModulo(adUnitIndex + 1, adUnits.Length);
-                return;
-            }
-
-            AdvanceProvider();
-        }
-
-        private IAdvertisingProvider GetCurrentProviderByAdUnit()
-        {
-            for (int i = 0; i < adUnits.Length; i++)
-            {
-                AdvertisingAdUnit adUnit = adUnits[PositiveModulo(adUnitIndex + i, adUnits.Length)];
-                IAdvertisingProvider provider = FindProvider(adUnit.ProviderName);
-
-                if (provider == null || !provider.IsInitialized || !provider.Supports(AdType))
-                    continue;
-
-                adUnitIndex = PositiveModulo(adUnitIndex + i, adUnits.Length);
-                return provider;
-            }
-
-            return null;
-        }
-
-        private IAdvertisingProvider FindProvider(string providerName)
-        {
-            foreach (IAdvertisingProvider provider in providers)
-            {
-                if (string.IsNullOrEmpty(providerName) || provider.ProviderName == providerName)
-                    return provider;
-            }
-
-            return null;
-        }
-
-        private AdvertisingAdRequest CreateRequest(IAdvertisingProvider provider)
-        {
-            if (adUnits == null || adUnits.Length == 0)
-                return new AdvertisingAdRequest(PlacementId, AdType, string.Empty);
-
-            AdvertisingAdUnit adUnit = adUnits[PositiveModulo(adUnitIndex, adUnits.Length)];
-            return new AdvertisingAdRequest(PlacementId, AdType, adUnit.GetAdUnitId());
         }
 
         private static int PositiveModulo(int value, int length)
