@@ -8,22 +8,22 @@ namespace Dann.GameFoundation
         public override void Initialize()
         {
             base.Initialize();
-            Debug.Log($"Initialize Advertising Provide {this.name}");
+            Debug.Log($"Initialize Advertising Provide {this.name} - {this.AdUnitId}");
         }
 
         public override void Hide(AdvertisingAdType adType)
         {
-            Debug.Log("Hide");
+            Debug.Log($"Hide Advertising Provide {this.name} - {this.AdUnitId}");
         }
 
         public override void Load(AdvertisingAdType adType, Action<AdvertisingAdState> completed)
         {
-            Debug.Log("Load");
+            Debug.Log($"Load Advertising Provide {this.name} - {this.AdUnitId}");
         }
 
         public override void Show(AdvertisingAdType adType, Action<bool> completed)
         {
-            Debug.Log("Show");
+            Debug.Log($"Show Advertising Provide {this.name} - {this.AdUnitId}");
         }
     }
 }

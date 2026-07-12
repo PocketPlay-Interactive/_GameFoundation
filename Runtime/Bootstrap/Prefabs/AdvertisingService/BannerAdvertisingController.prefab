@@ -1,53 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &3906068140271298879
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5633999071882111771}
-  - component: {fileID: 6873029926531197967}
-  m_Layer: 0
-  m_Name: Admob
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &5633999071882111771
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3906068140271298879}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 698294910443436447}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6873029926531197967
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3906068140271298879}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ac466ad38f9363349ab9f060f5a0d33e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Dann.GameFoundation::Dann.GameFoundation.AdmobBannerAdvertisingProvider
-  providerName: banner_admob
-  androidAdUnitId: ca-app-pub-3940256099942544/6300978111
-  iosAdUnitId: ca-app-pub-3940256099942544/6300978111
-  editorAdUnitId: ca-app-pub-3940256099942544/6300978111
 --- !u!1 &4428264127108343020
 GameObject:
   m_ObjectHideFlags: 0
@@ -77,8 +29,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 5633999071882111771}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &309257179060854309
@@ -94,5 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Dann.GameFoundation::Dann.GameFoundation.BannerAdvertisingController
   adType: 1
-  adState: 0
+  mode: 0
+  providers:
+  - {fileID: 0}
   reloadInterval: 30

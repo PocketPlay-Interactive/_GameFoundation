@@ -64,7 +64,7 @@ namespace Dann.GameFoundation
 
             if (isChecking)
             {
-                Debug.LogError(logPrefix + ConsentInformation.ConsentStatus.ToString().ToUpper() + " CHECKING");
+                // Debug.LogError(logPrefix + ConsentInformation.ConsentStatus.ToString().ToUpper() + " CHECKING");
                 yield break;
             }
 
@@ -87,13 +87,13 @@ namespace Dann.GameFoundation
                 };
             }
 
-            Debug.Log(logPrefix + ConsentInformation.ConsentStatus.ToString().ToUpper() + " --> UPDATE");
+            // Debug.Log(logPrefix + ConsentInformation.ConsentStatus.ToString().ToUpper() + " --> UPDATE");
 
             ConsentInformation.Update(requestParameters, (FormError error) =>
             {
                 if (error != null)
                 {
-                    Debug.LogError(logPrefix + ConsentInformation.ConsentStatus.ToString().ToUpper() + " --> " + error.Message);
+                    // Debug.LogError(logPrefix + ConsentInformation.ConsentStatus.ToString().ToUpper() + " --> " + error.Message);
                     AnalyticsService.Get().TrackEvent($"ump_consent_ump_update_error_" + ConsentInformation.ConsentStatus.ToString());
                     isChecking = false;
                     HasUnknownError = true;
@@ -104,7 +104,7 @@ namespace Dann.GameFoundation
                 {
                     // Consent has already been gathered or not required.
                     // Return control back to the user.
-                    Debug.Log(logPrefix + "Update " + ConsentInformation.ConsentStatus.ToString().ToUpper() + " -- Consent has already been gathered or not required");
+                    // Debug.Log(logPrefix + "Update " + ConsentInformation.ConsentStatus.ToString().ToUpper() + " -- Consent has already been gathered or not required");
                     AnalyticsService.Get().TrackEvent($"ump_consent_ump_update_success_" + ConsentInformation.ConsentStatus.ToString());
                     isChecking = false;
                     IsUMPReady = true;
@@ -116,19 +116,19 @@ namespace Dann.GameFoundation
 
                 // Consent not obtained and is required.
                 // Load the initial consent request form for the user.
-                Debug.Log(logPrefix + ConsentInformation.ConsentStatus.ToString().ToUpper() + " --> LOAD AND SHOW ConsentForm If Required");
+                // Debug.Log(logPrefix + ConsentInformation.ConsentStatus.ToString().ToUpper() + " --> LOAD AND SHOW ConsentForm If Required");
                 AnalyticsService.Get().TrackEvent($"ump_consent_ump_loadshow");
                 ConsentForm.LoadAndShowConsentFormIfRequired((FormError error) =>
                 {
                     if (error != null) // Form load failed.
                     {
-                        Debug.LogError(logPrefix + ConsentInformation.ConsentStatus.ToString().ToUpper() + " --> " + error.Message);
+                        // Debug.LogError(logPrefix + ConsentInformation.ConsentStatus.ToString().ToUpper() + " --> " + error.Message);
                         AnalyticsService.Get().TrackEvent($"ump_consent_ump_loadshow_error");
                         HasUnknownError = true;
                     }
                     else  // Form showing succeeded.
                     {
-                        Debug.Log(logPrefix + ConsentInformation.ConsentStatus.ToString().ToUpper() + " --> LOAD AND SHOW SUCCESS");
+                        // Debug.Log(logPrefix + ConsentInformation.ConsentStatus.ToString().ToUpper() + " --> LOAD AND SHOW SUCCESS");
                         AnalyticsService.Get().TrackEvent($"ump_consent_ump_loadshow_success");
                     }
                     CanRequestAds = ConsentInformation.CanRequestAds();
@@ -150,22 +150,22 @@ namespace Dann.GameFoundation
         private void LogAllConsentInformation()
         {
             Time.timeScale = 1;
-            Debug.Log($"[{this.GetType().ToString()}] --------------------------------- Log All Consent Information ---------------------------------");
-            Debug.Log($"[{this.GetType().ToString()}] Is Consent Form Available : " + ConsentInformation.IsConsentFormAvailable());
-            Debug.Log($"[{this.GetType().ToString()}] Consent Status : " + ConsentInformation.ConsentStatus);
-            Debug.Log($"[{this.GetType().ToString()}] Can Request Ads : " + ConsentInformation.CanRequestAds());
+            // Debug.Log($"[{this.GetType().ToString()}] --------------------------------- Log All Consent Information ---------------------------------");
+            // Debug.Log($"[{this.GetType().ToString()}] Is Consent Form Available : " + ConsentInformation.IsConsentFormAvailable());
+            // Debug.Log($"[{this.GetType().ToString()}] Consent Status : " + ConsentInformation.ConsentStatus);
+            // Debug.Log($"[{this.GetType().ToString()}] Can Request Ads : " + ConsentInformation.CanRequestAds());
 
         }
 
         public void ShowPrivacyOptionsForm(Button privacyButton, Action<string> onComplete)
         {
-            Debug.Log(logPrefix + "Showing privacy options form...");
+            // Debug.Log(logPrefix + "Showing privacy options form...");
             AnalyticsService.Get().TrackEvent($"ump_consent_ump_option_show");
             ConsentForm.ShowPrivacyOptionsForm((FormError error) =>
             {
                 if (error != null)
                 {
-                    Debug.LogError(logPrefix + "Showing privacy options form - ERROR " + error.Message);
+                    // Debug.LogError(logPrefix + "Showing privacy options form - ERROR " + error.Message);
                     onComplete?.Invoke(error.Message);
                     AnalyticsService.Get().TrackEvent($"ump_consent_ump_option_show_error");
                 }
@@ -173,7 +173,7 @@ namespace Dann.GameFoundation
                 {
                     if (privacyButton)
                         privacyButton.interactable = ConsentInformation.PrivacyOptionsRequirementStatus == PrivacyOptionsRequirementStatus.Required;
-                    Debug.Log(logPrefix + "Showing privacy options form - SUCCESS");
+                    // Debug.Log(logPrefix + "Showing privacy options form - SUCCESS");
                     onComplete?.Invoke(null);
                     AnalyticsService.Get().TrackEvent($"ump_consent_ump_option_show_success");
                 }
@@ -191,18 +191,18 @@ namespace Dann.GameFoundation
     public static bool CanRequestAds => false;
     public static IEnumerator DOGatherConsent()
     {
-        Debug.LogWarning(TAG + "Set Symbol USE_ADMOB in Player Settings");
+        // Debug.LogWarning(TAG + "Set Symbol USE_ADMOB in Player Settings");
         yield return null;
     }
 
     public static void ShowPrivacyOptionsForm(Button privacyButton, Action<string> onComplete)
     {
-        Debug.LogWarning(TAG + "Set Symbol USE_ADMOB in Player Settings");
+        // Debug.LogWarning(TAG + "Set Symbol USE_ADMOB in Player Settings");
     }
 
     public void ResetConsentInformation()
     {
-        Debug.LogWarning(TAG + "Set Symbol USE_ADMOB in Player Settings");
+        // Debug.LogWarning(TAG + "Set Symbol USE_ADMOB in Player Settings");
     }
 #endif
     }

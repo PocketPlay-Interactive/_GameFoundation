@@ -12,8 +12,7 @@ namespace Dann.GameFoundation
 
         protected override void VirtualInitializedProviders()
         {
-            // base.VirtualInitializedProviders();
-            
+
         }
 
         public override void ExecuteUpdate()

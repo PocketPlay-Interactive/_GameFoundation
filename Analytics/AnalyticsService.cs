@@ -8,6 +8,8 @@ namespace Dann.GameFoundation
     {
         [SerializeField] private GameObject[] providerPrefabs;
 
+        [Header("Setting")]
+        [SerializeField] private bool enableEditorLogging = false;
         private readonly List<IAnalyticsProvider> providers = new();
 
         public bool IsInitialized { get; private set; }
@@ -24,8 +26,7 @@ namespace Dann.GameFoundation
                 }
                 catch (Exception exception)
                 {
-                    Debug.LogError(
-                        $"Analytics provider init failed: {provider.ProviderName}\n{exception}");
+                    if(enableEditorLogging) Debug.LogError($"Analytics provider init failed: {provider.ProviderName}\n{exception}");
                 }
             }
 
@@ -62,11 +63,11 @@ namespace Dann.GameFoundation
         {
             if (string.IsNullOrWhiteSpace(eventName))
             {
-                Debug.LogWarning("Analytics event name is empty.");
+                if(enableEditorLogging) Debug.LogWarning("Analytics event name is empty.");
                 return;
             }
 
-            Debug.Log($"Analytics : {eventName}");
+            if(enableEditorLogging) Debug.Log($"Analytics : {eventName}");
 
             foreach (IAnalyticsProvider provider in providers)
             {
@@ -79,7 +80,7 @@ namespace Dann.GameFoundation
                 }
                 catch (Exception exception)
                 {
-                    Debug.LogError(
+                    if(enableEditorLogging) Debug.LogError(
                         $"Analytics event failed on {provider.ProviderName}: {eventName}\n{exception}");
                 }
             }
@@ -89,7 +90,7 @@ namespace Dann.GameFoundation
         {
             if (string.IsNullOrWhiteSpace(where))
             {
-                Debug.LogWarning("Analytics event name is empty.");
+                if(enableEditorLogging) Debug.LogWarning("Analytics event name is empty.");
                 return;
             }
 
@@ -104,7 +105,7 @@ namespace Dann.GameFoundation
                 }
                 catch (Exception exception)
                 {
-                    Debug.LogError(
+                    if(enableEditorLogging) Debug.LogError(
                         $"Analytics event failed on {provider.ProviderName}: {where}\n{exception}");
                 }
             }
@@ -121,7 +122,7 @@ namespace Dann.GameFoundation
                 }
                 catch (Exception exception)
                 {
-                    Debug.LogError(
+                    if(enableEditorLogging) Debug.LogError(
                         $"SetUserId failed on {provider.ProviderName}\n{exception}");
                 }
             }
@@ -138,7 +139,7 @@ namespace Dann.GameFoundation
                 }
                 catch (Exception exception)
                 {
-                    Debug.LogError(
+                    if(enableEditorLogging) Debug.LogError(
                         $"SetUserProperty failed on {provider.ProviderName}\n{exception}");
                 }
             }
@@ -155,7 +156,7 @@ namespace Dann.GameFoundation
                 }
                 catch (Exception exception)
                 {
-                    Debug.LogError(
+                    if(enableEditorLogging) Debug.LogError(
                         $"Analytics flush failed on {provider.ProviderName}\n{exception}");
                 }
             }
