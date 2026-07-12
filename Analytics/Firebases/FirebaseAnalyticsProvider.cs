@@ -7,6 +7,7 @@ using Firebase.Analytics;
 
 namespace Dann.GameFoundation
 {
+    [ExtensionModuleNotice("Drag this FirebaseAnalyticsProvider object into AnalyticsService -> Provider Prefabs.")]
     public sealed class FirebaseAnalyticsProvider : MonoBehaviour, IAnalyticsProvider
     {
         public string ProviderName => "Firebase";

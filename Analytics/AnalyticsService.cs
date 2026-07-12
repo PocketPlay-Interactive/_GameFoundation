@@ -83,6 +83,11 @@ namespace Dann.GameFoundation
             }
         }
 
+        public void TrackRevenue()
+        {
+
+        }
+
         public void SetUserId(string userId)
         {
             foreach (IAnalyticsProvider provider in providers)

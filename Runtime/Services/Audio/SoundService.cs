@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 
-[ExtensionModuleNotice("Drag this SoundServices object into Manager -> Extension Modules.")]
-public class SoundServices : SingletonGlobal<SoundServices>, IGameFoundationModule
+[ExtensionModuleNotice("Drag this SoundService object into Manager -> Extension Modules.")]
+public class SoundService : SingletonGlobal<SoundService>, IGameFoundationModule
 {
     public enum Sound
     {
