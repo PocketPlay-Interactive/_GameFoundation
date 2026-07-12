@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="Documentation/Images~/banner_1.png" alt="Game Foundation Banner" width="100%">
+  <img src="Documentation/Images~/banner_1.jpg" alt="Game Foundation Banner" width="100%">
 </p>
 
 <h1 align="center">Game Foundation</h1>
@@ -69,7 +69,7 @@ Quy ước tên:
 | Libraries | Source vendor giữ riêng khỏi code GameFoundation. |
 
 <p align="center">
-  <img src="Documentation/Images~/banner_2.png" alt="Game Foundation Core Modules" width="100%">
+  <img src="Documentation/Images~/banner_2.jpg" alt="Game Foundation Core Modules" width="100%">
 </p>
 
 ## Architecture
@@ -95,7 +95,7 @@ Design principles:
 - Project-specific code stays in `Assets/_Project`.
 
 <p align="center">
-  <img src="Documentation/Images~/banner_3.png" alt="Game Foundation Architecture" width="100%">
+  <img src="Documentation/Images~/banner_3.jpg" alt="Game Foundation Architecture" width="100%">
 </p>
 
 ## Documentation
@@ -174,7 +174,7 @@ Không đổi tên file, class hoặc public API trong đợt tổ chức folder
 Một số tên như `RuntimeStorageExtention`, `AdmobInterstitalOpen`, `AdMobInterstital`, `AdmobNativeCollap`, `Firebases` và `EditorCools` là tên legacy đang tồn tại trong code. Tài liệu giữ nguyên tên API/path để người dùng tìm đúng symbol; không rename nếu chưa có migration riêng.
 
 <p align="center">
-  <img src="Documentation/Images~/banner_4.png" alt="Game Foundation Package Structure" width="100%">
+  <img src="Documentation/Images~/banner_4.jpg" alt="Game Foundation Package Structure" width="100%">
 </p>
 
 ### Quy Tắc Phân Loại
