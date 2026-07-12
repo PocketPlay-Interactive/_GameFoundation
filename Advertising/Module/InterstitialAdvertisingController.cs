@@ -6,11 +6,7 @@ namespace Dann.GameFoundation
 
         protected override void OnShowCompleted(IAdvertisingProvider provider, bool shown)
         {
-            AdState = AdvertisingAdState.Unavailable;
-            LoadedProvider = null;
-
-            if (Mode == AdvertisingMediationMode.Waterfall)
-                AdvanceProvider();
+            base.OnShowCompleted(provider, shown);
         }
     }
 }
