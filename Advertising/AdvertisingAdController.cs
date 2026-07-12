@@ -4,37 +4,51 @@ using UnityEngine;
 
 namespace Dann.GameFoundation
 {
-    public enum AdvertisingAdLoadMode
-    {
-        Waterfall,
-        All
-    }
-
     public class AdvertisingAdController : MonoBehaviour
     {
-        private AdvertisingAdState adState = AdvertisingAdState.Unavailable;
-        [SerializeField] private AdvertisingAdLoadMode loadMode = AdvertisingAdLoadMode.Waterfall;
+        [SerializeField] private AdvertisingAdType adType = AdvertisingAdType.None;
+        [SerializeField] private AdvertisingAdState adState = AdvertisingAdState.Unavailable;
+        [SerializeField] private GameObject[] providerPrefabs;
 
         private readonly List<IAdvertisingProvider> providers = new();
         private IAdvertisingProvider loadedProvider;
         private int providerIndex;
-        private int loadVersion;
         private bool isShowing;
 
-        public AdvertisingAdType AdType = AdvertisingAdType.None;
+        public virtual AdvertisingAdType AdType => adType;
 
-        public AdvertisingAdState AdState => adState;
+        public AdvertisingAdState AdState
+        {
+            get => adState;
+            protected set => adState = value;
+        }
 
         public bool IsLoaded => adState == AdvertisingAdState.Ready;
 
-
-        [Header("Provider Prefabs")]
-        [SerializeField] private GameObject[] providerPrefabs;
         public IReadOnlyList<IAdvertisingProvider> Providers => providers;
 
-        public void ExecuteUpdate()
+        protected IAdvertisingProvider LoadedProvider
         {
-            
+            get => loadedProvider;
+            set => loadedProvider = value;
+        }
+
+        protected int ProviderIndex
+        {
+            get => providerIndex;
+            set => providerIndex = PositiveModulo(value, providers.Count);
+        }
+
+        protected bool IsShowing
+        {
+            get => isShowing;
+            set => isShowing = value;
+        }
+
+        public virtual void ExecuteUpdate()
+        {
+            if (!isShowing && adState == AdvertisingAdState.Unavailable)
+                Load();
         }
 
         public void BuildProviders()
@@ -52,7 +66,7 @@ namespace Dann.GameFoundation
 
                 foreach (MonoBehaviour component in components)
                 {
-                    if (!(component is IAdvertisingProvider provider))
+                    if (component is not IAdvertisingProvider provider)
                         continue;
 
                     if (!provider.Supports(AdType))
@@ -80,23 +94,23 @@ namespace Dann.GameFoundation
             }
         }
 
-        public void Load()
+        public virtual void Load()
         {
             if (isShowing || adState != AdvertisingAdState.Unavailable || providers.Count == 0)
                 return;
 
-            loadVersion++;
+            IAdvertisingProvider provider = GetCurrentProvider();
 
-            if (loadMode == AdvertisingAdLoadMode.All)
+            if (provider == null)
             {
-                LoadAllProviders(loadVersion);
+                AdvanceProvider();
                 return;
             }
 
-            LoadCurrentProvider(0, loadVersion);
+            LoadProvider(provider);
         }
 
-        public void Show(Action<bool> completed = null)
+        public virtual void Show(Action<bool> completed = null)
         {
             if (isShowing)
             {
@@ -118,22 +132,8 @@ namespace Dann.GameFoundation
                 loadedProvider.Show(AdType, shown =>
                 {
                     isShowing = false;
-
-                    if (!shown)
-                    {
-                        adState = AdvertisingAdState.Unavailable;
-                        loadedProvider = null;
-                        AdvanceProvider();
-                        completed?.Invoke(false);
-                        Load();
-                        return;
-                    }
-
-                    completed?.Invoke(true);
-                    adState = AdvertisingAdState.Unavailable;
-                    loadedProvider = null;
-                    AdvanceProvider();
-                    Load();
+                    OnShowCompleted(loadedProvider, shown);
+                    completed?.Invoke(shown);
                 });
             }
             catch (Exception exception)
@@ -141,15 +141,12 @@ namespace Dann.GameFoundation
                 isShowing = false;
                 Debug.LogError(
                     $"Advertising show failed on {loadedProvider.ProviderName}: {AdType}\n{exception}");
-                adState = AdvertisingAdState.Unavailable;
-                loadedProvider = null;
-                AdvanceProvider();
+                OnShowCompleted(loadedProvider, false);
                 completed?.Invoke(false);
-                Load();
             }
         }
 
-        public void Hide()
+        public virtual void Hide()
         {
             if (loadedProvider == null)
                 return;
@@ -165,128 +162,51 @@ namespace Dann.GameFoundation
             }
         }
 
-        private void LoadCurrentProvider(int skippedProviders, int version)
+        protected void LoadProvider(IAdvertisingProvider provider)
         {
-            IAdvertisingProvider provider = FindCurrentProvider();
-
-            if (provider == null)
-            {
-                AdvanceOrStop(skippedProviders, version);
+            if (provider == null || !provider.IsInitialized || !provider.Supports(AdType))
                 return;
-            }
 
             adState = AdvertisingAdState.Loading;
 
             try
             {
-                provider.Load(AdType, loaded =>
-                {
-                    if (version != loadVersion)
-                        return;
-
-                    if (loaded)
-                    {
-                        adState = AdvertisingAdState.Ready;
-                        loadedProvider = provider;
-                        return;
-                    }
-
-                    adState = AdvertisingAdState.Unavailable;
-                    AdvanceOrStop(skippedProviders, version);
-                });
+                provider.Load(AdType, state => OnProviderLoaded(provider, state));
             }
             catch (Exception exception)
             {
                 Debug.LogError(
                     $"Advertising load failed on {provider.ProviderName}: {AdType}\n{exception}");
-                adState = AdvertisingAdState.Unavailable;
-                AdvanceOrStop(skippedProviders, version);
+                OnProviderLoaded(provider, AdvertisingAdState.Unavailable);
             }
         }
 
-        private void LoadAllProviders(int version)
+        protected virtual void OnProviderLoaded(IAdvertisingProvider provider, AdvertisingAdState state)
         {
-            adState = AdvertisingAdState.Loading;
-            List<IAdvertisingProvider> loadableProviders = new();
-            int completedProviders = 0;
+            adState = state;
+            loadedProvider = state == AdvertisingAdState.Ready ? provider : null;
 
-            foreach (IAdvertisingProvider provider in providers)
-            {
-                if (!provider.IsInitialized || !provider.Supports(AdType))
-                    continue;
-
-                loadableProviders.Add(provider);
-            }
-
-            if (loadableProviders.Count == 0)
-            {
-                adState = AdvertisingAdState.Unavailable;
-                return;
-            }
-
-            foreach (IAdvertisingProvider provider in loadableProviders)
-            {
-                try
-                {
-                    provider.Load(AdType, loaded =>
-                    {
-                        CompleteAllProviderLoad(provider, loaded);
-                    });
-                }
-                catch (Exception exception)
-                {
-                    Debug.LogError(
-                        $"Advertising load failed on {provider.ProviderName}: {AdType}\n{exception}");
-                    CompleteAllProviderLoad(provider, false);
-                }
-            }
-
-            void CompleteAllProviderLoad(IAdvertisingProvider provider, bool loaded)
-            {
-                if (version != loadVersion)
-                    return;
-
-                completedProviders++;
-
-                if (loaded && adState == AdvertisingAdState.Loading)
-                {
-                    adState = AdvertisingAdState.Ready;
-                    loadedProvider = provider;
-                    return;
-                }
-
-                if (completedProviders >= loadableProviders.Count && adState == AdvertisingAdState.Loading)
-                {
-                    adState = AdvertisingAdState.Unavailable;
-                    Debug.LogWarning($"Advertising all-provider load has no loaded provider for {AdType}.");
-                }
-            }
+            if (state == AdvertisingAdState.Unavailable)
+                AdvanceProvider();
         }
 
-        private IAdvertisingProvider FindCurrentProvider()
+        protected virtual void OnShowCompleted(IAdvertisingProvider provider, bool shown)
+        {
+            adState = AdvertisingAdState.Unavailable;
+            loadedProvider = null;
+            AdvanceProvider();
+        }
+
+        protected IAdvertisingProvider GetCurrentProvider()
         {
             if (providers.Count == 0)
                 return null;
 
-            int index = PositiveModulo(providerIndex, providers.Count);
-            IAdvertisingProvider provider = providers[index];
+            IAdvertisingProvider provider = providers[PositiveModulo(providerIndex, providers.Count)];
             return provider.IsInitialized && provider.Supports(AdType) ? provider : null;
         }
 
-        private void AdvanceOrStop(int skippedProviders, int version)
-        {
-            AdvanceProvider();
-
-            if (skippedProviders + 1 >= providers.Count)
-            {
-                Debug.LogWarning($"Advertising waterfall has no loaded provider for {AdType}.");
-                return;
-            }
-
-            LoadCurrentProvider(skippedProviders + 1, version);
-        }
-
-        private void AdvanceProvider()
+        protected void AdvanceProvider()
         {
             loadedProvider = null;
 
@@ -298,7 +218,7 @@ namespace Dann.GameFoundation
 
         private static int PositiveModulo(int value, int length)
         {
-            return (value % length + length) % length;
+            return length == 0 ? 0 : (value % length + length) % length;
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Dann.GameFoundation
 
         bool Supports(AdvertisingAdType adType);
 
-        void Load(AdvertisingAdType adType, Action<bool> completed);
+        void Load(AdvertisingAdType adType, Action<AdvertisingAdState> completed);
 
         void Show(AdvertisingAdType adType, Action<bool> completed);
 

@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6435502804683258215}
-  - component: {fileID: 3232996243777214235}
+  - component: {fileID: 4734493172151233304}
   m_Layer: 0
   m_Name: MRECAdvertisingController
   m_TagString: Untagged
@@ -25,14 +25,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 305422420194068194}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3232996243777214235
+--- !u!114 &4734493172151233304
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,10 +41,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 305422420194068194}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8c4e19f2a6d94b7ba1290f3c5e4d8123, type: 3}
+  m_Script: {fileID: 11500000, guid: a1c3e5f7b9d04e2c8a6f1b3d5e7c0920, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Dann.GameFoundation::Dann.GameFoundation.AdvertisingAdController
+  m_EditorClassIdentifier: Dann.GameFoundation::Dann.GameFoundation.MRECAdvertisingController
+  adType: 0
   adState: 0
-  loadMode: 0
   providerPrefabs: []
-  AdType: 7
