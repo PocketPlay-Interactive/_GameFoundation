@@ -12,9 +12,8 @@ namespace Dann.GameFoundation
 
     public class AdvertisingAdController : MonoBehaviour
     {
-        [SerializeField] private AdvertisingAdState adState = AdvertisingAdState.Unavailable;
+        private AdvertisingAdState adState = AdvertisingAdState.Unavailable;
         [SerializeField] private AdvertisingAdLoadMode loadMode = AdvertisingAdLoadMode.Waterfall;
-        [SerializeField] private GameObject[] providerPrefabs;
 
         private readonly List<IAdvertisingProvider> providers = new();
         private IAdvertisingProvider loadedProvider;
@@ -28,6 +27,9 @@ namespace Dann.GameFoundation
 
         public bool IsLoaded => adState == AdvertisingAdState.Ready;
 
+
+        [Header("Provider Prefabs")]
+        [SerializeField] private GameObject[] providerPrefabs;
         public IReadOnlyList<IAdvertisingProvider> Providers => providers;
 
         public void ExecuteUpdate()
