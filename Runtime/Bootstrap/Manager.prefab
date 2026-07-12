@@ -46,18 +46,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd220801284f30b49a6b05594c0ac14f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Manager
-  IsFirebaseInitialized: 0
+  IsAnalyticsInitialized: 0
   IsAdvertisementReady: 0
-  IsInAppPurchaseInitialized: 0
   AlwayShowInterstitialAd: 1
-  IsAdvertisementIntertitialOpen: 0
   IsLoadingActive: 0
   AutoHideLoadingAfterTimeout: 1
   MaxLoadingDuration: 15
   CurrentLoadingElapsed: 0
   loadingCanvas: {fileID: 4909262649744664235}
   extensionModules: []
-  _hasInitialized: 0
 --- !u!1 &3977181263697738829
 GameObject:
   m_ObjectHideFlags: 0

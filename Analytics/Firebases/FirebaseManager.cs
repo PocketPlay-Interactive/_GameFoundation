@@ -17,7 +17,7 @@ public class FirebaseManager : SingletonGlobal<FirebaseManager>
 
     public IEnumerator InitializeAsync()
     {
-        if (Manager.I.IsFirebaseInitialized) yield break;
+        if (Manager.I.IsAnalyticsInitialized) yield break;
         Firebase.FirebaseApp.Create();
         yield return null;
         Firebase.FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
@@ -27,7 +27,7 @@ public class FirebaseManager : SingletonGlobal<FirebaseManager>
             if (dependencyStatus == Firebase.DependencyStatus.Available)
             {
                 app = Firebase.FirebaseApp.DefaultInstance;
-                Manager.I.NotifyFirebaseInitialized();
+                Manager.I.NotifyAnalyticsInitialized();
                 LogSystem.LogSuccess("FIREBASE INITIALIZED");
             }
             else
@@ -41,7 +41,7 @@ public class FirebaseManager : SingletonGlobal<FirebaseManager>
 
     private void Update()
     {
-        if (!Manager.I.IsFirebaseInitialized || isProcessingEvents || pendingEvents.Count == 0)
+        if (!Manager.I.IsAnalyticsInitialized || isProcessingEvents || pendingEvents.Count == 0)
             return;
 
         isProcessingEvents = true;
@@ -66,7 +66,7 @@ public class FirebaseManager : SingletonGlobal<FirebaseManager>
 
     public void TrackingEvent(string eventName)
     {
-        if (!Manager.I.IsFirebaseInitialized)
+        if (!Manager.I.IsAnalyticsInitialized)
         {
             pendingEvents.Enqueue(() => TrackingEvent(eventName));
             return;
@@ -78,7 +78,7 @@ public class FirebaseManager : SingletonGlobal<FirebaseManager>
 
     public void TrackingEvent(string eventName, params (string key, object value)[] parameters)
     {
-        if (!Manager.I.IsFirebaseInitialized)
+        if (!Manager.I.IsAnalyticsInitialized)
         {
             pendingEvents.Enqueue(() => TrackingEvent(eventName, parameters));
             return;

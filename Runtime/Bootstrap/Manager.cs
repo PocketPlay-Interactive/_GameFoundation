@@ -14,13 +14,11 @@ public enum Scene
 public class Manager : SingletonGlobal<Manager>
 {
     [Header("Sdk State")]
-    public bool IsFirebaseInitialized = false;
+    public bool IsAnalyticsInitialized = false;
     public bool IsAdvertisementReady = false;
-    public bool IsInAppPurchaseInitialized = false;
 
     [Header("Intertitial Ad Open")]
     public bool AlwayShowInterstitialAd = true;
-    public bool IsAdvertisementIntertitialOpen = false;
 
     [Header("Loading State")]
     public bool IsLoadingActive = false;
@@ -35,13 +33,10 @@ public class Manager : SingletonGlobal<Manager>
 
     private bool hasAdCallbackCompleted = false;
     [Header("SDK Initialization State")]
-    public bool _hasInitialized = false;
     private bool hasSdkInitializationHandler = false;
-    public event Action OnAdCallbackCompleted;
     public event Func<IEnumerator> OnSdkInitializationRequested;
-    public event Action OnFirebaseInitialized;
+    public event Action OnAnalyticsInitialized;
     public event Action OnAdvertisementReady;
-    public event Action OnInAppPurchaseInitialized;
     public event Action OnFoundationReady;
     public event Action OnApplicationResumed;
 
@@ -138,9 +133,8 @@ public class Manager : SingletonGlobal<Manager>
 
     public LoadingCanvas LoadingUI() => loadingCanvas;
 
-    public void NotifyFirebaseInitialized() => OnFirebaseInitialized?.Invoke();
+    public void NotifyAnalyticsInitialized() => OnAnalyticsInitialized?.Invoke();
     public void NotifyAdvertisementReady() => OnAdvertisementReady?.Invoke();
-    public void NotifyInAppPurchaseInitialized() => OnInAppPurchaseInitialized?.Invoke();
 
     public bool IsCanShowAdOpen()
     {
@@ -154,9 +148,7 @@ public class Manager : SingletonGlobal<Manager>
         Debug.Log("[Manager] FinalizeAdSequence called");
         if (hasAdCallbackCompleted) return;
         hasAdCallbackCompleted = true;
-        _hasInitialized = true;
         CurrentLoadingElapsed = 14.0f;
-        OnAdCallbackCompleted?.Invoke();
         OnFoundationReady?.Invoke();
     }
 

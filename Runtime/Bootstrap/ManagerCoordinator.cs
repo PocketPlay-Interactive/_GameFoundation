@@ -12,9 +12,8 @@ public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
         if (manager == null) return;
 
         manager.OnSdkInitializationRequested += InitializeSdkAsync;
-        manager.OnFirebaseInitialized += HandleFirebaseInitialized;
+        manager.OnAnalyticsInitialized += HandleAnalyticsInitialized;
         manager.OnAdvertisementReady += HandleAdvertisementReady;
-        manager.OnInAppPurchaseInitialized += HandleInAppPurchaseInitialized;
         manager.OnFoundationReady += HandleFoundationReady;
         manager.OnApplicationResumed += HandleApplicationResumed;
     }
@@ -24,9 +23,8 @@ public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
         if (manager == null) return;
 
         manager.OnSdkInitializationRequested -= InitializeSdkAsync;
-        manager.OnFirebaseInitialized -= HandleFirebaseInitialized;
+        manager.OnAnalyticsInitialized -= HandleAnalyticsInitialized;
         manager.OnAdvertisementReady -= HandleAdvertisementReady;
-        manager.OnInAppPurchaseInitialized -= HandleInAppPurchaseInitialized;
         manager.OnFoundationReady -= HandleFoundationReady;
         manager.OnApplicationResumed -= HandleApplicationResumed;
         manager = null;
@@ -36,13 +34,12 @@ public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
     {
 #if IAPPURCHASE_ENABLE
         InappPurchase.I.InitializePurchasing();
-        Manager.I.NotifyInAppPurchaseInitialized();
 #endif
 
-#if FIREBASE
+#if ANALYTICS
         yield return FirebaseManager.I.InitializeAsync();
-        yield return new WaitUntil(() => Manager.I.IsFirebaseInitialized);
-        LogSystem.LogSuccess($"[ManagerCoordinator] FIREBASE SDK INITIALIZED: {Manager.I.IsFirebaseInitialized}");
+        yield return new WaitUntil(() => Manager.I.IsAnalyticsInitialized);
+        LogSystem.LogSuccess($"[ManagerCoordinator] ANALYTICS SDK INITIALIZED: {Manager.I.IsAnalyticsInitialized}");
 #endif
 
 #if ADMOB
@@ -64,19 +61,14 @@ public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
         yield break;
     }
 
-    protected virtual void HandleFirebaseInitialized()
+    protected virtual void HandleAnalyticsInitialized()
     {
-        Manager.I.IsFirebaseInitialized = true;
+        Manager.I.IsAnalyticsInitialized = true;
     }
 
     protected virtual void HandleAdvertisementReady()
     {
         Manager.I.IsAdvertisementReady = true;
-    }
-
-    protected virtual void HandleInAppPurchaseInitialized()
-    {
-        Manager.I.IsInAppPurchaseInitialized = true;
     }
 
     protected virtual void HandleFoundationReady()
