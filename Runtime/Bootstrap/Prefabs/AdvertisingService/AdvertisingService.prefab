@@ -44,11 +44,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be2597327769fda45af8a9aacce1cd85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Dann.GameFoundation::Dann.GameFoundation.AdvertisingService
-  Advertisings:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  Advertisings: []
