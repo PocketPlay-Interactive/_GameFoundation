@@ -23,10 +23,19 @@ namespace Dann.GameFoundation
         MREC,
     }
 
+    public enum AdvertisingMediationMode
+    {
+        Waterfall,
+        Parallel
+    }
+
     public sealed class AdvertisingService : SingletonGlobal<AdvertisingService>
     {
         [Header("Advertisings Controllers")]
         [SerializeField] private AdvertisingAdController[] Advertisings;
+
+        [Header("Promise Advertising")]
+        [SerializeField] private AdvertisingAdController PromiseAdvertising;
 
         private const float UpdateInterval = 1f;
         private readonly Dictionary<AdvertisingAdType, AdvertisingAdController> adsByType = new();
@@ -42,7 +51,6 @@ namespace Dann.GameFoundation
             BuildAdMap();
             BuildProviders();
             InitializeProviders();
-
             IsInitialized = true;
         }
 
@@ -55,7 +63,7 @@ namespace Dann.GameFoundation
         public void Show(AdvertisingAdType adType, Action<bool> completed = null, params string[] parameters)
         {
             if (TryGetAd(adType, out AdvertisingAdController ad))
-                ad.Show(completed);
+                ad.Show(completed, parameters != null && parameters.Length > 0 ? parameters[0] : null);
             else
                 completed?.Invoke(false);
         }
@@ -66,28 +74,21 @@ namespace Dann.GameFoundation
                 ad.Hide();
         }
 
-        public void LoadBanner() => Load(AdvertisingAdType.Banner);
-        public void ShowBanner(Action<bool> completed = null) => Show(AdvertisingAdType.Banner, completed);
+        public void ShowBanner(Action<bool> completed = null, string providerName = null) => Show(AdvertisingAdType.Banner, completed, providerName);
         public void HideBanner() => Hide(AdvertisingAdType.Banner);
 
-        public void LoadInterstitial() => Load(AdvertisingAdType.Interstitial);
-        public void ShowInterstitial(Action<bool> completed = null) => Show(AdvertisingAdType.Interstitial, completed);
+        public void ShowInterstitial(Action<bool> completed = null, string providerName = null) => Show(AdvertisingAdType.Interstitial, completed, providerName);
 
-        public void LoadRewardedVideo() => Load(AdvertisingAdType.RewardedVideo);
-        public void ShowRewardedVideo(Action<bool> completed = null) => Show(AdvertisingAdType.RewardedVideo, completed);
+        public void ShowRewardedVideo(Action<bool> completed = null, string providerName = null) => Show(AdvertisingAdType.RewardedVideo, completed, providerName);
 
-        public void LoadRewardedInterstitial() => Load(AdvertisingAdType.RewardedInterstitial);
-        public void ShowRewardedInterstitial(Action<bool> completed = null) => Show(AdvertisingAdType.RewardedInterstitial, completed);
+        public void ShowRewardedInterstitial(Action<bool> completed = null, string providerName = null) => Show(AdvertisingAdType.RewardedInterstitial, completed, providerName);
 
-        public void LoadAppOpen() => Load(AdvertisingAdType.AppOpen);
-        public void ShowAppOpen(Action<bool> completed = null) => Show(AdvertisingAdType.AppOpen, completed);
+        public void ShowAppOpen(Action<bool> completed = null, string providerName = null) => Show(AdvertisingAdType.AppOpen, completed, providerName);
 
-        public void LoadNative() => Load(AdvertisingAdType.Native);
-        public void ShowNative(Action<bool> completed = null) => Show(AdvertisingAdType.Native, completed);
+        public void ShowNative(Action<bool> completed = null, string providerName = null) => Show(AdvertisingAdType.Native, completed, providerName);
         public void HideNative() => Hide(AdvertisingAdType.Native);
 
-        public void LoadMREC() => Load(AdvertisingAdType.MREC);
-        public void ShowMREC(Action<bool> completed = null) => Show(AdvertisingAdType.MREC, completed);
+        public void ShowMREC(Action<bool> completed = null, string providerName = null) => Show(AdvertisingAdType.MREC, completed, providerName);
         public void HideMREC() => Hide(AdvertisingAdType.MREC);
 
         private void BuildAdMap()

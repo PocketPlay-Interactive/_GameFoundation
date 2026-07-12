@@ -80,7 +80,7 @@ public class Manager : SingletonGlobal<Manager>
     {
         foreach (var module in GetExtensionModules())
         {
-            LogSystem.LogSuccess($"[Manager] INITIALIZE MODULE: {module.GetType().Name}");
+            LogSystem.LogSuccess($"[Manager] Extension Module: {module.GetType().Name.AddSpaceBeforeUppercase()}");
             yield return module.Initialize();
         }
     }
@@ -122,19 +122,14 @@ public class Manager : SingletonGlobal<Manager>
 
     public LoadingCanvas LoadingUI() => loadingCanvas;
 
-    public bool IsCanShowAdOpen()
-    {
-        if (CurrentLoadingElapsed >= MaxLoadingDuration)
-            return false;
-        return true;
-    }
-
     public void FinalizeAdSequence()
     {
         if (hasAdCallbackCompleted) return;
         hasAdCallbackCompleted = true;
         CurrentLoadingElapsed = 14.0f;
         OnFoundationReady?.Invoke();
+
+        LogSystem.LogSuccess("Finalize AdSequence");
     }
 
     private void OnApplicationPause(bool pause)

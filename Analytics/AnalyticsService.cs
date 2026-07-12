@@ -66,6 +66,8 @@ namespace Dann.GameFoundation
                 return;
             }
 
+            Debug.Log($"Analytics : {eventName}");
+
             foreach (IAnalyticsProvider provider in providers)
             {
                 try

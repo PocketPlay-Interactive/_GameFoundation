@@ -9,6 +9,8 @@ namespace Dann.GameFoundation
 
         bool IsInitialized { get; }
 
+        AdvertisingAdState AdState { get; set; }
+
         void Initialize();
 
         void Load(AdvertisingAdType adType, Action<AdvertisingAdState> completed);

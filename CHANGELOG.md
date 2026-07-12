@@ -30,7 +30,7 @@ All notable changes to this package are documented in this file.
 
 - Renamed `ThirdParty` to `Libraries` and `Third Party Notices.md` to `Library Notices.md`.
 - Moved analytics integrations to root `Analytics/Firebases` and `Analytics/AppsFlyer`.
-- Renamed Bacon UMP integration symbols/API references to Omni UMP with `ADMOB_UMP_OMNI`.
+- Renamed Bacon UMP integration symbols/API references to UMP with `ADMOB_UMP`.
 - Renamed haptics facade from `Vibrate` to `HapticFeedback`.
 - Renamed visible package folders from `Documentation~` and `Samples~` to `Documentation` and `Samples`.
 

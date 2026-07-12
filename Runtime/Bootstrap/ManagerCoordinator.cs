@@ -36,25 +36,28 @@ public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
         Debug.Log("Initialized AnalyticsServices");
         AnalyticsService.Get().Initialize();
         yield return new WaitUntil(() => AnalyticsService.Get().IsInitialized);
-        LogSystem.LogSuccess($"[ManagerCoordinator] ANALYTICS SDK INITIALIZED: {AnalyticsService.Get().IsInitialized}");
+        LogSystem.LogSuccess($"[ManagerCoordinator] Analytics Service: {AnalyticsService.Get().IsInitialized}");
 #endif
 
 #if ADMOB
         yield return null;
-#if ADMOB_UMP_OMNI
-        bool umpCompleted = false;
-        yield return Omni.UMP.Instance.DOGatherConsent(() => umpCompleted = true);
-        yield return new WaitUntil(() => umpCompleted);
-        FirebaseManager.I?.LogUMP("initialized_consent");
+#if ADMOB_UMP
+        yield return UMP.Instance.DOGatherConsent(EmptyCoroutine());
+        AnalyticsService.Get().TrackEvent("ump_consent_initialized_consent");
 #else
         AnalyticsService.Get().TrackEvent($"ump_consent_skipped_consent");
 #endif
 
         AdvertisingService.Get().Initialize();
         yield return new WaitUntil(() => AdvertisingService.Get().IsInitialized);
-        LogSystem.LogSuccess($"[ManagerCoordinator] ADMOB SDK INITIALIZED: {AdvertisingService.Get().IsInitialized}");
+        LogSystem.LogSuccess($"[ManagerCoordinator] Advertising Service: {AdvertisingService.Get().IsInitialized}");
 #endif
 
+        yield break;
+    }
+
+    private static IEnumerator EmptyCoroutine()
+    {
         yield break;
     }
 

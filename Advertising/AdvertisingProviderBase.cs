@@ -14,6 +14,8 @@ namespace Dann.GameFoundation
 
         public bool IsInitialized { get; protected set; }
 
+        [field: SerializeField] public AdvertisingAdState AdState { get; set; } = AdvertisingAdState.Unavailable;
+
         protected string AdUnitId
         {
             get
@@ -31,7 +33,6 @@ namespace Dann.GameFoundation
         public virtual void Initialize()
         {
             IsInitialized = true;
-            Debug.Log($"Initialize Advertising Provide {this.name}");
         }
 
         public abstract void Load(AdvertisingAdType adType, Action<AdvertisingAdState> completed);

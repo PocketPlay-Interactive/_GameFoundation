@@ -10,6 +10,12 @@ namespace Dann.GameFoundation
 
         public override AdvertisingAdType AdType => AdvertisingAdType.Banner;
 
+        protected override void VirtualInitializedProviders()
+        {
+            // base.VirtualInitializedProviders();
+            
+        }
+
         public override void ExecuteUpdate()
         {
             if (!isVisible)
@@ -30,8 +36,15 @@ namespace Dann.GameFoundation
             }
         }
 
-        public override void Show(System.Action<bool> completed = null)
+        public override void Show(System.Action<bool> completed = null, string providerName = null)
         {
+            if (Mode == AdvertisingMediationMode.Parallel && string.IsNullOrEmpty(providerName))
+            {
+                UnityEngine.Debug.LogError($"Advertising parallel show requires providerName: {AdType}", this);
+                completed?.Invoke(false);
+                return;
+            }
+
             isVisible = true;
 
             if (IsShowing)
@@ -40,7 +53,9 @@ namespace Dann.GameFoundation
                 return;
             }
 
-            if (LoadedProvider == null || AdState != AdvertisingAdState.Ready)
+            IAdvertisingProvider provider = string.IsNullOrEmpty(providerName) ? LoadedProvider : GetProvider(providerName);
+
+            if (provider == null || provider.AdState != AdvertisingAdState.Ready)
             {
                 showWhenLoaded = true;
                 Load();
@@ -48,6 +63,7 @@ namespace Dann.GameFoundation
                 return;
             }
 
+            LoadedProvider = provider;
             IsShowing = true;
 
             try
@@ -96,7 +112,7 @@ namespace Dann.GameFoundation
             if (state == AdvertisingAdState.Ready && isVisible && showWhenLoaded)
             {
                 showWhenLoaded = false;
-                Show();
+                Show(null, provider.ProviderName);
             }
         }
 

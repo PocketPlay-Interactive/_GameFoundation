@@ -30,11 +30,11 @@ namespace Dann.GameFoundation
             }
         }
 
-        public override void Show(System.Action<bool> completed = null)
+        public override void Show(System.Action<bool> completed = null, string providerName = null)
         {
             isVisible = true;
             showWhenLoaded = true;
-            base.Show(completed);
+            base.Show(completed, providerName);
         }
 
         public override void Hide()
@@ -52,7 +52,7 @@ namespace Dann.GameFoundation
             if (state == AdvertisingAdState.Ready && isVisible && showWhenLoaded)
             {
                 showWhenLoaded = false;
-                Show();
+                Show(null, provider.ProviderName);
             }
         }
 

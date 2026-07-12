@@ -5,6 +5,12 @@ namespace Dann.GameFoundation
 {
     public class AdmobBannerAdvertisingProvider : AdvertisingProviderBase
     {
+        public override void Initialize()
+        {
+            base.Initialize();
+            Debug.Log($"Initialize Advertising Provide {this.name}");
+        }
+
         public override void Hide(AdvertisingAdType adType)
         {
             Debug.Log("Hide");

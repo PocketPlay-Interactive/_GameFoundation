@@ -7,21 +7,36 @@ namespace Dann.GameFoundation
     public class AdvertisingAdController : MonoBehaviour
     {
         [SerializeField] private AdvertisingAdType adType = AdvertisingAdType.None;
-        [SerializeField] private AdvertisingAdState adState = AdvertisingAdState.Unavailable;
-        private readonly List<IAdvertisingProvider> providers = new();
+        [SerializeField] private AdvertisingMediationMode mode = AdvertisingMediationMode.Waterfall;
+        [SerializeField] private List<AdvertisingProviderBase> providers = new();
         private IAdvertisingProvider loadedProvider;
         private int providerIndex;
         private bool isShowing;
 
         public virtual AdvertisingAdType AdType => adType;
 
+        public AdvertisingMediationMode Mode => mode;
+
         public AdvertisingAdState AdState
         {
-            get => adState;
-            protected set => adState = value;
+            get
+            {
+                if (mode == AdvertisingMediationMode.Parallel)
+                    return GetParallelState();
+
+                IAdvertisingProvider provider = loadedProvider ?? GetCurrentProvider();
+                return provider?.AdState ?? AdvertisingAdState.Unavailable;
+            }
+            protected set
+            {
+                IAdvertisingProvider provider = loadedProvider ?? GetCurrentProvider();
+
+                if (provider != null)
+                    provider.AdState = value;
+            }
         }
 
-        public bool IsLoaded => adState == AdvertisingAdState.Ready;
+        public bool IsLoaded => AdState == AdvertisingAdState.Ready;
 
         public IReadOnlyList<IAdvertisingProvider> Providers => providers;
 
@@ -45,7 +60,7 @@ namespace Dann.GameFoundation
 
         public virtual void ExecuteUpdate()
         {
-            if (!isShowing && adState == AdvertisingAdState.Unavailable)
+            if (!isShowing && (AdState == AdvertisingAdState.Unavailable || mode == AdvertisingMediationMode.Parallel))
                 Load();
         }
 
@@ -54,13 +69,10 @@ namespace Dann.GameFoundation
             if (providers.Count > 0)
                 return;
 
-            MonoBehaviour[] components = GetComponentsInChildren<MonoBehaviour>(true);
+            AdvertisingProviderBase[] components = GetComponentsInChildren<AdvertisingProviderBase>(true);
 
-            foreach (MonoBehaviour component in components)
+            foreach (AdvertisingProviderBase provider in components)
             {
-                if (component is not IAdvertisingProvider provider)
-                    continue;
-
                 if (!providers.Contains(provider))
                     providers.Add(provider);
             }
@@ -83,11 +95,21 @@ namespace Dann.GameFoundation
                         $"Advertising provider init failed: {provider.ProviderName}\n{exception}");
                 }
             }
+
+            VirtualInitializedProviders();
         }
+
+        protected virtual void VirtualInitializedProviders() {}
 
         public virtual void Load()
         {
-            if (isShowing || adState != AdvertisingAdState.Unavailable)
+            if (mode == AdvertisingMediationMode.Parallel)
+            {
+                LoadParallel();
+                return;
+            }
+
+            if (isShowing || AdState != AdvertisingAdState.Unavailable)
                 return;
 
             if (providers.Count == 0)
@@ -107,21 +129,31 @@ namespace Dann.GameFoundation
             LoadProvider(provider);
         }
 
-        public virtual void Show(Action<bool> completed = null)
+        public virtual void Show(Action<bool> completed = null, string providerName = null)
         {
+            if (mode == AdvertisingMediationMode.Parallel && string.IsNullOrEmpty(providerName))
+            {
+                Debug.LogError($"Advertising parallel show requires providerName: {AdType}", this);
+                completed?.Invoke(false);
+                return;
+            }
+
             if (isShowing)
             {
                 completed?.Invoke(false);
                 return;
             }
 
-            if (loadedProvider == null || adState != AdvertisingAdState.Ready)
+            IAdvertisingProvider provider = string.IsNullOrEmpty(providerName) ? loadedProvider : GetProvider(providerName);
+
+            if (provider == null || provider.AdState != AdvertisingAdState.Ready)
             {
                 Load();
                 completed?.Invoke(false);
                 return;
             }
 
+            loadedProvider = provider;
             isShowing = true;
 
             try
@@ -161,10 +193,10 @@ namespace Dann.GameFoundation
 
         protected void LoadProvider(IAdvertisingProvider provider)
         {
-            if (provider == null || !provider.IsInitialized)
+            if (provider == null || !provider.IsInitialized || provider.AdState != AdvertisingAdState.Unavailable)
                 return;
 
-            adState = AdvertisingAdState.Loading;
+            provider.AdState = AdvertisingAdState.Loading;
 
             try
             {
@@ -180,18 +212,20 @@ namespace Dann.GameFoundation
 
         protected virtual void OnProviderLoaded(IAdvertisingProvider provider, AdvertisingAdState state)
         {
-            adState = state;
-            loadedProvider = state == AdvertisingAdState.Ready ? provider : null;
+            provider.AdState = state;
+            loadedProvider = state == AdvertisingAdState.Ready && mode == AdvertisingMediationMode.Waterfall ? provider : loadedProvider;
 
-            if (state == AdvertisingAdState.Unavailable)
+            if (state == AdvertisingAdState.Unavailable && mode == AdvertisingMediationMode.Waterfall)
                 AdvanceProvider();
         }
 
         protected virtual void OnShowCompleted(IAdvertisingProvider provider, bool shown)
         {
-            adState = AdvertisingAdState.Unavailable;
+            provider.AdState = AdvertisingAdState.Unavailable;
             loadedProvider = null;
-            AdvanceProvider();
+
+            if (mode == AdvertisingMediationMode.Waterfall)
+                AdvanceProvider();
         }
 
         protected IAdvertisingProvider GetCurrentProvider()
@@ -201,6 +235,41 @@ namespace Dann.GameFoundation
 
             IAdvertisingProvider provider = providers[PositiveModulo(providerIndex, providers.Count)];
             return provider.IsInitialized ? provider : null;
+        }
+
+        private void LoadParallel()
+        {
+            if (isShowing || providers.Count == 0)
+                return;
+
+            foreach (IAdvertisingProvider provider in providers)
+                LoadProvider(provider);
+        }
+
+        protected IAdvertisingProvider GetProvider(string providerName)
+        {
+            foreach (IAdvertisingProvider provider in providers)
+            {
+                if (string.Equals(provider.ProviderName, providerName, StringComparison.Ordinal))
+                    return provider;
+            }
+
+            return null;
+        }
+
+        private AdvertisingAdState GetParallelState()
+        {
+            bool hasLoading = false;
+
+            foreach (IAdvertisingProvider provider in providers)
+            {
+                if (provider.AdState == AdvertisingAdState.Ready)
+                    return AdvertisingAdState.Ready;
+
+                hasLoading |= provider.AdState == AdvertisingAdState.Loading;
+            }
+
+            return hasLoading ? AdvertisingAdState.Loading : AdvertisingAdState.Unavailable;
         }
 
         protected void AdvanceProvider()
