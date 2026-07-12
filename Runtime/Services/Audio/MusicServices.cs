@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 
+[ExtensionModuleNotice("Drag this MusicServices object into Manager -> Extension Modules.")]
 public class MusicServices : SingletonGlobal<MusicServices>, IGameFoundationModule
 {
     public enum Music
