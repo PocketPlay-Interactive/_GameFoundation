@@ -10,7 +10,7 @@ namespace Dann.GameFoundation
         All
     }
 
-    public abstract class AdvertisingAdController : MonoBehaviour
+    public class AdvertisingAdController : MonoBehaviour
     {
         [SerializeField] private AdvertisingAdState adState = AdvertisingAdState.Unavailable;
         [SerializeField] private AdvertisingAdLoadMode loadMode = AdvertisingAdLoadMode.Waterfall;

@@ -6,8 +6,8 @@ namespace Dann.GameFoundation
 {
     public sealed class AdvertisingService : SingletonGlobal<AdvertisingService>
     {
-        [Header("Ad Controllers")]
-        [SerializeField] private AdvertisingAdController[] ads;
+        [Header("Advertisings Controllers")]
+        [SerializeField] private AdvertisingAdController[] Advertisings;
 
         private const float UpdateInterval = 1f;
         private readonly Dictionary<AdvertisingAdType, AdvertisingAdController> adsByType = new();
@@ -75,12 +75,12 @@ namespace Dann.GameFoundation
         {
             adsByType.Clear();
 
-            if (ads == null)
+            if (Advertisings == null)
                 return;
 
-            for (int i = 0; i < ads.Length; i++)
+            for (int i = 0; i < Advertisings.Length; i++)
             {
-                AdvertisingAdController ad = ads[i];
+                AdvertisingAdController ad = Advertisings[i];
 
                 if (ad == null || ad.AdType == AdvertisingAdType.None)
                     continue;
