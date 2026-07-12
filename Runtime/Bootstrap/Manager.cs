@@ -134,7 +134,6 @@ public class Manager : SingletonGlobal<Manager>
 
     public void FinalizeAdSequence()
     {
-        Debug.Log("[Manager] FinalizeAdSequence called");
         if (hasAdCallbackCompleted) return;
         hasAdCallbackCompleted = true;
         CurrentLoadingElapsed = 14.0f;

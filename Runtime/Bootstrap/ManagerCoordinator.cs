@@ -14,7 +14,6 @@ public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
         if (manager == null) return;
 
         manager.OnSdkInitializationRequested += InitializeSdkAsync;
-        manager.OnFoundationReady += HandleFoundationReady;
         manager.OnApplicationResumed += HandleApplicationResumed;
     }
 
@@ -23,7 +22,6 @@ public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
         if (manager == null) return;
 
         manager.OnSdkInitializationRequested -= InitializeSdkAsync;
-        manager.OnFoundationReady -= HandleFoundationReady;
         manager.OnApplicationResumed -= HandleApplicationResumed;
         manager = null;
     }
@@ -52,7 +50,7 @@ public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
         AnalyticsService.Get().TrackEvent($"ump_consent_skipped_consent");
 #endif
 
-        yield return AdManager.Get().InitializeAsync();
+        // yield return AdManager.Get().InitializeAsync();
         yield return new WaitUntil(() => Manager.Get().IsAdvertisementReady);
         LogSystem.LogSuccess($"[ManagerCoordinator] ADMOB SDK INITIALIZED: {Manager.Get().IsAdvertisementReady}");
 #endif
@@ -60,17 +58,10 @@ public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
         yield break;
     }
 
-    protected virtual void HandleFoundationReady()
-    {
-#if ADMOB
-        AdManager.Get()?.InitializedAllOfAds();
-#endif
-    }
-
     protected virtual void HandleApplicationResumed()
     {
 #if ADMOB
-        AdManager.Get()?.CheckingOpenAd();
+        // AdManager.Get()?.CheckingOpenAd();
 #endif
     }
 }
