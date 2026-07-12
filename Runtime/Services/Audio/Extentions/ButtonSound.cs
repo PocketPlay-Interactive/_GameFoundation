@@ -9,7 +9,7 @@ public class ButtonSound : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        SoundServices.I.PlayOnShot(_audio);
+        SoundServices.Get().PlayOnShot(_audio);
     }
 
     public void OnPointerUp(PointerEventData eventData)

@@ -1,5 +1,7 @@
 using System.Collections;
+using Dann.GameFoundation;
 using UnityEngine;
+using UnityEngine.Analytics;
 
 [DefaultExecutionOrder(-90)]
 public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
@@ -8,12 +10,10 @@ public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
 
     protected virtual void OnEnable()
     {
-        manager = Manager.I;
+        manager = Manager.Get();
         if (manager == null) return;
 
         manager.OnSdkInitializationRequested += InitializeSdkAsync;
-        manager.OnAnalyticsInitialized += HandleAnalyticsInitialized;
-        manager.OnAdvertisementReady += HandleAdvertisementReady;
         manager.OnFoundationReady += HandleFoundationReady;
         manager.OnApplicationResumed += HandleApplicationResumed;
     }
@@ -23,8 +23,6 @@ public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
         if (manager == null) return;
 
         manager.OnSdkInitializationRequested -= InitializeSdkAsync;
-        manager.OnAnalyticsInitialized -= HandleAnalyticsInitialized;
-        manager.OnAdvertisementReady -= HandleAdvertisementReady;
         manager.OnFoundationReady -= HandleFoundationReady;
         manager.OnApplicationResumed -= HandleApplicationResumed;
         manager = null;
@@ -37,9 +35,10 @@ public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
 #endif
 
 #if FIREBASE
-        yield return FirebaseManager.I.InitializeAsync();
-        yield return new WaitUntil(() => Manager.I.IsAnalyticsInitialized);
-        LogSystem.LogSuccess($"[ManagerCoordinator] ANALYTICS SDK INITIALIZED: {Manager.I.IsAnalyticsInitialized}");
+        Debug.Log("Initialized AnalyticsServices");
+        AnalyticsService.Get().Initialize();
+        yield return new WaitUntil(() => AnalyticsService.Get().IsInitialized);
+        LogSystem.LogSuccess($"[ManagerCoordinator] ANALYTICS SDK INITIALIZED: {AnalyticsService.Get().IsInitialized}");
 #endif
 
 #if ADMOB
@@ -59,16 +58,6 @@ public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
 #endif
 
         yield break;
-    }
-
-    protected virtual void HandleAnalyticsInitialized()
-    {
-        Manager.I.IsAnalyticsInitialized = true;
-    }
-
-    protected virtual void HandleAdvertisementReady()
-    {
-        Manager.I.IsAdvertisementReady = true;
     }
 
     protected virtual void HandleFoundationReady()

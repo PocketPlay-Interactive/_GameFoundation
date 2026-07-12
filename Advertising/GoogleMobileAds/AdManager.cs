@@ -224,7 +224,7 @@ public partial class AdManager : SingletonGlobal<AdManager>
 
     private void Start()
     {
-        DOVirtual.DelayedCall(5.0f, () => EnqueueOrInvoke(() => Manager.I.FinalizeAdSequence()));
+        DOVirtual.DelayedCall(5.0f, () => EnqueueOrInvoke(() => Manager.Get().FinalizeAdSequence()));
     }
 
     public void ShowInterstitialFreeAd(Action action_1, Action action_2)

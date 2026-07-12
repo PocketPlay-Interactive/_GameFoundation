@@ -8,7 +8,6 @@ using UnityEngine;
 public class Manager : SingletonGlobal<Manager>
 {
     [Header("Sdk State")]
-    public bool IsAnalyticsInitialized = false;
     public bool IsAdvertisementReady = false;
 
     [Header("Intertitial Ad Open")]
@@ -29,8 +28,6 @@ public class Manager : SingletonGlobal<Manager>
     [Header("SDK Initialization State")]
     private bool hasSdkInitializationHandler = false;
     public event Func<IEnumerator> OnSdkInitializationRequested;
-    public event Action OnAnalyticsInitialized;
-    public event Action OnAdvertisementReady;
     public event Action OnFoundationReady;
     public event Action OnApplicationResumed;
 
@@ -127,9 +124,6 @@ public class Manager : SingletonGlobal<Manager>
     }
 
     public LoadingCanvas LoadingUI() => loadingCanvas;
-
-    public void NotifyAnalyticsInitialized() => OnAnalyticsInitialized?.Invoke();
-    public void NotifyAdvertisementReady() => OnAdvertisementReady?.Invoke();
 
     public bool IsCanShowAdOpen()
     {

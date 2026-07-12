@@ -4,25 +4,18 @@ using UnityEngine;
 
 namespace Dann.GameFoundation
 {
-    public sealed class AnalyticsService : MonoBehaviour
+    public sealed class AnalyticsService : SingletonGlobal<AnalyticsService>
     {
+        [SerializeField] private GameObject[] providerPrefabs;
+
         private readonly List<IAnalyticsProvider> providers = new();
 
         public bool IsInitialized { get; private set; }
 
-        public void RegisterProvider(IAnalyticsProvider provider)
-        {
-            if (provider == null)
-                throw new ArgumentNullException(nameof(provider));
-
-            if (providers.Contains(provider))
-                return;
-
-            providers.Add(provider);
-        }
-
         public void Initialize()
         {
+            BuildProviders();
+
             foreach (IAnalyticsProvider provider in providers)
             {
                 try
@@ -37,6 +30,30 @@ namespace Dann.GameFoundation
             }
 
             IsInitialized = true;
+        }
+
+        private void BuildProviders()
+        {
+            if (providers.Count > 0)
+                return;
+
+            if (providerPrefabs == null)
+                return;
+
+            foreach (GameObject providerPrefab in providerPrefabs)
+            {
+                if (providerPrefab == null)
+                    continue;
+
+                GameObject providerObject = Instantiate(providerPrefab, transform);
+                MonoBehaviour[] components = providerObject.GetComponentsInChildren<MonoBehaviour>(true);
+
+                foreach (MonoBehaviour component in components)
+                {
+                    if (component is IAnalyticsProvider provider && !providers.Contains(provider))
+                        providers.Add(provider);
+                }
+            }
         }
 
         public void TrackEvent(
