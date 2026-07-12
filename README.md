@@ -1,3 +1,23 @@
+<p align="center">
+  <img src="Documentation~/Images/banner.png" alt="Game Foundation" width="100%">
+</p>
+
+<h1 align="center">Game Foundation</h1>
+
+<p align="center">
+  Bộ nền tảng dùng chung cho các dự án Unity của PocketPlay Interactive.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Unity-6000.0-black?logo=unity">
+  <img src="https://img.shields.io/badge/UPM-Git%20Package-blue">
+  <img src="https://img.shields.io/github/v/release/PocketPlay-Interactive/_GameFoundation">
+  <img src="https://img.shields.io/github/license/PocketPlay-Interactive/_GameFoundation">
+  <img src="https://img.shields.io/github/last-commit/PocketPlay-Interactive/_GameFoundation">
+</p>
+
+---
+
 # GameFoundation for Unity
 
 Thư viện nền dùng chung cho các Unity project: helper, manager, pattern, save/load, security utilities và wrapper SDK. Package hỗ trợ cài đặt qua Unity Package Manager bằng Git URL, bật SDK bằng define khi cần, và vẫn compile được khi SDK chưa import.
