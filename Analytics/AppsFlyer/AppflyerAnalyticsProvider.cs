@@ -9,6 +9,7 @@ using AppsFlyerSDK;
 
 namespace Dann.GameFoundation
 {
+    [ExtensionModuleNotice("Drag this FirebaseAnalyticsProvider object into AnalyticsService -> Provider Prefabs.")]
     public class AppflyerAnalyticsProvider : MonoBehaviour, IAnalyticsProvider
     {
         public string ProviderName => "AppsFlyer";
