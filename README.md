@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="Documentation/Images/banner.svg" alt="Game Foundation Banner" width="100%">
+  <img src="Documentation/Images/banner_1.png" alt="Game Foundation Banner" width="100%">
 </p>
 
 <h1 align="center">Game Foundation</h1>
