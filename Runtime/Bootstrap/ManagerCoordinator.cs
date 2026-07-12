@@ -36,7 +36,7 @@ public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
         InappPurchase.I.InitializePurchasing();
 #endif
 
-#if ANALYTICS
+#if FIREBASE
         yield return FirebaseManager.I.InitializeAsync();
         yield return new WaitUntil(() => Manager.I.IsAnalyticsInitialized);
         LogSystem.LogSuccess($"[ManagerCoordinator] ANALYTICS SDK INITIALIZED: {Manager.I.IsAnalyticsInitialized}");

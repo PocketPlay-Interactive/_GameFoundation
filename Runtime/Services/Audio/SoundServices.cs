@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 
-public class SoundManager : SingletonGlobal<SoundManager>, IGameFoundationModule
+public class SoundServices : SingletonGlobal<SoundServices>, IGameFoundationModule
 {
     public enum Sound
     {
