@@ -6,7 +6,7 @@ public abstract class SingletonGlobal<T> : MonoBehaviour where T : SingletonGlob
     private static T m_Instance = null;
     static bool shuttingDown = false;
 
-    public static T I
+    private static T I
     {
         get
         {
@@ -26,6 +26,13 @@ public abstract class SingletonGlobal<T> : MonoBehaviour where T : SingletonGlob
             return m_Instance;
         }
     }
+
+    
+    public static T Get()
+    {
+        return I;
+    }
+
 
     protected virtual void Awake()
     {

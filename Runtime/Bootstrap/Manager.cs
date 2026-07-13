@@ -4,23 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public enum Scene
-{
-    Loading,
-    Ingame,
-}
-
 [DefaultExecutionOrder(-100)]
 public class Manager : SingletonGlobal<Manager>
 {
-    [Header("Sdk State")]
-    public bool IsFirebaseInitialized = false;
-    public bool IsAdvertisementReady = false;
-    public bool IsInAppPurchaseInitialized = false;
-
     [Header("Intertitial Ad Open")]
     public bool AlwayShowInterstitialAd = true;
-    public bool IsAdvertisementIntertitialOpen = false;
 
     [Header("Loading State")]
     public bool IsLoadingActive = false;
@@ -35,8 +23,10 @@ public class Manager : SingletonGlobal<Manager>
 
     private bool hasAdCallbackCompleted = false;
     [Header("SDK Initialization State")]
-    public bool _hasInitialized = false;
-    public event Action OnAdCallbackCompleted;
+    private bool hasSdkInitializationHandler = false;
+    public event Func<IEnumerator> OnSdkInitializationRequested;
+    public event Action OnFoundationReady;
+    public event Action OnApplicationResumed;
 
     protected override void Awake()
     {
@@ -45,9 +35,10 @@ public class Manager : SingletonGlobal<Manager>
         base.Awake();
 
         RuntimeStorageData.ReadData();
-        if (RuntimeStorageData.PLAYER.LastLoginDayOfMonth != DateTime.Now.Day)
+        DateTime now = DateTime.Now;
+        if (RuntimeStorageData.PLAYER.LastLogin.Date != now.Date)
         {
-            RuntimeStorageData.PLAYER.LastLoginDayOfMonth = DateTime.Now.Day;
+            RuntimeStorageData.PLAYER.LastLogin = now;
             RuntimeStorageData.PLAYER.LoginDayCount += 1;
         }
     }
@@ -56,45 +47,40 @@ public class Manager : SingletonGlobal<Manager>
     {
         Time.timeScale = 1;
         ShowLoading();
-        StartCoroutine(InitializeSDK());
+        StartCoroutine(InitializeBootstrap());
     }
 
-    private IEnumerator InitializeSDK()
+    private IEnumerator InitializeBootstrap()
     {
-#if FIREBASE
-        yield return FirebaseManager.I.InitializeAsync();
-        yield return new WaitUntil(() => IsFirebaseInitialized == true);
-        LogSystem.LogSuccess($"[Manager] FIREBASE SDK INITIALIZED: {IsFirebaseInitialized}");
-#endif
-#if ADMOB
-        yield return null;
-#if ADMOB_UMP_OMNI
-        bool umpCompleted = false;
-        yield return Omni.UMP.Instance.DOGatherConsent(() => umpCompleted = true);
-        yield return new WaitUntil(() => umpCompleted);
-        FirebaseManager.I?.LogUMP("initialized_consent");
-#else
-        FirebaseManager.I?.LogUMP("skipped_consent");
-#endif
-
-        yield return AdManager.I.InitializeAsync();
-        yield return new WaitUntil(() => IsAdvertisementReady == true);
-        LogSystem.LogSuccess($"[Manager] ADMOB SDK INITIALIZED: {IsAdvertisementReady}");
-#endif
-
+        yield return InitializeSdkThroughCoordinator();
         yield return InitializeExtensionModules();
 
 #if !ADMOB
         yield return null;
         FinalizeAdSequence();
+#else
+        if (!hasSdkInitializationHandler)
+            FinalizeAdSequence();
 #endif
+    }
+
+    private IEnumerator InitializeSdkThroughCoordinator()
+    {
+        var handlers = OnSdkInitializationRequested?.GetInvocationList();
+        hasSdkInitializationHandler = handlers != null;
+        if (!hasSdkInitializationHandler) yield break;
+
+        foreach (Func<IEnumerator> handler in handlers)
+        {
+            yield return handler();
+        }
     }
 
     private IEnumerator InitializeExtensionModules()
     {
         foreach (var module in GetExtensionModules())
         {
-            LogSystem.LogSuccess($"[Manager] INITIALIZE MODULE: {module.GetType().Name}");
+            LogSystem.LogSuccess($"[Manager] Extension Module: {module.GetType().Name.AddSpaceBeforeUppercase()}");
             yield return module.Initialize();
         }
     }
@@ -135,29 +121,21 @@ public class Manager : SingletonGlobal<Manager>
     }
 
     public LoadingCanvas LoadingUI() => loadingCanvas;
-    public bool IsCanShowAdOpen()
-    {
-        if (CurrentLoadingElapsed >= MaxLoadingDuration)
-            return false;
-        return true;
-    }
 
     public void FinalizeAdSequence()
     {
-        Debug.Log("[Manager] FinalizeAdSequence called");
         if (hasAdCallbackCompleted) return;
         hasAdCallbackCompleted = true;
-        _hasInitialized = true;
         CurrentLoadingElapsed = 14.0f;
-        OnAdCallbackCompleted?.Invoke();
+        OnFoundationReady?.Invoke();
 
-        AdManager.I?.InitializedAllOfAds();
+        LogSystem.LogSuccess("Finalize AdSequence");
     }
 
     private void OnApplicationPause(bool pause)
     {
         RuntimeStorageData.SaveAllData();
-        if (!pause) AdManager.I?.CheckingOpenAd();
+        if (!pause) OnApplicationResumed?.Invoke();
     }
 
     private void OnApplicationQuit()

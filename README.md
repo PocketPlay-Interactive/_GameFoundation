@@ -330,7 +330,7 @@ Trên object có script `Manager`:
 | AdMob | `AdManager` | `AdManager`, `AdmobInterstitalOpen`, `AdMobInterstital` và support component cần thiết | `ADMOB` |
 | AdMob test id | `AdManager` | `AdManager` | `ADMOB;ADMOB_TEST` |
 | Native ads/JKit | `AdManager` | `AdManager`, `AdmobNativeCollap`, `AdMobNativeInterstital` | `ADMOB;USE_ADMOB_CUSTOM_PLUGIN` |
-| Omni UMP consent flow | Bật qua `Manager` | SDK/script `Omni.UMP` phải tồn tại trong project | `ADMOB;ADMOB_UMP_OMNI` |
+| Omni UMP consent flow | Bật qua `Manager` | SDK/script `UMP` phải tồn tại trong project | `ADMOB;ADMOB_UMP` |
 | AppsFlyer | `AppflyerEventTracking` | `AppflyerEventTracking` | `APPFLYER` |
 | IAP | Không cần scene object | Gọi qua `InappPurchase.I` | `IAPPURCHASE_ENABLE` |
 | Audio dùng chung | `SoundManager`, `MusicManager` | `SoundManager`, `MusicManager` | Không cần |
@@ -602,7 +602,7 @@ Nếu muốn chỉnh tay, vào `Project Settings > Player > Other Settings > Scr
 | `FIREBASE` | Đã import Firebase Unity SDK. |
 | `ADMOB` | Đã import Google Mobile Ads SDK. |
 | `ADMOB_TEST` | Muốn dùng test ad unit id của Google. |
-| `ADMOB_UMP_OMNI` | Đã import flow UMP có API `Omni.UMP`. |
+| `ADMOB_UMP` | Đã import flow UMP có API `UMP`. |
 | `USE_ADMOB_CUSTOM_PLUGIN` | Đã import plugin native ads/JKit. |
 | `APPFLYER` | Đã import AppsFlyer SDK. |
 | `IAPPURCHASE_ENABLE` | Đã import Unity IAP. |
@@ -912,7 +912,7 @@ Tắt define tương ứng hoặc import đúng SDK trước khi bật define.
 
 ### Lỗi `Omni` không tồn tại khi bật AdMob
 
-Chỉ bật `ADMOB_UMP_OMNI` khi project đã có SDK/script cung cấp `Omni.UMP`. Nếu chỉ dùng Google Mobile Ads cơ bản, bật `ADMOB` là đủ.
+Chỉ bật `ADMOB_UMP` khi project đã có SDK/script cung cấp `UMP`. Nếu chỉ dùng Google Mobile Ads cơ bản, bật `ADMOB` là đủ.
 
 ### Gameplay không tiếp tục sau ads
 

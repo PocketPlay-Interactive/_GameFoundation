@@ -34,9 +34,9 @@ public class ExtensionDataDemo : MonoBehaviour
         ExtensionDataClass extensionData = RuntimeStorageData.PLAYER.ExtensionData;
 
         extensionData.Set(PlayerNameKey, "Player One");
-        extensionData.SetInt(ScoreKey, 1234);
-        extensionData.SetFloat(MoveSpeedKey, 2.5f);
-        extensionData.SetBool(IsVipKey, true);
+        extensionData.Set<int>(ScoreKey, 1234);
+        extensionData.Set<float>(MoveSpeedKey, 2.5f);
+        extensionData.Set<bool>(IsVipKey, true);
 
         RuntimeStorageData.SaveAllData();
         Debug.Log("[ExtensionDataDemo] Saved string, int, float and bool values.");
@@ -47,9 +47,9 @@ public class ExtensionDataDemo : MonoBehaviour
         ExtensionDataClass extensionData = RuntimeStorageData.PLAYER.ExtensionData;
 
         string playerName = extensionData.Get(PlayerNameKey, "Unknown Player");
-        int score = extensionData.GetInt(ScoreKey, 0);
-        float moveSpeed = extensionData.GetFloat(MoveSpeedKey, 0f);
-        bool isVip = extensionData.GetBool(IsVipKey, false);
+        int score = extensionData.Get<int>(ScoreKey, 0);
+        float moveSpeed = extensionData.Get<float>(MoveSpeedKey, 0f);
+        bool isVip = extensionData.Get<bool>(IsVipKey, false);
 
         Debug.Log(
             $"[ExtensionDataDemo] Loaded values - PlayerName: {playerName}, " +
@@ -75,7 +75,7 @@ public class ExtensionDataDemo : MonoBehaviour
 
     private static void LoadAndLogJsonDemoData()
     {
-        string json = RuntimeStorageData.PLAYER.ExtensionData.Get(PlayerProfileJsonKey);
+        string json = RuntimeStorageData.PLAYER.ExtensionData.Get<string>(PlayerProfileJsonKey);
         PlayerProfileData playerProfile = string.IsNullOrEmpty(json)
             ? null
             : JsonUtility.FromJson<PlayerProfileData>(json);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 
 [Serializable]
@@ -61,17 +62,17 @@ public class PlayerSerializable
         }
     }
 
-    // LastLoginDayOfMonth
+    // LastLogin
     [SerializeField]
-    private int lastLoginDayOfMonthObfuscated;
+    private string lastLoginObfuscated;
     [SerializeField]
-    private int lastLoginDayOfMonthChecksum;
-    public int LastLoginDayOfMonth
+    private int lastLoginChecksum;
+    public DateTime LastLogin
     {
-        get => ReadSecureInt(lastLoginDayOfMonthObfuscated, lastLoginDayOfMonthChecksum);
+        get => ReadSecureDateTime(lastLoginObfuscated, lastLoginChecksum);
         set
         {
-            WriteSecureInt(value, out lastLoginDayOfMonthObfuscated, out lastLoginDayOfMonthChecksum);
+            WriteSecureDateTime(value, out lastLoginObfuscated, out lastLoginChecksum);
         }
     }
 
@@ -122,7 +123,7 @@ public class PlayerSerializable
         GoldBalance = 0;
         SelectedLanguage = "English";
         OwnedProductIds = new List<string>();
-        LastLoginDayOfMonth = 0;
+        LastLogin = DateTime.MinValue;
         LoginDayCount = 0;
         IsInitialLaunch = false;
         CurrentLevelIndex = 0;
@@ -168,6 +169,23 @@ public class PlayerSerializable
     {
         obfuscated = MemoryObfuscation.ObfuscateInt(value);
         checksum = MemoryChecksum.GenerateChecksum(value);
+    }
+
+    private static DateTime ReadSecureDateTime(string obfuscated, int checksum)
+    {
+        if (string.IsNullOrEmpty(obfuscated) || !MemoryChecksum.VerifyChecksum(obfuscated, checksum))
+            return DateTime.MinValue;
+
+        string value = MemoryObfuscation.DeobfuscateString(obfuscated);
+        return DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var dateTime)
+            ? dateTime
+            : DateTime.MinValue;
+    }
+
+    private static void WriteSecureDateTime(DateTime value, out string obfuscated, out int checksum)
+    {
+        obfuscated = MemoryObfuscation.ObfuscateString(value.ToString("O", CultureInfo.InvariantCulture));
+        checksum = MemoryChecksum.GenerateChecksum(obfuscated);
     }
 }
 

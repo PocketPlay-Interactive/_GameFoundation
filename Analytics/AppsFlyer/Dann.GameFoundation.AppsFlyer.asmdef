@@ -1,0 +1,19 @@
+{
+  "name": "Dann.GameFoundation.AppsFlyer",
+  "rootNamespace": "Dann.GameFoundation",
+  "references": [
+    "Dann.GameFoundation",
+    "AppsFlyer"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [
+    "APPFLYER"
+  ],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
