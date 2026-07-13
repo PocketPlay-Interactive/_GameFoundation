@@ -2,6 +2,43 @@
 
 All notable changes to this package are documented in this file.
 
+## [1.0.16] - 2026-07-13
+
+### Added
+
+- Added prefab-backed `AdvertisingService` with per-ad controllers for banner, interstitial, rewarded, rewarded interstitial, app open, native, MREC, and startup promise ads.
+- Added generic advertising provider/controller APIs with waterfall and parallel mediation modes.
+- Added AdMob banner and interstitial providers under `Advertising/Admob`.
+- Added UMP consent helper behind `ADMOB_UMP`.
+- Added prefab-backed `AnalyticsService` with provider fan-out, revenue tracking, user identity, user properties, and flush support.
+- Added Firebase and AppsFlyer analytics providers, plus a separate AppsFlyer assembly definition.
+- Added `ManagerCoordinator` to initialize analytics, UMP, and advertising through SDK startup events.
+- Added extension module notice attributes and editor support.
+- Added compact duration formatting and weekday-end countdown helpers to `UtilsTimerHelper`.
+
+### Changed
+
+- Reworked advertising from the legacy `GoogleMobileAds`/`JKit` managers into provider-based `Advertising`, `Admob`, and `Module` folders.
+- Moved built-in service prefabs under `Runtime/Bootstrap/Prefabs`, including advertising and analytics prefabs.
+- Renamed audio services from `MusicManager` and `SoundManager` to `MusicService` and `SoundService`.
+- Moved `SoundButton` to `Runtime/Services/Audio/Extentions/ButtonSound`.
+- Updated `Manager` startup flow to delegate SDK initialization through `ManagerCoordinator`.
+- Updated SDK define documentation and editor define labels for AdMob, UMP, Firebase, AppsFlyer, and Unity IAP.
+- Updated extension data sample and runtime storage editor behavior for current APIs.
+
+### Fixed
+
+- Fixed interstitial completion flow for AdMob interstitial ads.
+- Fixed AdMob banner and interstitial provider initialization/load handling.
+- Fixed startup promise ad timeout handling.
+- Fixed analytics provider initialization errors so editor logging is optional.
+- Fixed Unity IAP integration calls against current runtime storage APIs.
+
+### Removed
+
+- Removed legacy `Advertising/GoogleMobileAds` and `Advertising/JKit` ad manager implementations.
+- Removed legacy `FirebaseManager` and `AppflyerEventTracking` in favor of provider-based analytics.
+
 ## [1.0.15] - 2026-07-13
 
 ### Changed
