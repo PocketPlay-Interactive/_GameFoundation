@@ -80,15 +80,88 @@ Quy ước tên:
 
 ```mermaid
 flowchart TD
-    Project[Game Project] --> Bootstrap[Bootstrap / Manager]
-    Bootstrap --> Features[Runtime / Features]
-    Bootstrap --> Services[Runtime / Services]
-    Bootstrap --> Integrations[SDK Integrations]
-    Features --> Services
-    Services --> Core[Runtime / Core]
+    Project[Game Project] --> Scene[Bootstrap Scene]
+    Project --> ProjectExt[Assets/_Project<br/>GameFoundationExtensions]
+
+    Scene --> Manager[Manager<br/>Composition Root]
+    Scene --> Concurrency[Concurrency<br/>Main-thread Queue]
+    Scene --> Loading[LoadingCanvas<br/>Loading UI]
+    Scene --> OptionalSceneServices[Scene Services<br/>Audio / Ads / Analytics / UI]
+
+    Manager --> ReadSave[RuntimeStorageData.ReadData]
+    Manager --> LoginState[Daily Login State]
+    Manager --> SdkCoordinator[SDK Coordinator<br/>OnSdkInitializationRequested]
+    Manager --> ModuleInit[InitializeExtensionModules]
+    Manager --> Finalize[FinalizeAdSequence<br/>OnFoundationReady]
+    Manager --> PauseQuit[Pause / Quit<br/>SaveAllData]
+
+    ProjectExt --> MonoModules[GameFoundationModuleBehaviour<br/>Drag to Manager Extension Modules]
+    ProjectExt --> RuntimeModules[IGameFoundationModule<br/>Register BeforeSceneLoad]
+    MonoModules --> ModuleRegistryMerge[Module Merge + Sort by Order]
+    RuntimeModules --> Registry[GameFoundationModuleRegistry]
+    Registry --> ModuleRegistryMerge
+    ModuleRegistryMerge --> ModuleInit
+
+    ModuleInit --> Services[Runtime/Services]
+    ModuleInit --> Integrations[Runtime/Integrations]
+    ModuleInit --> Analytics[AnalyticsService]
+    ModuleInit --> Advertising[AdvertisingService]
+    ModuleInit --> Features[Runtime/Features]
+
+    Services --> Persistence[Persistence<br/>Setting / Player / ExtensionData]
+    Services --> Audio[Audio<br/>SoundService / MusicService]
+    Services --> AssetsService[Assets<br/>ResourceHandle / ImageHandler]
+    Services --> Pooling[Pooling]
+    Services --> NetworkTime[NetworkTime]
+
+    Features --> UI[UI<br/>Canvas / Popup / Button]
+    Features --> Interaction[Interaction<br/>Input / Touch / Raycast / Shake]
+    Features --> Pathfinding[Pathfinding<br/>A* Graph]
+    Features --> CommonBehaviours[CommonBehaviours]
+
+    Integrations --> IAP[Unity IAP]
+    Integrations --> Haptics[Haptics]
+    Integrations --> Device[Device APIs<br/>Torch]
+    Analytics --> AnalyticsProviders[Firebase / AppsFlyer Providers]
+    Advertising --> AdControllers[Ad Controllers<br/>Banner / Interstitial / Rewarded / AppOpen]
+    AdControllers --> AdProviders[AdMob / Custom Providers]
+
+    Persistence --> SaveFiles[(Encrypted Save Files<br/>persistentDataPath)]
+    Persistence --> Security[Runtime/Security<br/>Hash / Checksum / Obfuscation]
+    AnalyticsProviders --> OptionalSDKs[Optional SDKs<br/>via Define Symbols]
+    AdProviders --> OptionalSDKs
+    IAP --> OptionalSDKs
+
+    Services --> Core[Runtime/Core]
+    Features --> Core
     Integrations --> Core
-    Project --> ProjectExt[Assets / _Project / GameFoundationExtensions]
-    ProjectExt --> Bootstrap
+    Analytics --> Core
+    Advertising --> Core
+    Editor[Editor Tools<br/>Defines / Importers / Data / Build] -. editor only .-> Project
+
+    Core --> Patterns[Patterns<br/>Singleton / ServiceLocator / EventBus]
+    Core --> Extensibility[Extensibility<br/>Modules / Notices]
+    Core --> Threading[Threading]
+    Core --> Diagnostics[Diagnostics<br/>LogSystem]
+    Core --> Utilities[Utilities / Extensions]
+
+    classDef project fill:#FF6B6B,stroke:#24292f,stroke-width:2px,color:#fff
+    classDef bootstrap fill:#4ECDC4,stroke:#24292f,stroke-width:2px,color:#073642
+    classDef core fill:#45B7D1,stroke:#24292f,stroke-width:2px,color:#fff
+    classDef services fill:#96CEB4,stroke:#24292f,stroke-width:2px,color:#073642
+    classDef features fill:#FFEAA7,stroke:#24292f,stroke-width:2px,color:#24292f
+    classDef integrations fill:#DDA0DD,stroke:#24292f,stroke-width:2px,color:#24292f
+    classDef data fill:#A8DADC,stroke:#24292f,stroke-width:2px,color:#073642
+    classDef editor fill:#CDB4DB,stroke:#24292f,stroke-width:2px,color:#24292f
+
+    class Project,ProjectExt project
+    class Scene,Manager,Concurrency,Loading,SdkCoordinator,ModuleInit,Finalize bootstrap
+    class Core,Patterns,Extensibility,Threading,Diagnostics,Utilities core
+    class Services,Persistence,Audio,AssetsService,Pooling,NetworkTime services
+    class Features,UI,Interaction,Pathfinding,CommonBehaviours features
+    class Integrations,IAP,Haptics,Device,Analytics,Advertising,AnalyticsProviders,AdControllers,AdProviders,OptionalSDKs integrations
+    class SaveFiles,Security,ReadSave,LoginState,PauseQuit data
+    class Editor editor
 ```
 
 Design principles:
