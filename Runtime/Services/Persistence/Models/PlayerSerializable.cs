@@ -275,6 +275,24 @@ public class ExtensionDataClass
         return TryGetIndex(key, out _);
     }
 
+    public bool Remove(string key)
+    {
+        EnsureLists();
+        int idx = keys.IndexOf(key);
+        if (idx < 0)
+            return false;
+
+        keys.RemoveAt(idx);
+
+        if (idx < values.Count)
+            values.RemoveAt(idx);
+
+        if (idx < checksums.Count)
+            checksums.RemoveAt(idx);
+
+        return true;
+    }
+
     private void SetString(string key, string value)
     {
         string obfuscated = MemoryObfuscation.ObfuscateString(value);

@@ -57,8 +57,5 @@ public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
 
     protected virtual void HandleApplicationResumed()
     {
-#if ADMOB
-        // AdManager.Get()?.CheckingOpenAd();
-#endif
     }
 }

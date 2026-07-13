@@ -189,7 +189,7 @@ public static class RuntimeStorageData
     }
 }
 
-public static class RuntimeStorageExtention
+public static class RuntimeStorageExtension
 {
     public static bool Has(string key)
     {
@@ -198,8 +198,8 @@ public static class RuntimeStorageExtention
 
     public static void Delete(string key)
     {
-        // RuntimeStorageData.PLAYER.ExtensionData.remo
-        LogSystem.LogError("This function is not yet available.");
+        RuntimeStorageData.PLAYER.ExtensionData.Remove(key);
+        RuntimeStorageData.SaveAllData();
     }
 
     public static T Load<T>(string key, T defaultValue = default(T))
@@ -215,4 +215,12 @@ public static class RuntimeStorageExtention
         RuntimeStorageData.PLAYER.ExtensionData.Set(key, data);
         RuntimeStorageData.SaveAllData();
     }
+}
+
+public static class RuntimeStorageExtention
+{
+    public static bool Has(string key) => RuntimeStorageExtension.Has(key);
+    public static void Delete(string key) => RuntimeStorageExtension.Delete(key);
+    public static T Load<T>(string key, T defaultValue = default(T)) => RuntimeStorageExtension.Load(key, defaultValue);
+    public static void Save<T>(string key, T data) => RuntimeStorageExtension.Save(key, data);
 }

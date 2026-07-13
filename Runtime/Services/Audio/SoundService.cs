@@ -186,6 +186,6 @@ public class SoundService : SingletonGlobal<SoundService>, IGameFoundationModule
             audioSources.Add(src);
         }
 
-        Debug.Log($"[SoundManager] Initialized with {count} AudioSources");
+        Debug.Log($"[SoundService] Initialized with {count} AudioSources");
     }
 }
