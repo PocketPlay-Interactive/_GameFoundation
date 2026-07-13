@@ -746,22 +746,24 @@ RuntimeStorageData.SaveAllData();
 
 Với dự án mới, nếu cần data riêng, ưu tiên tạo wrapper trong `Assets/_Project/GameFoundationExtensions` dùng `PlayerSerializable.ExtensionData`. Xem mục [Thêm User Data Riêng Mà Không Sửa GameFoundation](#thêm-user-data-riêng-mà-không-sửa-gamefoundation) trước khi sửa model gốc.
 
-#### RuntimeStorageExtention
+#### RuntimeStorageExtension
 
-`RuntimeStorageExtention` là API rút gọn để lưu và đọc data riêng của project qua `Player.ExtensionData`. API hỗ trợ trực tiếp `string`, `int`, `float`, `bool`; các kiểu còn lại được serialize bằng `JsonUtility`.
+`RuntimeStorageExtension` là API rút gọn để lưu và đọc data riêng của project qua `Player.ExtensionData`. API hỗ trợ trực tiếp `string`, `int`, `float`, `bool`; các kiểu còn lại được serialize bằng `JsonUtility`.
+
+`RuntimeStorageExtention` vẫn tồn tại như alias legacy để code cũ không gãy.
 
 ```csharp
-RuntimeStorageExtention.Save("project.best_score", 1200);
-int bestScore = RuntimeStorageExtention.Load<int>("project.best_score");
+RuntimeStorageExtension.Set("project.best_score", 1200);
+int bestScore = RuntimeStorageExtension.Int("project.best_score");
 
-RuntimeStorageExtention.Save("project.inventory", inventoryData);
+RuntimeStorageExtension.Set("project.inventory", inventoryData);
 InventorySaveData inventory =
-    RuntimeStorageExtention.Load<InventorySaveData>("project.inventory");
+    RuntimeStorageExtension.Object<InventorySaveData>("project.inventory");
 
-bool hasInventory = RuntimeStorageExtention.Has("project.inventory");
+bool hasInventory = RuntimeStorageExtension.Has("project.inventory");
 ```
 
-`Save<T>` tự gọi `RuntimeStorageData.SaveAllData()` sau khi cập nhật. Với object, class phải tương thích với `JsonUtility`, có constructor không tham số và được đánh dấu `[Serializable]`; nếu key không tồn tại hoặc JSON không hợp lệ, `Load<T>` trả về `new T()`. Chỉ gọi API sau khi `RuntimeStorageData.ReadData()` đã khởi tạo player data. `Delete` hiện chưa khả dụng.
+`Set<T>` tự gọi `RuntimeStorageData.SaveAllData()` sau khi cập nhật. Với object, class phải tương thích với `JsonUtility`, có constructor không tham số và được đánh dấu `[Serializable]`; nếu key không tồn tại hoặc JSON không hợp lệ, `Object<T>` trả về default value. Chỉ gọi API sau khi `RuntimeStorageData.ReadData()` đã khởi tạo player data.
 
 ### Time/NetworkTime
 

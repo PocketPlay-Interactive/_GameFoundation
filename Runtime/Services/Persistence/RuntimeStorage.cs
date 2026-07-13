@@ -207,6 +207,13 @@ public static class RuntimeStorageExtension
         return RuntimeStorageData.PLAYER.ExtensionData.Get(key, defaultValue);
     }
 
+    public static T Get<T>(string key, T defaultValue = default(T)) => Load(key, defaultValue);
+    public static string String(string key, string defaultValue = "") => Load(key, defaultValue);
+    public static int Int(string key, int defaultValue = 0) => Load(key, defaultValue);
+    public static float Float(string key, float defaultValue = 0f) => Load(key, defaultValue);
+    public static bool Bool(string key, bool defaultValue = false) => Load(key, defaultValue);
+    public static T Object<T>(string key, T defaultValue = default(T)) => Load(key, defaultValue);
+
     public static void Save<T>(string key, T data)
     {
         if (data == null)
@@ -215,12 +222,6 @@ public static class RuntimeStorageExtension
         RuntimeStorageData.PLAYER.ExtensionData.Set(key, data);
         RuntimeStorageData.SaveAllData();
     }
-}
 
-public static class RuntimeStorageExtention
-{
-    public static bool Has(string key) => RuntimeStorageExtension.Has(key);
-    public static void Delete(string key) => RuntimeStorageExtension.Delete(key);
-    public static T Load<T>(string key, T defaultValue = default(T)) => RuntimeStorageExtension.Load(key, defaultValue);
-    public static void Save<T>(string key, T data) => RuntimeStorageExtension.Save(key, data);
+    public static void Set<T>(string key, T data) => Save(key, data);
 }

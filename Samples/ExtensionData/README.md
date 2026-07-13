@@ -2,6 +2,8 @@
 
 Sample này hướng dẫn lưu data riêng của project vào `RuntimeStorageData.PLAYER.ExtensionData`.
 
+API ngắn hơn: xem `RUNTIME_STORAGE_EXTENSION_README.md`.
+
 Mở scene:
 
 ```text
