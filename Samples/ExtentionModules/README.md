@@ -1,13 +1,13 @@
-# Extention Modules Sample
+# Ví dụ Extension Modules
 
-`Manager` khoi tao module trong `InitializeExtensionModules()`.
+`Manager` khởi tạo module trong `InitializeExtensionModules()`.
 
-Nguon module:
+Nguồn module:
 
-- Scene module: `MonoBehaviour[] extensionModules` tren `Manager`.
+- Scene module: `MonoBehaviour[] extensionModules` trên `Manager`.
 - Runtime module: `GameFoundationModuleRegistry.Register(...)`.
 
-Tat ca module can implement:
+Tất cả module cần implement:
 
 ```csharp
 public interface IGameFoundationModule
@@ -17,13 +17,13 @@ public interface IGameFoundationModule
 }
 ```
 
-Module co `Order` nho chay truoc.
+Module có `Order` nhỏ chạy trước.
 
-## Cach 1: Module co MonoBehaviour
+## Cách 1: Module có MonoBehaviour
 
-Dung khi module can reference trong Inspector, GameObject, prefab, SerializeField, hoac lifecycle cua Unity.
+Dùng khi module cần reference trong Inspector, GameObject, prefab, `SerializeField`, hoặc lifecycle của Unity.
 
-File mau: `SampleMonoExtensionModule.cs`
+File mẫu: `SampleMonoExtensionModule.cs`
 
 ```csharp
 using System.Collections;
@@ -42,20 +42,20 @@ public sealed class SampleMonoExtensionModule : GameFoundationModuleBehaviour
 }
 ```
 
-Cach gan:
+Cách gắn:
 
-1. Tao GameObject trong scene.
+1. Tạo GameObject trong scene.
 2. Add component `SampleMonoExtensionModule`.
-3. Chon GameObject co `Manager`.
-4. Keo component vao `Manager -> Extension Modules`.
+3. Chọn GameObject có `Manager`.
+4. Kéo component vào `Manager -> Extension Modules`.
 
-`GameFoundationModuleBehaviour` da co san field `order`.
+`GameFoundationModuleBehaviour` đã có sẵn field `order`.
 
-## Cach 2: Module khong can MonoBehaviour
+## Cách 2: Module không cần MonoBehaviour
 
-Dung khi module chi can code runtime, khong can object trong scene.
+Dùng khi module chỉ cần code runtime, không cần object trong scene.
 
-File mau: `SampleRuntimeExtensionModule.cs`
+File mẫu: `SampleRuntimeExtensionModule.cs`
 
 ```csharp
 using System.Collections;
@@ -79,10 +79,10 @@ public sealed class SampleRuntimeExtensionModule : IGameFoundationModule
 }
 ```
 
-Khong can keo vao Inspector. Unity goi `Register()` truoc khi scene load, sau do `Manager` lay module tu registry.
+Không cần kéo vào Inspector. Unity gọi `Register()` trước khi scene load, sau đó `Manager` lấy module từ registry.
 
-## Ghi nho
+## Ghi nhớ
 
-- `Initialize()` duoc goi sau SDK coordinator, truoc `FinalizeAdSequence()`.
-- Module coroutine duoc chay lan luot theo `Order`.
-- Neu module can doi async, `yield return` trong `Initialize()`.
+- `Initialize()` được gọi sau SDK coordinator, trước `FinalizeAdSequence()`.
+- Module coroutine được chạy lần lượt theo `Order`.
+- Nếu module cần đợi async, dùng `yield return` trong `Initialize()`.
