@@ -339,8 +339,8 @@ Với một scene bootstrap mới, mặc định nên có các script sau:
 | Bắt buộc | `Concurrency` | `Concurrency` | Chạy callback/coroutine về main thread. Nhiều manager dùng `Concurrency.Instance()`. |
 | Nên có | `LoadingCanvas` | `LoadingCanvas` hoặc child UI của `Manager` | UI loading mặc định cho bootstrap. Có thể bỏ trống nếu project tự quản lý loading. |
 | Tùy game | `CanvasManager` | `CanvasManager` | Quản lý screen/popup nếu dùng hệ UI có sẵn của foundation. |
-| Tùy game | `SoundManager` | `SoundManager` | Quản lý sound effect dùng chung. |
-| Tùy game | `MusicManager` | `MusicManager` | Quản lý background music dùng chung. |
+| Tùy game | `SoundService` | `SoundService` | Quản lý sound effect dùng chung. |
+| Tùy game | `MusicService` | `MusicService` | Quản lý background music dùng chung. |
 | Tùy game | `InputManager` | `InputManager` | Dùng input wrapper trong `Runtime/Features/Interaction/Input`. |
 | Tùy game | `RaycastSystem` | `RaycastSystem` | Dùng raycast/touch interaction helper. |
 
@@ -367,20 +367,18 @@ Scene
 |   `-- Concurrency
 |-- CanvasManager
 |   `-- CanvasManager
-|-- SoundManager
-|   `-- SoundManager
-|-- MusicManager
-|   `-- MusicManager
-|-- FirebaseManager              # Nếu bật FIREBASE
-|   `-- FirebaseManager
-|-- AdManager                    # Nếu bật ADMOB
-|   |-- AdManager
-|   |-- AdmobInterstitalOpen
-|   |-- AdMobInterstital
-|   |-- AdmobNativeCollap        # Nếu bật USE_ADMOB_CUSTOM_PLUGIN
-|   `-- AdMobNativeInterstital   # Nếu bật USE_ADMOB_CUSTOM_PLUGIN
-`-- AppflyerEventTracking        # Nếu bật APPFLYER
-    `-- AppflyerEventTracking
+|-- SoundService
+|   `-- SoundService
+|-- MusicService
+|   `-- MusicService
+|-- Analytics
+|   `-- AnalyticsService         # Provider prefabs: Firebase / AppsFlyer
+`-- Advertising
+    |-- AdvertisingService       # Nếu bật ADMOB hoặc provider ads khác
+    |-- BannerAdvertisingController
+    |-- InterstitialAdvertisingController
+    |-- RewardedVideoAdvertisingController
+    `-- AppOpenAdvertisingController
 ```
 
 Nếu chỉ muốn dùng core helper và save/load, chỉ cần `Manager` + `Concurrency`. Các script còn lại thêm theo tính năng project thực sự dùng.
@@ -403,21 +401,21 @@ Trên object có script `Manager`:
 
 | Khi dùng | GameObject gợi ý | Script cần gắn | Define cần bật |
 | --- | --- | --- | --- |
-| Firebase Analytics | `FirebaseManager` | `FirebaseManager` | `FIREBASE` |
-| AdMob | `AdManager` | `AdManager`, `AdmobInterstitalOpen`, `AdMobInterstital` và support component cần thiết | `ADMOB` |
-| AdMob test id | `AdManager` | `AdManager` | `ADMOB;ADMOB_TEST` |
-| Native ads/JKit | `AdManager` | `AdManager`, `AdmobNativeCollap`, `AdMobNativeInterstital` | `ADMOB;USE_ADMOB_CUSTOM_PLUGIN` |
+| Firebase Analytics | `Analytics` | `AnalyticsService` + `FirebaseAnalyticsProvider` prefab | `FIREBASE` |
+| AdMob | `Advertising` | `AdvertisingService`, ad controllers, `Admob*AdvertisingProvider` prefab | `ADMOB` |
+| AdMob test id | `Advertising` | `AdvertisingService` + AdMob provider prefab | `ADMOB;ADMOB_TEST` |
+| Native ads/JKit | `Advertising` | `AdvertisingService`, `NativeAdvertisingController`, custom provider prefab | `ADMOB;USE_ADMOB_CUSTOM_PLUGIN` |
 | Omni UMP consent flow | Bật qua `Manager` | SDK/script `UMP` phải tồn tại trong project | `ADMOB;ADMOB_UMP` |
-| AppsFlyer | `AppflyerEventTracking` | `AppflyerEventTracking` | `APPFLYER` |
+| AppsFlyer | `Analytics` | `AnalyticsService` + `AppflyerAnalyticsProvider` prefab | `APPFLYER` |
 | IAP | Không cần scene object | Gọi qua `InappPurchase.I` | `IAPPURCHASE_ENABLE` |
-| Audio dùng chung | `SoundManager`, `MusicManager` | `SoundManager`, `MusicManager` | Không cần |
+| Audio dùng chung | `SoundService`, `MusicService` | `SoundService`, `MusicService` | Không cần |
 | UI dùng chung | `CanvasManager` | `CanvasManager` | Không cần |
 
-Nếu không bật `ADMOB`, `Manager` sẽ tự finalize bootstrap sau khi init extension modules. Nếu có `AdManager` fallback trong scene thì callback bị gọi lặp cũng được chặn bởi `Manager.FinalizeAdSequence()`.
+Nếu không bật `ADMOB`, `Manager` sẽ tự finalize bootstrap sau khi init extension modules. Nếu dùng `AdvertisingService`, flow ads có thể gọi `Manager.FinalizeAdSequence()` sau promise ad startup; callback bị gọi lặp được chặn sẵn.
 
 ## Mở Rộng Cho Dự Án Mới
 
-Không sửa trực tiếp `Manager`, `RuntimeStorageData`, `AdManager` cho logic riêng của từng game nếu có thể tránh được. Đặt code riêng của project vào:
+Không sửa trực tiếp `Manager`, `RuntimeStorageData`, `AnalyticsService` hoặc `AdvertisingService` cho logic riêng của từng game nếu có thể tránh được. Đặt code riêng của project vào:
 
 ```text
 Assets/_Project/GameFoundationExtensions
@@ -846,8 +844,8 @@ Analytics và advertising nằm ở package root; SDK/native API còn lại nằ
 
 | Folder | Provider/chức năng |
 | --- | --- |
-| `/Advertising/GoogleMobileAds` | AdMob và support component dùng Google Mobile Ads. |
-| `/Advertising/JKit` | Native/collapse ad adapter dùng JKit. |
+| `Advertising/Admob` | AdMob provider dùng Google Mobile Ads. |
+| `Advertising/Module` | Các ad controller: banner, interstitial, rewarded, app open, native, MREC. |
 | `Analytics/Firebases` | Firebase initialization và analytics. |
 | `Analytics/AppsFlyer` | AppsFlyer và ad revenue forwarding. |
 | `Runtime/Integrations/Purchasing/UnityIAP` | Unity In-App Purchasing. |
@@ -867,15 +865,22 @@ FIREBASE
 ```
 
 ```csharp
-yield return FirebaseManager.I.InitializeAsync();
-FirebaseManager.I.TrackingEvent("level_start");
-FirebaseManager.I.TrackingEvent("level_complete", ("level", 10), ("time", 42.5f));
-FirebaseManager.I.TrackingAdsEvent("paid_ads_banner", "home_banner", "0.0012");
+using Dann.GameFoundation;
+using System.Collections.Generic;
+
+AnalyticsService.Get().Initialize();
+AnalyticsService.Get().TrackEvent("level_start");
+AnalyticsService.Get().TrackEvent("level_complete", new Dictionary<string, object>
+{
+    { "level", 10 },
+    { "time", 42.5f }
+});
+AnalyticsService.Get().TrackRevenue("paid_ads_banner", "home_banner", "ads", "USD", 0.0012);
 ```
 
-Khi không có `FIREBASE`, các hàm tracking là no-op.
+Khi không có provider hoặc provider chưa initialize, `AnalyticsService` bỏ qua event cho provider đó.
 
-Firebase event được queue khi manager chưa init. Kiểm tra event trong `Firebase Console > Analytics > Events`.
+Kiểm tra event trong `Firebase Console > Analytics > Events`.
 
 ### AdMob
 
@@ -886,21 +891,26 @@ ADMOB
 API hay dùng:
 
 ```csharp
-AdManager.I.ShowBanner();
-AdManager.I.HideBanner();
+using Dann.GameFoundation;
 
-AdManager.I.ShowInterstitialAdWithSpaceTime(() =>
-{
-    // Continue gameplay
-}, "level_complete");
+AdvertisingService.Get().ShowBanner();
+AdvertisingService.Get().HideBanner();
 
-AdManager.I.ShowRewardedAd(() =>
+AdvertisingService.Get().ShowInterstitial(shown =>
 {
-    // Give reward
-}, "double_coin");
+    // Continue gameplay.
+});
+
+AdvertisingService.Get().ShowRewardedVideo(success =>
+{
+    if (success)
+    {
+        // Give reward.
+    }
+});
 ```
 
-Lưu ý: kiểm tra lại ad unit id trên `AdManager` cho từng project mới. Không nên giữ production id của project khác.
+Lưu ý: kiểm tra lại ad unit id trên provider prefab cho từng project mới. Không nên giữ production id của project khác.
 
 ### AppsFlyer
 
@@ -914,7 +924,7 @@ Tracking ad revenue cần cả AppsFlyer và AdMob:
 APPFLYER;ADMOB
 ```
 
-`AppflyerEventTracking.I.LogAdRevenue(adValue)` forward paid event từ AdMob sang AppsFlyer.
+`AppflyerAnalyticsProvider` nhận revenue qua `AnalyticsService.TrackRevenue(...)` và forward sang AppsFlyer.
 
 ### In-App Purchase
 
@@ -997,7 +1007,7 @@ Kiểm tra callback truyền vào `ShowInterstitialAdWithSpaceTime` / `ShowRewar
 
 ### Manager initialize bị treo
 
-Kiểm tra scene có `AdManager` khi bật `ADMOB`. Nếu không dùng ads, bỏ define `ADMOB` để `Manager` tự finalize bootstrap.
+Kiểm tra scene có `AdvertisingService`, ad controller và provider prefab khi bật `ADMOB`. Nếu không dùng ads, bỏ define `ADMOB` để `Manager` tự finalize bootstrap.
 
 ### Mất reference prefab/script sau khi rename hoặc move
 

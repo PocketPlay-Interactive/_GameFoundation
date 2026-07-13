@@ -21,9 +21,9 @@ After import, add a `Manager` prefab or GameObject with `Manager` to the first s
 
 ```csharp
 RuntimeStorageData.SaveAllData();
-SoundManager.I.PlaySound(sound);
-MusicManager.I.PlayMusic(music);
-EventBus.Publish(new GameMessageEvent { Message = "hello" });
+SoundService.Get().PlayOnShot(SoundService.Sound.BUTTON);
+MusicService.Get().PlayMusic(MusicService.Music.NONE);
+EventBus.Publish(new GameMessageEvent { Key = "hello", Value = null });
 ```
 
 ## Package Layout
