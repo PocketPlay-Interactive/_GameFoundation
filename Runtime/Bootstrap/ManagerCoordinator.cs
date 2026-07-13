@@ -28,10 +28,6 @@ public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
 
     protected virtual IEnumerator InitializeSdkAsync()
     {
-#if IAPPURCHASE_ENABLE
-        InappPurchase.I.InitializePurchasing();
-#endif
-
 #if FIREBASE
         Debug.Log("Initialized AnalyticsServices");
         AnalyticsService.Get().Initialize();
