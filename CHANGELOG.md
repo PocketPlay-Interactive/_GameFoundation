@@ -2,6 +2,28 @@
 
 All notable changes to this package are documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- Added detailed extension module sample documentation with MonoBehaviour and runtime-registered module examples.
+- Added `RuntimeStorageExtension` convenience APIs: `Set`, `Get`, `String`, `Int`, `Float`, `Bool`, and `Object`.
+- Added `RuntimeStorageExtention` legacy alias forwarding to `RuntimeStorageExtension` to preserve existing project code.
+- Added `RuntimeStorageExtension` sample README under `Samples/ExtensionData`.
+- Added `ExtensionDataClass.Remove` and wired `RuntimeStorageExtension.Delete` to remove keys and save immediately.
+
+### Changed
+
+- Expanded the README architecture diagram and restored the visual package header.
+- Updated README and documentation references from legacy `AdManager`, `FirebaseManager`, `SoundManager`, and `MusicManager` APIs to current provider-based `AdvertisingService`, `AnalyticsService`, `SoundService`, and `MusicService` APIs.
+- Updated sample documentation to use `RuntimeStorageExtension` instead of the removed temporary `GameSave` wrapper.
+- Updated `SoundService` initialization log label.
+
+### Fixed
+
+- Removed stale `AdManager` resume comment from `ManagerCoordinator`.
+- Corrected quick-start EventBus sample to use `GameMessageEvent.Key` and `Value`.
+
 ## [1.0.16] - 2026-07-13
 
 ### Added
