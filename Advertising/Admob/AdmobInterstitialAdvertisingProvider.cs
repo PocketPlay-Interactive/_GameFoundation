@@ -25,6 +25,7 @@ namespace Dann.GameFoundation
 
         public override void Load(AdvertisingAdType adType, Action<AdvertisingAdState> completed)
         {
+#if ADMOB
             Debug.Log($"Load Advertising Provide {this.name} - {this.AdUnitId}");
             if (_interstitialAd != null)
             {
@@ -65,13 +66,16 @@ namespace Dann.GameFoundation
                     onInterstitialClosed?.Invoke(false);
                 };
             });
+#endif
         }
 
         public override void Show(AdvertisingAdType adType, Action<bool> completed)
         {
+#if ADMOB
             Debug.Log($"Show Advertising Provide {this.name} - {this.AdUnitId}");
             _interstitialAd.Show();
             onInterstitialClosed = completed;
+#endif
         }
     }
 }
