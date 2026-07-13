@@ -1,0 +1,19 @@
+{
+  "name": "Dann.GameFoundation.UnityIAP",
+  "rootNamespace": "Dann.GameFoundation",
+  "references": [
+    "Dann.GameFoundation",
+    "UnityEngine.Purchasing"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [
+    "IAPPURCHASE_ENABLE"
+  ],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

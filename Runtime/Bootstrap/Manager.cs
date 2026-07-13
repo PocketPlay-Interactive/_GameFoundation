@@ -56,9 +56,6 @@ public class Manager : SingletonGlobal<Manager>
     {
         Time.timeScale = 1;
         ShowLoading();
-#if IAPPURCHASE_ENABLE
-        InappPurchase.I.InitializePurchasing();
-#endif
         StartCoroutine(InitializeSDK());
     }
 

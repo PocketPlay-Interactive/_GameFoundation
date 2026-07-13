@@ -2,6 +2,17 @@
 
 All notable changes to this package are documented in this file.
 
+## [1.0.15] - 2026-07-13
+
+### Changed
+
+- Moved Unity IAP integration into a separate optional assembly gated by `IAPPURCHASE_ENABLE`.
+- Registered Unity IAP initialization through `GameFoundationModuleRegistry` instead of a direct `Manager` reference.
+
+### Fixed
+
+- Prevented projects without Unity IAP from compiling `UnityEngine.Purchasing` references when IAP is disabled.
+
 ## [1.0.14] - 2026-07-10
 
 ### Changed
