@@ -38,6 +38,32 @@ public static class UtilsTimerHelper
     public static TimeSpan ConvertSecondsToTimeSpan(int seconds)
         => TimeSpan.FromSeconds(seconds);
 
+    public static string FormatCompactDuration(TimeSpan remaining)
+    {
+        if (remaining.TotalDays >= 1d)
+        {
+            return $"{(int)remaining.TotalDays}d {remaining.Hours}h";
+        }
+
+        if (remaining.TotalHours >= 1d)
+        {
+            return $"{(int)remaining.TotalHours}h {remaining.Minutes}m";
+        }
+
+        return $"{remaining.Minutes}m {remaining.Seconds}s";
+    }
+
+    public static TimeSpan GetTimeUntilWeekdayEnd(
+        DateTime trustedToday,
+        TimeSpan currentTimeOfDay,
+        DayOfWeek endDay = DayOfWeek.Sunday)
+    {
+        DateTime now = trustedToday.Date + currentTimeOfDay;
+        int daysUntilEndDay = ((int)endDay - (int)trustedToday.DayOfWeek + 7) % 7;
+        DateTime end = trustedToday.Date.AddDays(daysUntilEndDay + 1);
+        return end > now ? end - now : TimeSpan.Zero;
+    }
+
     public static string ToMinuteSecondString(int totalSeconds)
         => $"{totalSeconds / 60}m {totalSeconds % 60}s";
 
