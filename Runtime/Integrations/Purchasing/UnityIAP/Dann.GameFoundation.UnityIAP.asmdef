@@ -12,8 +12,15 @@
   "precompiledReferences": [],
   "autoReferenced": true,
   "defineConstraints": [
-    "IAPPURCHASE_ENABLE"
+    "IAPPURCHASE_ENABLE",
+    "GAMEFOUNDATION_UNITY_PURCHASING"
   ],
-  "versionDefines": [],
+  "versionDefines": [
+    {
+      "name": "com.unity.purchasing",
+      "expression": "5.0.0",
+      "define": "GAMEFOUNDATION_UNITY_PURCHASING"
+    }
+  ],
   "noEngineReferences": false
 }

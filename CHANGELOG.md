@@ -8,6 +8,7 @@ All notable changes to this package are documented in this file.
 
 - Moved Unity IAP integration into a separate optional assembly gated by `IAPPURCHASE_ENABLE`.
 - Registered Unity IAP initialization through `GameFoundationModuleRegistry` instead of a direct `Manager` reference.
+- Required `com.unity.purchasing` to exist before compiling the optional Unity IAP assembly.
 
 ### Fixed
 
