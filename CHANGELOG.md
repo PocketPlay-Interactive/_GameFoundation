@@ -14,6 +14,7 @@ All notable changes to this package are documented in this file.
 ### Fixed
 
 - Prevented projects without Unity IAP from compiling `UnityEngine.Purchasing` references when IAP is disabled.
+- Updated Unity IAP integration calls to current singleton and runtime storage APIs.
 
 ## [1.0.14] - 2026-07-10
 

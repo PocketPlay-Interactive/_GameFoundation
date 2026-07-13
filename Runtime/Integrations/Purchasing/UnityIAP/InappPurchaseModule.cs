@@ -7,7 +7,7 @@ public sealed class InappPurchaseModule : IGameFoundationModule
 
     public IEnumerator Initialize()
     {
-        InappPurchase.I.InitializePurchasing();
+        InappPurchase.Get().InitializePurchasing();
         yield break;
     }
 

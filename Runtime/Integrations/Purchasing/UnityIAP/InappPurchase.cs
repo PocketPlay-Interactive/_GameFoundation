@@ -26,7 +26,7 @@ public class InappPurchase : GenericSingleton<InappPurchase>
     public async void InitializePurchasing()
     {
 #if IAPPURCHASE_ENABLE
-        ProductList = ResourceHandle.I.LoadData<InappProductList>("InappProductList");
+        ProductList = ResourceHandle.Get().LoadData<InappProductList>("InappProductList");
         storeController = UnityIAPServices.StoreController();
 
         // Đăng ký event handler trước khi connect
@@ -48,7 +48,7 @@ public class InappPurchase : GenericSingleton<InappPurchase>
     private void OnProductsFetched(List<Product> products)
     {
         Log("[InappPurchase] Products fetched: " + products.Count);
-        RuntimeStorageData.Player.RemoveAllProducts();
+        RuntimeStorageData.PLAYER.RemoveAllProducts();
         storeController.FetchPurchases();
     }
     
@@ -61,11 +61,11 @@ public class InappPurchase : GenericSingleton<InappPurchase>
         {
             var product = order.CartOrdered.Items().First()?.Product;
             Debug.Log($"[InappPurchase] Confirmed purchase found: {product.definition.id}");
-            RuntimeStorageData.Player.AddProduct(product.definition.id);
+            RuntimeStorageData.PLAYER.AddProduct(product.definition.id);
             EventBus.Publish(new PurchaseCompletedEvent { ProductId = product.definition.id });
         }
 
-        RuntimeStorageData.Player.LogAllProducts();
+        RuntimeStorageData.PLAYER.LogAllProducts();
     }
     
     private void OnPurchasePending(PendingOrder order)
@@ -138,7 +138,7 @@ public class InappPurchase : GenericSingleton<InappPurchase>
                 Log($"[InappPurchase] Purchase failed for product ID: {productId}");
                 return;
             }
-            RuntimeStorageData.Player.AddProduct(productId);
+            RuntimeStorageData.PLAYER.AddProduct(productId);
             EventBus.Publish(new PurchaseCompletedEvent { ProductId = productId });
         };
 
