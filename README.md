@@ -15,6 +15,7 @@
   <img src="https://img.shields.io/badge/UPM-Git%20Package-2C8EBB">
   <img src="https://img.shields.io/badge/Platform-Internal-6A5ACD">
   <img src="https://img.shields.io/badge/Status-Active-2EA44F">
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/Changelog-1.0.16-0366D6"></a>
 </p>
 
 ---
