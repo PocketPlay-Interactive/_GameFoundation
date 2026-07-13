@@ -2,43 +2,53 @@
   <img src="Documentation/Images~/banner_1.jpg" alt="Game Foundation Banner" width="100%">
 </p>
 
-<h1 align="center">Game Foundation</h1>
+<h1 align="center">⚡ Game Foundation</h1>
 
 <p align="center">
-  Bộ nền tảng dùng chung cho các dự án Unity của PocketPlay Interactive.
+  <strong>Nền tảng Unity dùng chung cho hệ sinh thái game của PocketPlay Interactive.</strong>
   <br/>
-  Tập trung vào khả năng tái sử dụng, mở rộng và tăng tốc phát triển game.
+  Tái sử dụng nhanh hơn. Mở rộng sạch hơn. Khởi động dự án mới gọn hơn.
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Unity-2022.3+-000000?logo=unity&logoColor=white">
-  <img src="https://img.shields.io/badge/UPM-Git%20Package-2C8EBB">
-  <img src="https://img.shields.io/badge/Platform-Internal-6A5ACD">
-  <img src="https://img.shields.io/badge/Status-Active-2EA44F">
-  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/Changelog-1.0.16-0366D6"></a>
+  <img src="https://img.shields.io/badge/Unity-2022.3+-000000?logo=unity&logoColor=white&style=flat-square">
+  <img src="https://img.shields.io/badge/UPM-Git%20Package-2C8EBB?style=flat-square">
+  <img src="https://img.shields.io/badge/Package-com.dann.gamefoundation-6A5ACD?style=flat-square">
+  <img src="https://img.shields.io/badge/Status-Active-2EA44F?style=flat-square">
+  <img src="https://img.shields.io/badge/Owner-PocketPlay-FF6B6B?style=flat-square">
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/Changelog-1.0.16-0366D6?style=flat-square"></a>
 </p>
 
 ---
 
-**Game Foundation** là package nền tảng nội bộ dùng chung cho nhiều Unity project của PocketPlay Interactive.
+**Game Foundation** là package nền tảng nội bộ dùng chung cho nhiều Unity project của **PocketPlay Interactive**.
 
 Package gom các phần lặp lại giữa dự án: bootstrap, helper, manager, pattern, save/load, security utilities, SDK wrapper, optional feature và editor tool. Mục tiêu là giảm code copy-paste, chuẩn hóa workflow, dựng project mới nhanh hơn và vẫn giữ khả năng mở rộng theo từng game.
 
-## Table of Contents
+> Một foundation tốt không cố làm game thay bạn. Nó dọn sạch phần lặp lại để team tập trung vào gameplay, content và vận hành.
 
-- [Overview](#overview)
-- [Core Modules](#core-modules)
-- [Architecture](#architecture)
-- [Documentation](#documentation)
-- [Cấu Trúc](#cấu-trúc)
-- [Cài Đặt](#cài-đặt)
-- [Tạo Scene Mới](#tạo-scene-mới)
-- [Mở Rộng Cho Dự Án Mới](#mở-rộng-cho-dự-án-mới)
-- [Scripting Define Symbols](#scripting-define-symbols)
-- [Roadmap](#roadmap)
-- [Troubleshooting](#troubleshooting)
+## 📚 Mục Lục
 
-## Overview
+- [🚀 Tổng Quan](#tổng-quan)
+- [🔥 Module Cốt Lõi](#module-cốt-lõi)
+- [🧩 Kiến Trúc](#kiến-trúc)
+- [📖 Tài Liệu](#tài-liệu)
+- [🗺️ Cấu Trúc](#cấu-trúc)
+- [📦 Cài Đặt](#cài-đặt)
+- [🎬 Tạo Scene Mới](#tạo-scene-mới)
+- [🛠️ Mở Rộng Cho Dự Án Mới](#mở-rộng-cho-dự-án-mới)
+- [⚙️ Scripting Define Symbols](#scripting-define-symbols)
+- [🧱 Core](#core)
+- [⚡ Services](#services)
+- [🧩 Features](#features)
+- [🔌 Integrations](#integrations)
+- [🛡️ Security](#security)
+- [📚 Libraries](#libraries)
+- [📜 Roadmap](#roadmap)
+- [✅ Kiểm Tra Sau Khi Import](#kiểm-tra-sau-khi-import)
+- [🧯 Troubleshooting](#troubleshooting)
+
+## 🚀 Tổng Quan
 
 Game Foundation cung cấp một lớp nền dùng lại được cho gameplay, service cấp ứng dụng, integration SDK và tooling trong Unity Editor.
 
@@ -56,39 +66,47 @@ Quy ước tên:
 | Package ID | `com.dann.gamefoundation` |
 | Chủ sở hữu | `PocketPlay Interactive` |
 
-## Core Modules
+## 🔥 Module Cốt Lõi
 
-| Module | Purpose |
-| --- | --- |
-| Core | Pattern, contract, utility, diagnostics, threading và I/O nền. |
-| Services | Save/load, audio, asset loading, pooling và network time. |
-| Features | UI, interaction, pathfinding, combat text và common behaviour tùy chọn. |
-| Bootstrap | Composition root, loading flow và extension module init qua `Manager`. |
-| Integrations | SDK/native adapter như IAP, haptics, device API, ads và analytics. |
-| Security | Integrity, memory obfuscation và legacy save compatibility. |
-| Editor | Build tool, importer, inspector và data tool cho developer workflow. |
-| Libraries | Source vendor giữ riêng khỏi code GameFoundation. |
+| Module | Mục đích | Giá trị |
+| --- | --- | --- |
+| **Core** | Pattern, contract, utility, diagnostics, threading và I/O nền. | Lõi thấp nhất, ít phụ thuộc, dùng lại ở mọi dự án. |
+| **Services** | Save/load, audio, asset loading, pooling và network time. | Capability cấp ứng dụng, sẵn để gameplay gọi. |
+| **Features** | UI, interaction, pathfinding, combat text và common behaviour tùy chọn. | Gắn khi cần, không kéo nặng project. |
+| **Bootstrap** | Composition root, loading flow và extension module init qua `Manager`. | Một điểm khởi động rõ ràng cho scene/game. |
+| **Integrations** | SDK/native adapter như IAP, haptics, device API, ads và analytics. | Tích hợp ngoài được bọc bằng define/fallback. |
+| **Security** | Integrity, memory obfuscation và legacy save compatibility. | Bảo vệ save/data ở mức runtime cần thiết. |
+| **Editor** | Build tool, importer, inspector và data tool cho developer workflow. | Giảm thao tác thủ công trong Unity Editor. |
+| **Libraries** | Source vendor giữ riêng khỏi code GameFoundation. | Tách third-party khỏi code foundation. |
 
 <p align="center">
   <img src="Documentation/Images~/banner_2.jpg" alt="Game Foundation Core Modules" width="100%">
 </p>
 
-## Architecture
+## 🧩 Kiến Trúc
 
 ```mermaid
 flowchart TD
-    Project[Game Project] --> Bootstrap[Bootstrap / Manager]
-    Bootstrap --> Features[Runtime / Features]
-    Bootstrap --> Services[Runtime / Services]
-    Bootstrap --> Integrations[SDK Integrations]
+    Project[🎮 Game Project] --> Bootstrap[🚀 Bootstrap / Manager]
+    Bootstrap --> Features[🧩 Runtime / Features]
+    Bootstrap --> Services[⚡ Runtime / Services]
+    Bootstrap --> Integrations[🔌 SDK Integrations]
     Features --> Services
-    Services --> Core[Runtime / Core]
+    Services --> Core[🧱 Runtime / Core]
     Integrations --> Core
-    Project --> ProjectExt[Assets / _Project / GameFoundationExtensions]
+    Project --> ProjectExt[📁 Assets / _Project / GameFoundationExtensions]
     ProjectExt --> Bootstrap
+
+    style Project fill:#FF6B6B,stroke:#24292f,stroke-width:2px,color:#fff
+    style Bootstrap fill:#4ECDC4,stroke:#24292f,stroke-width:2px,color:#073642
+    style Core fill:#45B7D1,stroke:#24292f,stroke-width:2px,color:#fff
+    style Services fill:#96CEB4,stroke:#24292f,stroke-width:2px,color:#073642
+    style Features fill:#FFEAA7,stroke:#24292f,stroke-width:2px,color:#24292f
+    style Integrations fill:#DDA0DD,stroke:#24292f,stroke-width:2px,color:#24292f
+    style ProjectExt fill:#FFB347,stroke:#24292f,stroke-width:2px,color:#24292f
 ```
 
-Design principles:
+Tôn chỉ thiết kế:
 
 - Reusable over duplicated.
 - Modular over tightly coupled.
@@ -99,7 +117,7 @@ Design principles:
   <img src="Documentation/Images~/banner_3.jpg" alt="Game Foundation Architecture" width="100%">
 </p>
 
-## Documentation
+## 📖 Tài Liệu
 
 | Guide | Nội dung |
 | --- | --- |
@@ -108,7 +126,7 @@ Design principles:
 | [SDK Defines](Documentation/sdk-defines.md) | Define cho Firebase, AdMob, AppsFlyer, IAP và plugin tùy chọn. |
 | [Samples](Documentation/samples.md) | Cách import và dùng sample scene/code. |
 
-## Cấu Trúc
+## 🗺️ Cấu Trúc
 
 | Folder | Vai trò |
 | --- | --- |
@@ -126,48 +144,48 @@ Design principles:
 
 ```text
 Packages/com.dann.gamefoundation
-|-- Runtime
-|   |-- Core
-|   |   |-- Diagnostics
-|   |   |-- Extensibility
-|   |   |-- IO
-|   |   |-- Patterns
-|   |   |-- Threading
-|   |   `-- Utilities
-|   |-- Services
-|   |   |-- Assets
-|   |   |-- Audio
-|   |   |-- Persistence
-|   |   |-- Pooling
-|   |   `-- Time
-|   |-- Features
-|   |   |-- CombatText
-|   |   |-- Common
-|   |   |-- CommonBehaviours
-|   |   |-- Interaction
-|   |   |-- Pathfinding
-|   |   `-- UI
-|   |-- Bootstrap
-|   |-- Integrations
-|   |   |-- Device
-|   |   |-- Haptics
-|   |   `-- Purchasing
-|   `-- Security
-|       |-- Integrity
-|       |-- Legacy
-|       `-- Obfuscation
-|-- Advertising
-|   |-- GoogleMobileAds
-|   `-- JKit
-|-- Analytics
-|   |-- AppsFlyer
-|   `-- Firebases
-|-- Editor
-|-- Libraries
-|   |-- DOTween
-|   |-- EditorCools
-|   `-- NiceVibrations
-`-- Samples
+├── Runtime
+│   ├── Core
+│   │   ├── Diagnostics
+│   │   ├── Extensibility
+│   │   ├── IO
+│   │   ├── Patterns
+│   │   ├── Threading
+│   │   └── Utilities
+│   ├── Services
+│   │   ├── Assets
+│   │   ├── Audio
+│   │   ├── Persistence
+│   │   ├── Pooling
+│   │   └── Time
+│   ├── Features
+│   │   ├── CombatText
+│   │   ├── Common
+│   │   ├── CommonBehaviours
+│   │   ├── Interaction
+│   │   ├── Pathfinding
+│   │   └── UI
+│   ├── Bootstrap
+│   ├── Integrations
+│   │   ├── Device
+│   │   ├── Haptics
+│   │   └── Purchasing
+│   └── Security
+│       ├── Integrity
+│       ├── Legacy
+│       └── Obfuscation
+├── Advertising
+│   ├── GoogleMobileAds
+│   └── JKit
+├── Analytics
+│   ├── AppsFlyer
+│   └── Firebases
+├── Editor
+├── Libraries
+│   ├── DOTween
+│   ├── EditorCools
+│   └── NiceVibrations
+└── Samples
 ```
 
 Không đổi tên file, class hoặc public API trong đợt tổ chức folder này. Code cũ tiếp tục gọi API bằng tên hiện có.
@@ -178,7 +196,7 @@ Một số tên như `RuntimeStorageExtention`, `AdmobInterstitalOpen`, `AdMobIn
   <img src="Documentation/Images~/banner_4.jpg" alt="Game Foundation Package Structure" width="100%">
 </p>
 
-### Quy Tắc Phân Loại
+### 🧭 Quy Tắc Phân Loại
 
 Không phân loại theo tên class có chữ `Manager` hay không. Phân loại theo trách nhiệm và chiều dependency:
 
@@ -207,9 +225,9 @@ Với project mới, product ID, gameplay event và economy config nên đặt t
 
 `Runtime/Security/Legacy/HashLib.cs` tồn tại để tương thích save hiện tại. Phần TripleDES/MD5 trong đó là legacy compatibility, không nên dùng làm primitive bảo mật mới.
 
-## Cài Đặt
+## 📦 Cài Đặt
 
-### Qua Package Manager
+### 1. Qua Package Manager
 
 1. Mở `Window > Package Manager`.
 2. Chọn nút `+` rồi chọn `Add package from git URL...`.
@@ -237,7 +255,7 @@ https://github.com/PocketPlay-Interactive/_GameFoundation.git#v1.0.0
 
 Sau khi Unity resolve package, chọn Game Foundation trong Package Manager để import nội dung ở mục Samples. Giữ toàn bộ `.meta` của package trong Git để GUID asset ổn định.
 
-### Qua Local Package
+### 2. Qua Local Package
 
 Trong Package Manager, chọn `Add package from disk...` rồi chọn file `package.json` ở root repository.
 
@@ -251,7 +269,7 @@ UGUI và các Unity built-in module được runtime sử dụng. Firebase, Goog
 Ads, AppsFlyer, Unity IAP và JKit vẫn là integration tùy chọn; chỉ bật define
 tương ứng sau khi SDK đó đã được cài.
 
-## Tạo Scene Mới
+## 🎬 Tạo Scene Mới
 
 ### Checklist Script Mặc Định
 
@@ -339,7 +357,7 @@ Trên object có script `Manager`:
 
 Nếu không bật `ADMOB`, `Manager` sẽ tự finalize bootstrap sau khi init extension modules. Nếu có `AdManager` fallback trong scene thì callback bị gọi lặp cũng được chặn bởi `Manager.FinalizeAdSequence()`.
 
-## Mở Rộng Cho Dự Án Mới
+## 🛠️ Mở Rộng Cho Dự Án Mới
 
 Không sửa trực tiếp `Manager`, `RuntimeStorageData`, `AdManager` cho logic riêng của từng game nếu có thể tránh được. Đặt code riêng của project vào:
 
@@ -586,7 +604,7 @@ Quy tắc:
 - Config của từng game như ad unit id, product id, economy, level, remote flag nên nằm trong ScriptableObject hoặc folder `_Project`, không hard-code vào foundation.
 - Khi phân phối qua UPM, phải commit toàn bộ `.meta` để giữ GUID asset ổn định.
 
-## Scripting Define Symbols
+## ⚙️ Scripting Define Symbols
 
 Có thể bật/tắt define bằng editor window:
 
@@ -610,7 +628,7 @@ Nếu muốn chỉnh tay, vào `Project Settings > Player > Other Settings > Scr
 
 Nếu chưa import SDK, không bật define tương ứng.
 
-## Core
+## 🧱 Core
 
 Code nền nằm trong `Runtime/Core`. Nhóm này không chứa SDK, gameplay feature hay state cấp ứng dụng.
 
@@ -648,7 +666,7 @@ Concurrency.Instance().Enqueue(MyCoroutine(), 0.5f);
 
 Scene phải có object gắn script `Concurrency` trước khi gọi `Concurrency.Instance()`.
 
-## Services
+## ⚡ Services
 
 Các service nằm trong `Runtime/Services` và cung cấp API cấp ứng dụng cho gameplay:
 
@@ -734,7 +752,7 @@ Method trả `DateTime` đã cộng offset local hiện tại của thiết bị
 
 Network time giúp giảm phụ thuộc vào đồng hồ thiết bị nhưng cache local vẫn chỉ là fallback. Không dùng service này làm nguồn xác thực duy nhất cho economy hoặc giao dịch có giá trị; quyết định quan trọng nên được kiểm tra ở server.
 
-## Features
+## 🧩 Features
 
 Feature Unity tùy chọn nằm trong `Runtime/Features`. Chỉ đưa feature thực sự dùng vào scene/project:
 
@@ -764,7 +782,7 @@ public class MyRaycastHandler : MonoBehaviour, IRaycastEventsListener
 }
 ```
 
-## Integrations
+## 🔌 Integrations
 
 Analytics và advertising nằm ở package root; SDK/native API còn lại nằm trong `Runtime/Integrations`:
 
@@ -858,7 +876,7 @@ Nếu project dùng `Torch`, Android manifest cần khai báo camera/flash:
 <uses-feature android:name="android.hardware.camera.flash" android:required="false" />
 ```
 
-## Security
+## 🛡️ Security
 
 Security runtime nằm trong `Runtime/Security`:
 
@@ -877,7 +895,7 @@ bool valid = MemoryChecksum.VerifyChecksum(value, checksum);
 
 `MemoryChecksum` dùng device-bound HMAC cho value mới và vẫn chấp nhận legacy checksum khi đọc save cũ.
 
-## Libraries
+## 📚 Libraries
 
 Source nguyên bản của DOTween, EditorCools và NiceVibrations nằm trong `Libraries`. Không đặt code GameFoundation hoặc code project vào đây; khi update vendor nên thay nguyên package và kiểm tra lại integration tương ứng.
 
@@ -886,7 +904,7 @@ Các thành phần trong `Libraries` giữ license và điều khoản phân ph�
 
 Editor tool nằm trong `Editor`, tách khỏi runtime build. Scene/code demo của inspector helper nằm trong `Samples`.
 
-## Roadmap
+## 📜 Roadmap
 
 - [x] UPM package structure.
 - [x] Bootstrap scene flow với `Manager` và extension modules.
@@ -896,7 +914,7 @@ Editor tool nằm trong `Editor`, tách khỏi runtime build. Scene/code demo c�
 - [ ] Sample scene chuẩn cho bootstrap, save, UI và ads flow.
 - [ ] Test coverage cho các service cốt lõi.
 
-## Kiểm Tra Sau Khi Import
+## ✅ Kiểm Tra Sau Khi Import
 
 1. Mở Unity và đợi reimport xong.
 2. Kiểm tra Console không có compile error.
@@ -905,7 +923,7 @@ Editor tool nằm trong `Editor`, tách khỏi runtime build. Scene/code demo c�
 5. Nếu bật define SDK, đảm bảo SDK đã import trước.
 6. Regenerate `.csproj` từ Unity nếu IDE vẫn đọc path cũ.
 
-## Troubleshooting
+## 🧯 Troubleshooting
 
 ### Lỗi namespace Firebase/GoogleMobileAds/AppsFlyer/JKit không tồn tại
 
