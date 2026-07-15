@@ -91,13 +91,13 @@ public class InappPurchase : GenericSingleton<InappPurchase>
     }
 #endif
 
-    public bool HasProduct(string productId) => Products.Any(p => p.ProductId == productId);
+    public bool HasProductId(string productId) => Products.Any(p => p.ProductId == productId);
 
     public string GetProductIdByIndex(int index) => (index >= 0 && index < Products.Count) ? Products[index].ProductId : "";
 
-    public int GetProductIndexById(string id) => Products.FindIndex(p => p.ProductId == id);
+    public int GetProductIdByID(string id) => Products.FindIndex(p => p.ID == id);
 
-    public string GetProductInfo(string productId)
+    public string GetLocalizedPrice(string productId)
     {
 #if IAPPURCHASE_ENABLE
         var product = storeController?.GetProducts()?.FirstOrDefault(p => p.definition.id == productId);
