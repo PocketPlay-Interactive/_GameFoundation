@@ -113,7 +113,7 @@ public class InappPurchase : GenericSingleton<InappPurchase>
     private string GetLocalPrice(string productId) =>
         Products.FirstOrDefault(p => p.ProductId == productId)?.ProductPrice ?? "";
 
-    private bool AntiSpamClick()
+    private bool throttleClick()
     {
         int now = UtilsTimerHelper.CurrentTimeInSeconds();
         if (now - lastPurchaseAttemptTimestamp > 1)
@@ -127,7 +127,7 @@ public class InappPurchase : GenericSingleton<InappPurchase>
     public void BuyProduct(string productId, Action<bool> onComplete)
     {
 #if IAPPURCHASE_ENABLE
-        if (string.IsNullOrEmpty(productId) || AntiSpamClick()) return;
+        if (string.IsNullOrEmpty(productId) || throttleClick()) return;
         Log($"[InappPurchase] Buy IAP: {productId}");
         currentProductId = productId;
         OnPurchaseComplete = complete =>
