@@ -95,7 +95,13 @@ public class InappPurchase : GenericSingleton<InappPurchase>
 
     public string GetProductIdByIndex(int index) => (index >= 0 && index < Products.Count) ? Products[index].ProductId : "";
 
-    public int GetProductIdByID(string id) => Products.FindIndex(p => p.ID.ToString() == id);
+    public string GetProductIdByID(string id)
+    {
+        var product = Products.Find(p => p.ID.ToString() == id);
+        if (product == null)
+            return null;
+        return product.ProductId;
+    }
 
     public string GetLocalizedPrice(string productId)
     {
