@@ -28,9 +28,11 @@ public class CanvasManager : Singleton<CanvasManager>
     [SerializeField] private string _popupId = "";
 
     public string CanvasId => _canvasId;
+    public ScreenCanvas Canvas => GetCanvasById(_canvasId);
     public string PreviousCanvasId => _previousCanvasId;
     public ScreenCanvas PreviousCanvas => GetCanvasById(_previousCanvasId);
     public string PopupId => _popupId;
+    public PopupCanvas Popup => GetPopupById(_popupId);
 
     [Header("Settings")]
     [SerializeField] private bool _autoChangeCanvas = true;
@@ -137,6 +139,16 @@ public class CanvasManager : Singleton<CanvasManager>
         foreach (var canvasRoot in CanvasRoots)
         {
             if (canvasRoot.CanvasID == canvasId) return canvasRoot.Canvas;
+        }
+
+        return null;
+    }
+
+    private PopupCanvas GetPopupById(string popupId)
+    {
+        foreach (var popupRoot in PopupRoots)
+        {
+            if (popupRoot.PopupID == popupId) return popupRoot.Popup;
         }
 
         return null;
