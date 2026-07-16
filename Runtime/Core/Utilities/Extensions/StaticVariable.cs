@@ -151,7 +151,9 @@ public static class StaticVariable
 
     // Remap giá trị từ [a,b] sang [c,d]
     public static float Remap(this float value, float from1, float to1, float from2, float to2)
-        => (value - from1) / (to1 - from1) * (to2 - from2) + from2;
+        => Mathf.Approximately(from1, to1)
+            ? from2
+            : (value - from1) / (to1 - from1) * (to2 - from2) + from2;
 
     // Lerp 2 giá trị
     public static float Lerp(this float a, float b, float t) => Mathf.Lerp(a, b, t);
@@ -343,13 +345,9 @@ public static class StaticVariable
     /// </summary>
     public static void OpenURL(string url)
     {
-#if UNITY_EDITOR
+        if (string.IsNullOrEmpty(url)) return;
+
         Application.OpenURL(url);
-#elif UNITY_WEBGL
-        Application.OpenURL(url);
-#else
-        Application.OpenURL(url);
-#endif
     }
 
     #endregion
@@ -408,6 +406,8 @@ public static class StaticVariable
 
     public static bool ContainsItem<T>(this T[] target, T item)
     {
+        if (target == null) return false;
+
         for (int i = 0; i < target.Length; i++)
             if (AreEqual(target[i], item)) return true;
         return false;
@@ -415,15 +415,19 @@ public static class StaticVariable
 
     public static T GetRandomElement<T>(this T[] target)
     {
+        if (target == null || target.Length == 0) return default;
+
         int i = UnityEngine.Random.Range(0, target.Length);
         return target[i];
     }
 
     // Extension cho List: GetRandomElement, RemoveNullItems
     public static T GetRandomElement<T>(this IList<T> list)
-        => list.Count == 0 ? default : list[UnityEngine.Random.Range(0, list.Count)];
+        => list == null || list.Count == 0 ? default : list[UnityEngine.Random.Range(0, list.Count)];
     public static void RemoveNullItems<T>(this List<T> list) where T : class
-        => list.RemoveAll(item => item == null);
+    {
+        if (list != null) list.RemoveAll(item => item == null);
+    }
 
     public static T[] MoveFirstToLast<T>(this T[] arr)
     {
@@ -452,7 +456,7 @@ public static class StaticVariable
     /// </summary>
     public static GameObject FindNearest(this Transform target, List<GameObject> lstObject)
     {
-        if (lstObject == null || lstObject.Count == 0) return null;
+        if (target == null || lstObject == null || lstObject.Count == 0) return null;
 
         GameObject nearest = null;
         float shortest = Mathf.Infinity;
@@ -475,7 +479,7 @@ public static class StaticVariable
 
     public static GameObject FindNearest(this GameObject target, List<GameObject> lstObject)
     {
-        if (lstObject == null || lstObject.Count == 0) return null;
+        if (target == null || lstObject == null || lstObject.Count == 0) return null;
 
         GameObject nearest = null;
         float shortest = Mathf.Infinity;
@@ -703,8 +707,10 @@ public static class StaticVariable
 
     public static Transform FindByName(this Transform[] arr, string name)
     {
+        if (arr == null || string.IsNullOrEmpty(name)) return null;
+
         for (int i = 0; i < arr.Length; i++)
-            if (arr[i].name == name) return arr[i];
+            if (arr[i] != null && arr[i].name == name) return arr[i];
         return null;
     }
 
@@ -730,6 +736,7 @@ public static class StaticVariable
 
     public static Transform GetChildTransform(this GameObject _object, int index)
     {
+        if (_object == null || index < 0 || index >= _object.transform.childCount) return null;
         return _object.transform.GetChild(index);
     }
 
@@ -747,11 +754,13 @@ public static class StaticVariable
 
     public static void LogArray<T>(this T[] arr)
     {
+        if (arr == null) return;
         arr.SimpleForEach(a => Debug.Log(a));
     }
 
     public static void LogArrayWithPrefix<T>(this T[] arr, string type)
     {
+        if (arr == null) return;
         arr.SimpleForEach(a => Debug.Log($"[{type}] {a}"));
     }
 
@@ -767,6 +776,8 @@ public static class StaticVariable
     /// </summary>
     public static string AddSpaceBeforeUppercase(this string input)
     {
+        if (string.IsNullOrEmpty(input)) return input;
+
         output.Clear();
         for (int i = 0; i < input.Length; i++)
         {
@@ -778,7 +789,9 @@ public static class StaticVariable
 
     // Extension cho string: ToTitleCase
     public static string ToTitleCase(this string str)
-        => CultureInfo.CurrentCulture.TextInfo.ToTitleCase(str.ToLower());
+        => string.IsNullOrEmpty(str)
+            ? str
+            : CultureInfo.CurrentCulture.TextInfo.ToTitleCase(str.ToLower());
 
     /// <summary>
     /// Safe Enum.TryParse with default fallback.
@@ -794,10 +807,12 @@ public static class StaticVariable
     #region Date Helpers
 
     private static readonly string[] Months = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-    public static string GetMonthAbbreviation(int Month) => Months[Month - 1];
+    public static string GetMonthAbbreviation(int Month) =>
+        Month >= 1 && Month <= Months.Length ? Months[Month - 1] : "";
     public static DayOfWeek GetDayOfWeek(DateTime dateTime) => dateTime.DayOfWeek;
     public static DayOfWeek GetDayOfWeek(int year, int month, int day) => new DateTime(year, month, day).DayOfWeek;
-    public static string GetMonthAbbreviation(string Month) => GetMonthAbbreviation(int.Parse(Month));
+    public static string GetMonthAbbreviation(string Month) =>
+        int.TryParse(Month, out var month) ? GetMonthAbbreviation(month) : "";
 
     #endregion
 
@@ -817,12 +832,19 @@ public static class StaticVariable
     // Extension cho RectTransform: SetAnchor, SetPivot, SetSize
     public static void SetAnchor(this RectTransform rt, Vector2 min, Vector2 max)
     {
+        if (rt == null) return;
+
         rt.anchorMin = min;
         rt.anchorMax = max;
     }
-    public static void SetPivot(this RectTransform rt, Vector2 pivot) => rt.pivot = pivot;
+    public static void SetPivot(this RectTransform rt, Vector2 pivot)
+    {
+        if (rt != null) rt.pivot = pivot;
+    }
     public static void SetSize(this RectTransform rt, Vector2 size)
     {
+        if (rt == null) return;
+
         var oldSize = rt.rect.size;
         var deltaSize = size - oldSize;
         rt.offsetMin -= new Vector2(deltaSize.x * rt.pivot.x, deltaSize.y * rt.pivot.y);

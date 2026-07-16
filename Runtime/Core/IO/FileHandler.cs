@@ -68,12 +68,11 @@ public static class FileHandler
 
     public static void WriteFile(string path, string content)
     {
-        FileStream fileStream = new FileStream(path, FileMode.Create);
+        string directory = Path.GetDirectoryName(path);
+        if (!string.IsNullOrEmpty(directory))
+            Directory.CreateDirectory(directory);
 
-        using (StreamWriter writer = new StreamWriter(fileStream))
-        {
-            writer.Write(content);
-        }
+        File.WriteAllText(path, content);
     }
 
     public static bool Exists(string path)
@@ -85,15 +84,7 @@ public static class FileHandler
 
     public static string ReadFile(string path)
     {
-        if (File.Exists(path))
-        {
-            using (StreamReader reader = new StreamReader(path))
-            {
-                string content = reader.ReadToEnd();
-                return content;
-            }
-        }
-        return "";
+        return File.Exists(path) ? File.ReadAllText(path) : "";
     }
 
     public static string Between(string STR, string FirstString, string LastString)

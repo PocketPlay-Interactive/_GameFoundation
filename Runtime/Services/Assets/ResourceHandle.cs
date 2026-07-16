@@ -7,8 +7,13 @@ public class ResourceHandle : GenericSingleton<ResourceHandle>
 
     public T Load<T>(string path) where T : Object
     {
-        if (_cache.TryGetValue(path, out var cached) && cached is T tObj)
-            return tObj;
+        if (string.IsNullOrEmpty(path)) return null;
+
+        if (_cache.TryGetValue(path, out var cached))
+        {
+            if (cached is T tObj && tObj != null) return tObj;
+            _cache.Remove(path);
+        }
 
         var asset = Resources.Load<T>(path);
         if (asset != null)
@@ -28,6 +33,8 @@ public class ResourceHandle : GenericSingleton<ResourceHandle>
 
     public void Unload(string path)
     {
+        if (string.IsNullOrEmpty(path)) return;
+
         if (_cache.TryGetValue(path, out var asset) && asset != null)
         {
             Resources.UnloadAsset(asset);

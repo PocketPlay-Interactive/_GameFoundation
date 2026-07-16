@@ -10,6 +10,8 @@ public static class SliderTweenExtentions
         float duration,
         Ease ease = Ease.OutCubic)
     {
+        if (slider == null) return null;
+
         float currentValue = slider.value;
 
         return DOTween.To(

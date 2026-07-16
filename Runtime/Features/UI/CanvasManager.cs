@@ -104,6 +104,8 @@ public class CanvasManager : Singleton<CanvasManager>
     {
         foreach (var canvasRoot in CanvasRoots)
         {
+            if (canvasRoot.Canvas == null) continue;
+
             if (canvasRoot.CanvasID == canvasId)
             {
                 canvasRoot.Canvas.Show();
@@ -116,6 +118,8 @@ public class CanvasManager : Singleton<CanvasManager>
     {
         foreach (var popupRoot in PopupRoots)
         {
+            if (popupRoot.Popup == null) continue;
+
             if (popupRoot.PopupID == popupId)
             {
                 popupRoot.Popup.Show();
@@ -188,6 +192,8 @@ public class CanvasManager : Singleton<CanvasManager>
 
             foreach (var popupRoot in PopupRoots)
             {
+                if (popupRoot.Popup == null) continue;
+
                 if (popupRoot.PopupID == _debugPopupId)
                 {
                     popupRoot.Popup.Show();

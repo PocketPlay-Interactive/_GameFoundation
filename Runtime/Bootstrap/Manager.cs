@@ -42,6 +42,10 @@ public class Manager : SingletonGlobal<Manager>
             RuntimeStorageData.PLAYER.LoginDayCount += 1;
             RuntimeStorageData.SaveAllData();
         }
+
+#if !UNITY_EDITOR && !DEVELOPMENT_BUILD
+        Debug.unityLogger.logEnabled = false;
+#endif
     }
 
     private void Start()

@@ -124,53 +124,54 @@ public static class EventBus
 public static class EventBusExtensions
 {
     public static GameMessageEvent _gameMessageEvent = new GameMessageEvent();
-    public static GameMessageEvent GameMessageEvent(string key, object value = null)
-    {
-        _gameMessageEvent.Key = key;
-        _gameMessageEvent.Value = value;
-        return _gameMessageEvent;
-    }
 
-    private static readonly CanvasEvent _canvasEvent = new CanvasEvent();
-    public static CanvasEvent CanvasEvent(string canvasId)
-    {
-        _canvasEvent.CanvasId = canvasId;
-        return _canvasEvent;
-    }
+    public static GameMessageEvent GameMessageEvent(string key, object value = null) =>
+        new GameMessageEvent { Key = key, Value = value };
 
-    private static readonly PopupEvent _popupEvent = new PopupEvent();
-    public static PopupEvent PopupEvent(string popupId)
-    {
-        _popupEvent.PopupId = popupId;
-        return _popupEvent;
-    }
+    public static void PublishGameMessage(string key, object value = null) =>
+        EventBus.Publish(GameMessageEvent(key, value));
 
-    private static readonly TouchBeganEvent _touchBeganEvent = new TouchBeganEvent();
-    private static readonly TouchHoldEvent _touchHoldEvent = new TouchHoldEvent();
-    private static readonly TouchEndedEvent _touchEndedEvent = new TouchEndedEvent();
+    public static CanvasEvent CanvasEvent(string canvasId) =>
+        new CanvasEvent { CanvasId = canvasId };
 
-    public static TouchBeganEvent TouchBeganEvent(Vector2 position)
-    {
-        _touchBeganEvent.Position = position;
-        return _touchBeganEvent;
-    }
+    public static void PublishCanvas(string canvasId) =>
+        EventBus.Publish(CanvasEvent(canvasId));
 
-    public static TouchHoldEvent TouchHoldEvent(Vector2 position)
-    {
-        _touchHoldEvent.Position = position;
-        return _touchHoldEvent;
-    }
+    public static PopupEvent PopupEvent(string popupId) =>
+        new PopupEvent { PopupId = popupId };
 
-    public static TouchEndedEvent TouchEndedEvent(Vector2 position)
-    {
-        _touchEndedEvent.Position = position;
-        return _touchEndedEvent;
-    }
+    public static void PublishPopup(string popupId) =>
+        EventBus.Publish(PopupEvent(popupId));
 
-    public static DeviceMotionEvent DeviceMotionEvent(DeviceMotionType type, float magnitude)
-    {
-        return new DeviceMotionEvent { Type = type, Magnitude = magnitude };
-    }
+    public static TouchBeganEvent TouchBeganEvent(Vector2 position) =>
+        new TouchBeganEvent { Position = position };
+
+    public static void PublishTouchBegan(Vector2 position) =>
+        EventBus.Publish(TouchBeganEvent(position));
+
+    public static TouchHoldEvent TouchHoldEvent(Vector2 position) =>
+        new TouchHoldEvent { Position = position };
+
+    public static void PublishTouchHold(Vector2 position) =>
+        EventBus.Publish(TouchHoldEvent(position));
+
+    public static TouchEndedEvent TouchEndedEvent(Vector2 position) =>
+        new TouchEndedEvent { Position = position };
+
+    public static void PublishTouchEnded(Vector2 position) =>
+        EventBus.Publish(TouchEndedEvent(position));
+
+    public static DeviceMotionEvent DeviceMotionEvent(DeviceMotionType type, float magnitude) =>
+        new DeviceMotionEvent { Type = type, Magnitude = magnitude };
+
+    public static void PublishDeviceMotion(DeviceMotionType type, float magnitude) =>
+        EventBus.Publish(DeviceMotionEvent(type, magnitude));
+
+    public static PurchaseCompletedEvent PurchaseCompletedEvent(string productId) =>
+        new PurchaseCompletedEvent { ProductId = productId };
+
+    public static void PublishPurchaseCompleted(string productId) =>
+        EventBus.Publish(PurchaseCompletedEvent(productId));
 }
 
 // Event definitions

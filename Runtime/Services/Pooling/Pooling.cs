@@ -5,7 +5,6 @@ using UnityEngine;
 public class Pooling : GenericSingleton<Pooling>
 {
     private readonly Dictionary<int, List<GameObject>> pools = new();
-    private readonly Dictionary<string, GameObject> poolPrefabs = new();
 
     public GameObject GetPrefab(string prefabName)
     {
@@ -20,13 +19,11 @@ public class Pooling : GenericSingleton<Pooling>
 
     public GameObject GetPrefab(GameObject prefab)
     {
-        int id = prefab.GetInstanceID();
-        if (!pools.TryGetValue(id, out var list))
-            pools[id] = list = new List<GameObject>();
+        if (prefab == null) return null;
 
-        foreach (var go in list)
-            if (!go.activeSelf)
-                return Activate(go);
+        var list = GetPool(prefab);
+        var inactive = GetInactive(list);
+        if (inactive != null) return Activate(inactive);
 
         var obj = Object.Instantiate(prefab);
         obj.name = prefab.name;
@@ -36,13 +33,11 @@ public class Pooling : GenericSingleton<Pooling>
 
     public GameObject GetPrefab(GameObject prefab, Vector3 pos, Quaternion rot, Transform parent = null)
     {
-        int id = prefab.GetInstanceID();
-        if (!pools.TryGetValue(id, out var list))
-            pools[id] = list = new List<GameObject>();
+        if (prefab == null) return null;
 
-        foreach (var go in list)
-            if (!go.activeSelf)
-                return Activate(go, pos, rot, parent);
+        var list = GetPool(prefab);
+        var inactive = GetInactive(list);
+        if (inactive != null) return Activate(inactive, pos, rot, parent);
 
         var obj = Object.Instantiate(prefab, pos, rot, parent);
         obj.name = prefab.name;
@@ -51,7 +46,7 @@ public class Pooling : GenericSingleton<Pooling>
     }
 
     public GameObject GetPrefab(GameObject prefab, Transform parent)
-        => GetPrefab(prefab, prefab.transform.position, prefab.transform.rotation, parent);
+        => prefab == null ? null : GetPrefab(prefab, prefab.transform.position, prefab.transform.rotation, parent);
 
     public T GetPrefab<T>(GameObject prefab) where T : Component
         => GetPrefab(prefab)?.GetComponent<T>();
@@ -73,6 +68,33 @@ public class Pooling : GenericSingleton<Pooling>
     {
         if (obj == null) return;
         DOVirtual.DelayedCall(time, () => PushToPool(obj));
+    }
+
+    private List<GameObject> GetPool(GameObject prefab)
+    {
+        int id = prefab.GetInstanceID();
+        if (!pools.TryGetValue(id, out var list))
+            pools[id] = list = new List<GameObject>();
+
+        return list;
+    }
+
+    private GameObject GetInactive(List<GameObject> list)
+    {
+        for (int i = list.Count - 1; i >= 0; i--)
+        {
+            var go = list[i];
+            if (go == null)
+            {
+                list.RemoveAt(i);
+                continue;
+            }
+
+            if (!go.activeSelf)
+                return go;
+        }
+
+        return null;
     }
 
     private GameObject Activate(GameObject go)

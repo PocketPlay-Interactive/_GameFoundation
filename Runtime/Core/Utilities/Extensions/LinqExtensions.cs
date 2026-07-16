@@ -7,6 +7,7 @@ using Random = UnityEngine.Random;
 public static class LinqExtensions
 {
     private static readonly List<Transform> linqCache = new();
+    private static readonly List<float> probabilityCache = new();
 
     public static void AddOrUpdate<T, TJ>(this IDictionary<T, TJ> dict, T key, TJ val)
     {
@@ -21,34 +22,43 @@ public static class LinqExtensions
     }
 
     public static TJ GetOrDefault<T, TJ>(this IDictionary<T, TJ> dict, T key) =>
-        dict.ContainsKey(key) ? dict[key] : default;
+        dict != null && dict.TryGetValue(key, out var value) ? value : default;
 
     public static T GetRandom<T>(this IEnumerable<T> enumerable,out int index)
     {
-        var list = enumerable.ToList();
+        var list = enumerable as IList<T> ?? enumerable?.ToList();
+        if (list == null || list.Count == 0)
+        {
+            index = -1;
+            return default;
+        }
+
         index = Random.Range(0, list.Count);
         return list[index];
     }
 
     public static T GetRandomWithReduceFactor<T>(this IEnumerable<T> enumerable,float factor)
     {
-        var list = enumerable.ToList();
+        var list = enumerable as IList<T> ?? enumerable?.ToList();
+        if (list == null || list.Count == 0) return default;
     
-        var probabilityList = new List<float>();
+        probabilityCache.Clear();
 
         var currentProbability = 1f;
-        probabilityList.Add(1f);
+        probabilityCache.Add(1f);
+        var probabilitySum = 1f;
         for (var i = 1; i < list.Count; i++)
         {
             currentProbability = currentProbability*factor;
-            probabilityList.Add(currentProbability);
+            probabilityCache.Add(currentProbability);
+            probabilitySum += currentProbability;
         }
 
-        var p = Random.Range(0f, probabilityList.Sum());
+        var p = Random.Range(0f, probabilitySum);
 
         for (var i = 0; i < list.Count; i++)
         {
-            p -= probabilityList[i];
+            p -= probabilityCache[i];
             if (p <= 0)
             {
 //                Debug.Log(i);
@@ -67,7 +77,9 @@ public static class LinqExtensions
 
     public static IEnumerable<T> GetRandom<T>(this IEnumerable<T> enumerable, int count)
     {
-        var list = enumerable.ToList();
+        var list = enumerable?.ToList();
+        if (list == null || count <= 0)
+            yield break;
 
         if (list.Count<count)
         {
@@ -85,9 +97,9 @@ public static class LinqExtensions
 
     public static T GetRandomOrDefault<T>(this IEnumerable<T> enumerable)
     {
-        var list = enumerable.ToList();
+        var list = enumerable as IList<T> ?? enumerable?.ToList();
 
-        if (list.Count == 0)
+        if (list == null || list.Count == 0)
             return default;
 
         return list.GetRandom();
@@ -165,6 +177,8 @@ public static class LinqExtensions
 
     public static Transform[] GetChilds(this Transform parent)
     {
+        if (parent == null) return Array.Empty<Transform>();
+
         // Lấy số lượng child
         int childCount = parent.childCount;
 
@@ -182,6 +196,8 @@ public static class LinqExtensions
 
     public static Transform[] GetChilds(this GameObject parent)
     {
+        if (parent == null) return Array.Empty<Transform>();
+
         // Lấy số lượng child
         int childCount = parent.transform.childCount;
 
@@ -199,28 +215,30 @@ public static class LinqExtensions
 
     public static List<Transform> GetRandomChildren(this GameObject parent, int count)
     {
-        linqCache.Clear();
-        if (parent == null) return linqCache;
+        if (parent == null || count <= 0) return new List<Transform>();
 
+        linqCache.Clear();
         foreach (Transform child in parent.transform)
         {
             linqCache.Add(child);
         }
 
-        return linqCache.OrderBy(x => Random.value).Take(count).ToList();
+        linqCache.Shuffle();
+        return linqCache.GetRange(0, Mathf.Min(count, linqCache.Count));
     }
 
     public static List<Transform> GetRandomChildren(this Transform parent, int count)
     {
-        linqCache.Clear();
-        if (parent == null) return linqCache;
+        if (parent == null || count <= 0) return new List<Transform>();
 
+        linqCache.Clear();
         foreach (Transform child in parent.transform)
         {
             linqCache.Add(child);
         }
 
-        return linqCache.OrderBy(x => Random.value).Take(count).ToList();
+        linqCache.Shuffle();
+        return linqCache.GetRange(0, Mathf.Min(count, linqCache.Count));
     }
 
     public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)

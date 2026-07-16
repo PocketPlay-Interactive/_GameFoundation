@@ -2,10 +2,6 @@
 
 public static class VectorExtensions
 {
-    // Cache các mảng dùng cho tween, tránh new[] mỗi lần
-    private static readonly Vector3[] path2 = new Vector3[2];
-    private static readonly Vector3[] path3 = new Vector3[3];
-
     // Tạo vector nhanh
     // private static readonly Vector2 _cache2D = new Vector2(0, 0);
     private static readonly Vector3 _cache = new Vector3(0, 0, 0);
@@ -65,22 +61,19 @@ public static class VectorExtensions
     public static float Lerp(this Vector2Int v, float t) => Mathf.Lerp(v.x, v.y, t);
 
     // Nearest point trên vector
-    private static readonly Vector2[] nearestPoints = new Vector2[2];
     public static Vector2 GetNearestPointToVector(this Vector2 vec, Vector2 point, out float distance, out bool endNearest)
     {
         if (Vector2.Angle(vec, point) >= 90)
         {
             distance = point.magnitude;
             endNearest = true;
-            nearestPoints[0] = Vector2.zero;
-            return nearestPoints[0];
+            return Vector2.zero;
         }
         if (Vector2.Angle((point - vec), -vec) >= 90)
         {
             distance = (point - vec).magnitude;
             endNearest = true;
-            nearestPoints[1] = vec;
-            return nearestPoints[1];
+            return vec;
         }
         endNearest = false;
         distance = Mathf.Sin(Vector2.Angle(vec, point) * Mathf.Deg2Rad) * point.magnitude;
@@ -125,26 +118,19 @@ public static class VectorExtensions
         var e = q.eulerAngles; e.z += z; return Quaternion.Euler(e);
     }
 
-    // Các hàm dùng cho tween có thể dùng path2, path3 để tránh new mảng mỗi lần
-    public static Vector3[] GetPath2(Vector3 a, Vector3 b)
-    {
-        path2[0] = a;
-        path2[1] = b;
-        return path2;
-    }
-    public static Vector3[] GetPath3(Vector3 a, Vector3 b, Vector3 c)
-    {
-        path3[0] = a;
-        path3[1] = b;
-        path3[2] = c;
-        return path3;
-    }
+    public static Vector3[] GetPath2(Vector3 a, Vector3 b) =>
+        new[] { a, b };
+
+    public static Vector3[] GetPath3(Vector3 a, Vector3 b, Vector3 c) =>
+        new[] { a, b, c };
 }
 
 public static class PrimitiveExtensions
 {
     public static int FloorTo(this int value, int digit)
     {
+        if (digit <= 0) return value;
+
         var pow = (int)Mathf.Pow(10, digit);
         return (value / pow) * pow;
     }
@@ -167,7 +153,12 @@ public static class ColorExtensions
     /// </summary>
     public static Color ToColor(this string hex)
     {
-        if (!ColorUtility.TryParseHtmlString("#" + hex, out Color color))
+        if (string.IsNullOrEmpty(hex)) return Color.white;
+
+        if (!hex.StartsWith("#"))
+            hex = "#" + hex;
+
+        if (!ColorUtility.TryParseHtmlString(hex, out Color color))
         {
             Debug.LogError("Invalid hexadecimal color value: " + hex);
             color = Color.white;
@@ -179,15 +170,34 @@ public static class ColorExtensions
 // --- Transform property shortcuts (kept naming for backward compatibility) ---
 public static class TransformShortcuts
 {
-    public static Vector3 Position(this GameObject obj) => obj.transform.position;
-    public static void Position(this GameObject obj, Vector3 pos) => obj.transform.position = pos;
+    public static Vector3 Position(this GameObject obj) => obj != null ? obj.transform.position : default;
+    public static void Position(this GameObject obj, Vector3 pos)
+    {
+        if (obj != null) obj.transform.position = pos;
+    }
 
-    public static Quaternion Rotation(this GameObject obj) => obj.transform.rotation;
-    public static void Rotation(this GameObject obj, Quaternion rot) => obj.transform.rotation = rot;
-    public static Vector3 Scale(this GameObject obj) => obj.transform.localScale;
-    public static void Scale(this GameObject obj, float s) => obj.transform.localScale = VectorExtensions.Create(s);
-    public static void Scale(this GameObject obj, Vector3 s) => obj.transform.localScale = s;
+    public static Quaternion Rotation(this GameObject obj) => obj != null ? obj.transform.rotation : Quaternion.identity;
+    public static void Rotation(this GameObject obj, Quaternion rot)
+    {
+        if (obj != null) obj.transform.rotation = rot;
+    }
 
-    public static void Parent(this GameObject obj, Transform parent) => obj.transform.SetParent(parent);
-    public static GameObject Parent(this GameObject obj) => obj.transform.parent != null ? obj.transform.parent.gameObject : null;
+    public static Vector3 Scale(this GameObject obj) => obj != null ? obj.transform.localScale : Vector3.one;
+    public static void Scale(this GameObject obj, float s)
+    {
+        if (obj != null) obj.transform.localScale = VectorExtensions.Create(s);
+    }
+
+    public static void Scale(this GameObject obj, Vector3 s)
+    {
+        if (obj != null) obj.transform.localScale = s;
+    }
+
+    public static void Parent(this GameObject obj, Transform parent)
+    {
+        if (obj != null) obj.transform.SetParent(parent);
+    }
+
+    public static GameObject Parent(this GameObject obj) =>
+        obj != null && obj.transform.parent != null ? obj.transform.parent.gameObject : null;
 }

@@ -14,6 +14,8 @@ public static class TextTweenExtensions
         string format = "N0",
         Ease ease = Ease.OutCubic)
     {
+        if (text == null) return null;
+
         int currentValue = ParseNumber(text.text, prefix, suffix);
 
         if (currentValue == to)
