@@ -51,6 +51,14 @@ namespace Dann.GameFoundation
 
             if (IsShowing)
             {
+                UnityEngine.Debug.LogError($"Advertising show skipped, another ad is already showing: {AdType}", this);
+                completed?.Invoke(false);
+                return;
+            }
+
+            if (Mode == AdvertisingMediationMode.Parallel && LoadedProvider != null)
+            {
+                UnityEngine.Debug.LogError($"Advertising parallel show skipped, provider already showing: {AdType}/{LoadedProvider.ProviderName}", this);
                 completed?.Invoke(false);
                 return;
             }

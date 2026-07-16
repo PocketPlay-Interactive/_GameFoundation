@@ -153,6 +153,14 @@ namespace Dann.GameFoundation
 
             if (isShowing)
             {
+                Debug.LogError($"Advertising show skipped, another ad is already showing: {AdType}", this);
+                completed?.Invoke(false);
+                return;
+            }
+
+            if (mode == AdvertisingMediationMode.Parallel && loadedProvider != null)
+            {
+                Debug.LogError($"Advertising parallel show skipped, provider already showing: {AdType}/{loadedProvider.ProviderName}", this);
                 completed?.Invoke(false);
                 return;
             }
@@ -259,6 +267,12 @@ namespace Dann.GameFoundation
 
         public virtual void Hide()
         {
+            if (mode == AdvertisingMediationMode.Parallel)
+            {
+                HideParallel();
+                return;
+            }
+
             if (loadedProvider == null)
                 return;
 
@@ -352,6 +366,25 @@ namespace Dann.GameFoundation
             }
 
             return hasLoading ? AdvertisingAdState.Loading : AdvertisingAdState.Unavailable;
+        }
+
+        private void HideParallel()
+        {
+            foreach (IAdvertisingProvider provider in providers)
+            {
+                try
+                {
+                    provider.Hide(AdType);
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogError(
+                        $"Advertising hide failed on {provider.ProviderName}: {AdType}\n{exception}");
+                }
+            }
+
+            loadedProvider = null;
+            isShowing = false;
         }
 
         protected void AdvanceProvider()
