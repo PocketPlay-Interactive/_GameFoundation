@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 namespace Dann.GameFoundation
@@ -14,6 +16,9 @@ namespace Dann.GameFoundation
         private IAdvertisingProvider loadedProvider;
         private int providerIndex;
         private bool isShowing;
+        private static int adPauseDepth;
+        private static float previousTimeScale = 1f;
+        private static int previousTargetFrameRate = -1;
 
         public virtual AdvertisingAdType AdType => adType;
 
@@ -164,23 +169,92 @@ namespace Dann.GameFoundation
             loadedProvider = provider;
             isShowing = true;
 
+            if (Concurrency.Exists())
+                Concurrency.Instance().Enqueue(ShowProvider(provider, completed));
+            else
+                StartCoroutine(ShowProvider(provider, completed));
+        }
+
+        private IEnumerator ShowProvider(IAdvertisingProvider provider, Action<bool> completed)
+        {
+            bool pausesGame = IsFullscreenAd(AdType);
+            yield return new WaitForEndOfFrame();
+
+            if (pausesGame)
+                PauseGameForAd();
+
             try
             {
-                loadedProvider.Show(AdType, shown =>
+                provider.Show(AdType, shown =>
                 {
-                    isShowing = false;
-                    OnShowCompleted(loadedProvider, shown);
-                    completed?.Invoke(shown);
+                    CompleteShowOnMainThread(provider, shown, completed, pausesGame);
                 });
             }
             catch (Exception exception)
             {
+                if (pausesGame)
+                    ResumeGameAfterAd();
+
                 isShowing = false;
                 Debug.LogError(
-                    $"Advertising show failed on {loadedProvider.ProviderName}: {AdType}\n{exception}");
-                OnShowCompleted(loadedProvider, false);
+                    $"Advertising show failed on {provider.ProviderName}: {AdType}\n{exception}");
+                OnShowCompleted(provider, false);
                 completed?.Invoke(false);
             }
+        }
+
+        private void CompleteShowOnMainThread(IAdvertisingProvider provider, bool shown, Action<bool> completed, bool pausesGame)
+        {
+            void Complete()
+            {
+                if (pausesGame)
+                    ResumeGameAfterAd();
+
+                isShowing = false;
+                OnShowCompleted(provider, shown);
+                completed?.Invoke(shown);
+            }
+
+            if (Concurrency.Exists())
+                Concurrency.Instance().Enqueue(Complete);
+            else
+                StartCoroutine(CompleteNextFrame(Complete));
+        }
+
+        private static IEnumerator CompleteNextFrame(Action completed)
+        {
+            yield return new WaitForEndOfFrame();
+            completed();
+        }
+
+        private static bool IsFullscreenAd(AdvertisingAdType adType)
+        {
+            return adType == AdvertisingAdType.Interstitial ||
+                   adType == AdvertisingAdType.RewardedVideo ||
+                   adType == AdvertisingAdType.RewardedInterstitial ||
+                   adType == AdvertisingAdType.AppOpen;
+        }
+
+        private static void PauseGameForAd()
+        {
+            if (adPauseDepth++ > 0)
+                return;
+
+            previousTimeScale = Time.timeScale;
+            previousTargetFrameRate = Application.targetFrameRate;
+            Application.targetFrameRate = 5;
+            Time.timeScale = 0f;
+            DOTween.PauseAll();
+        }
+
+        private static void ResumeGameAfterAd()
+        {
+            if (adPauseDepth == 0 || --adPauseDepth > 0)
+                return;
+
+            Time.timeScale = previousTimeScale;
+            Application.targetFrameRate = previousTargetFrameRate;
+            DOTween.PlayAll();
         }
 
         public virtual void Hide()

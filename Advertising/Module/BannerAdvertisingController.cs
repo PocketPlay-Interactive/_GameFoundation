@@ -20,6 +20,9 @@ namespace Dann.GameFoundation
 
         public override void ExecuteUpdate()
         {
+            if (!IsLoaded && AdState == AdvertisingAdState.Unavailable)
+                Load();
+
             if (!isVisible)
                 return;
 
@@ -31,11 +34,8 @@ namespace Dann.GameFoundation
                 LoadedProvider = null;
             }
 
-            if (!IsLoaded && AdState == AdvertisingAdState.Unavailable)
-            {
+            if (!IsLoaded)
                 showWhenLoaded = true;
-                Load();
-            }
         }
 
         public override void Show(System.Action<bool> completed = null, string providerName = null)

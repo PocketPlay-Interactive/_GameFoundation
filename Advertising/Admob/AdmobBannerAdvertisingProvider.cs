@@ -9,6 +9,7 @@ namespace Dann.GameFoundation
     public class AdmobBannerAdvertisingProvider : AdvertisingProviderBase
     {
 #if ADMOB
+        [SerializeField] private AdPosition position = AdPosition.Bottom;
         private BannerView bannerView;
 #endif
 
@@ -29,11 +30,12 @@ namespace Dann.GameFoundation
         public override void Load(AdvertisingAdType adType, Action<AdvertisingAdState> completed)
         {
 #if ADMOB
-            Debug.Log($"Load Advertising Provide {this.name} - {this.AdUnitId}");
+            Debug.Log($"Load Advertising Provide {this.name} - {this.AdUnitId} - {Time.time}");
             bannerView?.Destroy();
 
             AdSize adaptiveSize = AdSize.GetCurrentOrientationAnchoredAdaptiveBannerAdSizeWithWidth(AdSize.FullWidth);
-            bannerView = new BannerView(this.AdUnitId, adaptiveSize, AdPosition.Bottom);
+            bannerView = new BannerView(this.AdUnitId, adaptiveSize, position);
+            bannerView.Hide();
             bannerView.OnBannerAdLoaded += () =>
             {
                 completed?.Invoke(AdvertisingAdState.Ready);

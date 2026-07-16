@@ -32,6 +32,7 @@ namespace Dann.GameFoundation
             Debug.Log($"Load Advertising Provide {this.name} - {this.AdUnitId}");
             bannerView?.Destroy();
             bannerView = new BannerView(this.AdUnitId, AdSize.MediumRectangle, AdPosition.Bottom);
+            bannerView.Hide();
             bannerView.OnBannerAdLoaded += () =>
             {
                 completed?.Invoke(AdvertisingAdState.Ready);

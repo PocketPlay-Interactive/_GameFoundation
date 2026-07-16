@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+#if ADMOB
+using GoogleMobileAds.Api;
+#endif
 using UnityEngine;
 
 namespace Dann.GameFoundation
@@ -50,9 +53,31 @@ namespace Dann.GameFoundation
 
         public void Initialize()
         {
+#if ADMOB
+            MobileAds.SetiOSAppPauseOnBackground(true);
+            MobileAds.RaiseAdEventsOnUnityMainThread = true;
+            MobileAds.Initialize(_ => RunAfterAdSdkOnMainThread());
+#else
+            InitializeAfterAdSdk();
+#endif
+        }
+
+#if ADMOB
+        private void RunAfterAdSdkOnMainThread()
+        {
+            if (Concurrency.Exists())
+                Concurrency.Instance().Enqueue(InitializeAfterAdSdk);
+            else
+                InitializeAfterAdSdk();
+        }
+#endif
+
+        private void InitializeAfterAdSdk()
+        {
             BuildAdMap();
             BuildProviders();
             InitializeProviders();
+            LoadAllAds();
 
             PromiseAdvertisingOnStartup(
                 shown => {
@@ -60,6 +85,12 @@ namespace Dann.GameFoundation
                     Manager.Get().FinalizeAdSequence();
                 },
                 () => IsInitialized = true).Forget();
+        }
+
+        private void LoadAllAds()
+        {
+            foreach (AdvertisingAdController ad in adsByType.Values)
+                ad.Load();
         }
 
         public void Load(AdvertisingAdType adType, params string[] parameters)
