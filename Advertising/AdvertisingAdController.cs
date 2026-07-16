@@ -100,6 +100,12 @@ namespace Dann.GameFoundation
         {
             foreach (IAdvertisingProvider provider in providers)
             {
+                if (provider == null)
+                {
+                    Debug.LogError($"Advertising provider init failed, null provider in list: {AdType}", this);
+                    continue;
+                }
+
                 try
                 {
                     provider.Initialize();
@@ -107,7 +113,7 @@ namespace Dann.GameFoundation
                 catch (Exception exception)
                 {
                     Debug.LogError(
-                        $"Advertising provider init failed: {provider.ProviderName}\n{exception}");
+                        $"Advertising provider init failed: {provider.ProviderName ?? provider.GetType().Name}\n{exception}");
                 }
             }
 
@@ -368,6 +374,9 @@ namespace Dann.GameFoundation
         {
             foreach (IAdvertisingProvider provider in providers)
             {
+                if (provider == null)
+                    continue;
+
                 if (string.Equals(provider.ProviderName, providerName, StringComparison.Ordinal))
                     return provider;
             }
@@ -381,6 +390,9 @@ namespace Dann.GameFoundation
 
             foreach (IAdvertisingProvider provider in providers)
             {
+                if (provider == null)
+                    continue;
+
                 if (provider.AdState == AdvertisingAdState.Ready)
                     return AdvertisingAdState.Ready;
 
@@ -394,6 +406,9 @@ namespace Dann.GameFoundation
         {
             foreach (IAdvertisingProvider provider in providers)
             {
+                if (provider == null)
+                    continue;
+
                 try
                 {
                     provider.Hide(AdType);
