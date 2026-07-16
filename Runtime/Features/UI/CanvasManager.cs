@@ -24,9 +24,12 @@ public class CanvasManager : Singleton<CanvasManager>
 
     [Header("Identifiers")]
     [SerializeField] private string _canvasId = "";
+    [SerializeField] private string _previousCanvasId = "";
     [SerializeField] private string _popupId = "";
 
     public string CanvasId => _canvasId;
+    public string PreviousCanvasId => _previousCanvasId;
+    public ScreenCanvas PreviousCanvas => GetCanvasById(_previousCanvasId);
     public string PopupId => _popupId;
 
     [Header("Settings")]
@@ -52,7 +55,7 @@ public class CanvasManager : Singleton<CanvasManager>
         {
             if (!_autoChangeCanvas) return;
         
-            _canvasId = evt.CanvasId;
+            SetCanvasId(evt.CanvasId);
             foreach (var canvasRoot in CanvasRoots)
             {
                 if (canvasRoot.CanvasID == evt.CanvasId)
@@ -71,7 +74,7 @@ public class CanvasManager : Singleton<CanvasManager>
         {
             if (_autoChangeCanvas) return;
 
-            _canvasId = canvasId;
+            SetCanvasId(canvasId);
             foreach (var canvasRoot in CanvasRoots)
             {
                 if (canvasRoot.CanvasID == canvasId)
@@ -119,6 +122,24 @@ public class CanvasManager : Singleton<CanvasManager>
                 else popupRoot.Popup.Hide();
             }
         }
+    }
+
+    private void SetCanvasId(string canvasId)
+    {
+        if (_canvasId == canvasId) return;
+
+        _previousCanvasId = _canvasId;
+        _canvasId = canvasId;
+    }
+
+    private ScreenCanvas GetCanvasById(string canvasId)
+    {
+        foreach (var canvasRoot in CanvasRoots)
+        {
+            if (canvasRoot.CanvasID == canvasId) return canvasRoot.Canvas;
+        }
+
+        return null;
     }
 
     public T GetCanvas<T>()
