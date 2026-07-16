@@ -52,77 +52,75 @@ public class CanvasManager : Singleton<CanvasManager>
 
     public virtual void OnCanvasEventMethod(CanvasEvent evt)
     {
+        if (!_autoChangeCanvas) return;
+
+        var canvasId = evt.CanvasId;
+        SetCanvasId(canvasId);
         Concurrency.Instance().Enqueue( OnCanvas );
         void OnCanvas()
         {
-            if (!_autoChangeCanvas) return;
-        
-            SetCanvasId(evt.CanvasId);
-            foreach (var canvasRoot in CanvasRoots)
-            {
-                if (canvasRoot.CanvasID == evt.CanvasId)
-                {
-                    canvasRoot.Canvas.Show();
-                }
-                else canvasRoot.Canvas.Hide();
-            } 
+            ShowCanvas(canvasId);
         }       
     }
 
     public void OnCanvas(string canvasId)
     {
+        if (_autoChangeCanvas) return;
+
+        SetCanvasId(canvasId);
         Concurrency.Instance().Enqueue( OnCanvas );
         void OnCanvas()
         {
-            if (_autoChangeCanvas) return;
-
-            SetCanvasId(canvasId);
-            foreach (var canvasRoot in CanvasRoots)
-            {
-                if (canvasRoot.CanvasID == canvasId)
-                {
-                    canvasRoot.Canvas.Show();
-                }
-                else canvasRoot.Canvas.Hide();
-            } 
+            ShowCanvas(canvasId);
         }
     }
 
     public virtual void OnPopupEventMethod(PopupEvent evt)
     {
+        if (!_autoChangePopup) return;
+
+        var popupId = evt.PopupId;
+        _popupId = popupId;
         Concurrency.Instance().Enqueue( OnPopup );
         void OnPopup()
         {
-            if (!_autoChangePopup) return;
-
-            _popupId = evt.PopupId;
-            foreach (var popupRoot in PopupRoots)
-            {
-                if (popupRoot.PopupID == evt.PopupId)
-                {
-                    popupRoot.Popup.Show();
-                }
-                else popupRoot.Popup.Hide();
-            }
+            ShowPopup(popupId);
         }
     }
 
     public void OnPopup(string popupId)
     {
+        if (_autoChangePopup) return;
+
+        _popupId = popupId;
         Concurrency.Instance().Enqueue( OnPopup );
         void OnPopup()
         {
-            if (_autoChangePopup) return;
+            ShowPopup(popupId);
+        }
+    }
 
-            _popupId = popupId;
-            foreach (var popupRoot in PopupRoots)
+    private void ShowCanvas(string canvasId)
+    {
+        foreach (var canvasRoot in CanvasRoots)
+        {
+            if (canvasRoot.CanvasID == canvasId)
             {
-                if (popupRoot.PopupID == popupId)
-                {
-                    popupRoot.Popup.Show();
-                }
-                else popupRoot.Popup.Hide();
+                canvasRoot.Canvas.Show();
             }
+            else canvasRoot.Canvas.Hide();
+        }
+    }
+
+    private void ShowPopup(string popupId)
+    {
+        foreach (var popupRoot in PopupRoots)
+        {
+            if (popupRoot.PopupID == popupId)
+            {
+                popupRoot.Popup.Show();
+            }
+            else popupRoot.Popup.Hide();
         }
     }
 
