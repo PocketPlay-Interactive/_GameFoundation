@@ -40,6 +40,7 @@ public class Manager : SingletonGlobal<Manager>
         {
             RuntimeStorageData.PLAYER.LastLogin = now;
             RuntimeStorageData.PLAYER.LoginDayCount += 1;
+            RuntimeStorageData.SaveAllData();
         }
     }
 

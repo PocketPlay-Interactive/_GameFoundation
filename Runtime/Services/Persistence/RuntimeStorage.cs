@@ -50,6 +50,7 @@ public static class RuntimeStorageData
             PLAYER = ReadNew<PlayerSerializable>(DATATYPE.PLAYER) as PlayerSerializable;
             Debug.LogWarning("Player data was null, created new default player data.");
         }
+        PLAYER.EnsureDefaults();
     }
 
     public static void SaveAllData()
@@ -144,7 +145,7 @@ public static class RuntimeStorageData
         if (_data == null || _data == "" || _data == "{}") return;
         _data = HashLib.Base64Encode(_data);
         var encodeMD5 = HashLib.EncryptAndDeviceID(_data);
-        File.WriteAllText(path, encodeMD5);
+        WriteAllTextSafe(path, encodeMD5);
     }
 
     private static T ReadDataExist<T>(string path) where T : class
@@ -152,15 +153,11 @@ public static class RuntimeStorageData
         try
         {
             // Debug.Log($"Đọc data cũ");
-            FileStream fs = new FileStream(path, FileMode.Open);
-            StreamReader sr = new StreamReader(fs);
-            string _data = sr.ReadToEnd();
+            string _data = File.ReadAllText(path);
             var decodeMD5 = HashLib.DecryptAndDeviceID(_data);
             _data = HashLib.Base64Decode(decodeMD5);
 
             var data = JsonUtility.FromJson<T>(_data);
-            fs.Flush();
-            fs.Close();
             return data;
         }
         catch (System.Exception ex)
@@ -168,6 +165,31 @@ public static class RuntimeStorageData
             LogSystem.LogError($"[RuntimeStorage] ReadDataExist Error: {ex.Message}");
         }
         return null;
+    }
+
+    private static void WriteAllTextSafe(string path, string content)
+    {
+        string directory = Path.GetDirectoryName(path);
+        if (!string.IsNullOrEmpty(directory))
+            Directory.CreateDirectory(directory);
+
+        string tempPath = path + ".tmp";
+        File.WriteAllText(tempPath, content);
+
+        try
+        {
+            if (File.Exists(path))
+                File.Replace(tempPath, path, null);
+            else
+                File.Move(tempPath, path);
+        }
+        catch
+        {
+            if (!File.Exists(tempPath)) return;
+
+            File.Copy(tempPath, path, true);
+            File.Delete(tempPath);
+        }
     }
 
     private static string GetPath(DATATYPE dataType)

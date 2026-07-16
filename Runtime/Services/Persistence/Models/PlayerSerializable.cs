@@ -130,6 +130,21 @@ public class PlayerSerializable
         ExtensionData = new ExtensionDataClass();
     }
 
+    public void EnsureDefaults()
+    {
+        if (string.IsNullOrEmpty(PlayerId))
+            PlayerId = SystemInfo.deviceUniqueIdentifier;
+
+        if (string.IsNullOrEmpty(SelectedLanguage))
+            SelectedLanguage = "English";
+
+        if (ownedProductIdsObfuscated == null)
+            ownedProductIdsObfuscated = new List<string>();
+
+        if (ExtensionData == null)
+            ExtensionData = new ExtensionDataClass();
+    }
+
     public bool CanShowAds() =>
         OwnedProductIds == null || OwnedProductIds.Count == 0;
 
@@ -138,16 +153,38 @@ public class PlayerSerializable
 
     public void AddProduct(string productId)
     {
+        if (string.IsNullOrEmpty(productId)) return;
+
         var pkgs = OwnedProductIds;
         if (pkgs != null && !pkgs.Contains(productId))
         {
             pkgs.Add(productId);
             OwnedProductIds = pkgs;
+            RuntimeStorageData.SaveAllData();
         }
     }
 
     public void RemoveAllProducts() =>
+        RemoveAllProducts(true);
+
+    public void RemoveAllProducts(bool save)
+    {
         OwnedProductIds = new List<string>();
+        if (save) RuntimeStorageData.SaveAllData();
+    }
+
+    public void RemoveProductsExcept(IEnumerable<string> productIds)
+    {
+        if (productIds == null) return;
+
+        var validProductIds = new HashSet<string>(productIds);
+        var pkgs = OwnedProductIds;
+        int removedCount = pkgs.RemoveAll(productId => !validProductIds.Contains(productId));
+        if (removedCount <= 0) return;
+
+        OwnedProductIds = pkgs;
+        RuntimeStorageData.SaveAllData();
+    }
 
     public void LogAllProducts()
     {

@@ -47,8 +47,14 @@ public class InappPurchase : GenericSingleton<InappPurchase>
 #if IAPPURCHASE_ENABLE
     private void OnProductsFetched(List<Product> products)
     {
-        Log("[InappPurchase] Products fetched: " + products.Count);
-        RuntimeStorageData.PLAYER.RemoveAllProducts();
+        Log("[InappPurchase] Products fetched: " + (products?.Count ?? 0));
+#if !UNITY_EDITOR
+        if (products != null && products.Count > 0)
+            RuntimeStorageData.PLAYER.RemoveProductsExcept(products
+                .Where(product => product?.definition != null)
+                .Select(product => product.definition.id));
+#endif
+
         storeController.FetchPurchases();
     }
     
@@ -56,10 +62,14 @@ public class InappPurchase : GenericSingleton<InappPurchase>
     // Dùng để xử lý các đơn hàng đã xác nhận, ví dụ: cấp quyền cho người dùng, lưu trạng thái mua.
     private void OnPurchasesFetched(Orders orders)
     {
+        if (orders?.ConfirmedOrders == null) return;
+
         Log("[InappPurchase] Purchases fetched: " + orders.ConfirmedOrders.Count);
         foreach (var order in orders.ConfirmedOrders)
         {
-            var product = order.CartOrdered.Items().First()?.Product;
+            var product = order.CartOrdered.Items().FirstOrDefault()?.Product;
+            if (product == null) continue;
+
             Debug.Log($"[InappPurchase] Confirmed purchase found: {product.definition.id}");
             RuntimeStorageData.PLAYER.AddProduct(product.definition.id);
             EventBus.Publish(new PurchaseCompletedEvent { ProductId = product.definition.id });
@@ -71,14 +81,18 @@ public class InappPurchase : GenericSingleton<InappPurchase>
     private void OnPurchasePending(PendingOrder order)
     {
         Log("[InappPurchase] Purchase pending: " + order.CartOrdered);
-        var product = order.CartOrdered.Items().First()?.Product;
+        var product = order.CartOrdered.Items().FirstOrDefault()?.Product;
+        if (product == null) return;
+
         Debug.Log($"[InappPurchase] Pending purchase: {product.definition.id}");
         storeController.ConfirmPurchase(order);
     }
 
     private void OnPurchaseConfirmed(Order order)
     {
-        var product = order.CartOrdered.Items().First()?.Product;
+        var product = order.CartOrdered.Items().FirstOrDefault()?.Product;
+        if (product == null) return;
+
         Debug.Log($"[InappPurchase] Confirmed purchase: {product.definition.id}");
 
         OnPurchaseComplete?.Invoke(true);
@@ -132,8 +146,14 @@ public class InappPurchase : GenericSingleton<InappPurchase>
 
     public void BuyProduct(string productId, Action<bool> onComplete)
     {
+        if (string.IsNullOrEmpty(productId))
+        {
+            onComplete?.Invoke(false);
+            return;
+        }
+
 #if IAPPURCHASE_ENABLE
-        if (string.IsNullOrEmpty(productId) || throttleClick()) return;
+        if (throttleClick()) return;
         Log($"[InappPurchase] Buy IAP: {productId}");
         currentProductId = productId;
         OnPurchaseComplete = complete =>
@@ -174,6 +194,8 @@ public class InappPurchase : GenericSingleton<InappPurchase>
             InitializePurchasing();
         }
 #else
+        RuntimeStorageData.PLAYER.AddProduct(productId);
+        EventBus.Publish(new PurchaseCompletedEvent { ProductId = productId });
         onComplete?.Invoke(true);
 #endif
     }

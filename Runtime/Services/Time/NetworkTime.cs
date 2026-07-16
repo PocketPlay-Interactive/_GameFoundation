@@ -154,6 +154,7 @@ public static class NetworkTime
         RuntimeStorageData.PLAYER.ExtensionData.Set(
             TimeKey,
             dateTimeString);
+        RuntimeStorageData.SaveAllData();
     }
 
     private static DateTime ConvertUtcToLocalTime(DateTime utcTime)

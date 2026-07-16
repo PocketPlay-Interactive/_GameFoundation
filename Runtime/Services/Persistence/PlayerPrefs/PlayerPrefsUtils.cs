@@ -39,6 +39,7 @@ public static class PlayerPrefsUtils
         {
             PlayerPrefs.SetInt(key, value);
         }
+        PlayerPrefs.Save();
     }
 
     public static int GetInt(string key, int defaultValue = 0)
@@ -80,6 +81,7 @@ public static class PlayerPrefsUtils
         {
             PlayerPrefs.SetFloat(key, value);
         }
+        PlayerPrefs.Save();
     }
 
     public static float GetFloat(string key, float defaultValue = 0f)
@@ -120,6 +122,7 @@ public static class PlayerPrefsUtils
         {
             PlayerPrefs.SetString(key, value);
         }
+        PlayerPrefs.Save();
     }
     
     public static string GetString(string key, string defaultValue = "")
@@ -151,6 +154,7 @@ public static class PlayerPrefsUtils
         PlayerPrefs.DeleteKey(key);
         PlayerPrefs.DeleteKey(key + ChecksumSuffix);
         PlayerPrefs.DeleteKey(key + ObfuscationKeySuffix);
+        PlayerPrefs.Save();
     }
 
     // Kiểm tra tồn tại
