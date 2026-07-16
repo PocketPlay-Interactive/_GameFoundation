@@ -19,6 +19,8 @@ namespace Dann.GameFoundation
         private static int adPauseDepth;
         private static float previousTimeScale = 1f;
         private static int previousTargetFrameRate = -1;
+        private static float lastNonAppOpenFullscreenClosedTime = -999f;
+        private static readonly List<Tween> pausedAdTweens = new();
 
         public virtual AdvertisingAdType AdType => adType;
 
@@ -213,10 +215,12 @@ namespace Dann.GameFoundation
 
         private void CompleteShowOnMainThread(IAdvertisingProvider provider, bool shown, Action<bool> completed, bool pausesGame)
         {
-            void Complete()
+            IEnumerator Complete()
             {
                 if (pausesGame)
                     ResumeGameAfterAd();
+
+                yield return new WaitForEndOfFrame();
 
                 isShowing = false;
                 OnShowCompleted(provider, shown);
@@ -224,15 +228,9 @@ namespace Dann.GameFoundation
             }
 
             if (Concurrency.Exists())
-                Concurrency.Instance().Enqueue(Complete);
+                Concurrency.Instance().Enqueue(Complete());
             else
-                StartCoroutine(CompleteNextFrame(Complete));
-        }
-
-        private static IEnumerator CompleteNextFrame(Action completed)
-        {
-            yield return new WaitForEndOfFrame();
-            completed();
+                StartCoroutine(Complete());
         }
 
         private static bool IsFullscreenAd(AdvertisingAdType adType)
@@ -252,7 +250,11 @@ namespace Dann.GameFoundation
             previousTargetFrameRate = Application.targetFrameRate;
             Application.targetFrameRate = 5;
             Time.timeScale = 0f;
-            DOTween.PauseAll();
+            pausedAdTweens.Clear();
+            DOTween.PlayingTweens(pausedAdTweens);
+
+            foreach (Tween tween in pausedAdTweens)
+                tween.Pause();
         }
 
         private static void ResumeGameAfterAd()
@@ -262,7 +264,14 @@ namespace Dann.GameFoundation
 
             Time.timeScale = previousTimeScale;
             Application.targetFrameRate = previousTargetFrameRate;
-            DOTween.PlayAll();
+
+            foreach (Tween tween in pausedAdTweens)
+            {
+                if (tween != null && tween.IsActive())
+                    tween.Play();
+            }
+
+            pausedAdTweens.Clear();
         }
 
         public virtual void Hide()
@@ -317,11 +326,24 @@ namespace Dann.GameFoundation
 
         protected virtual void OnShowCompleted(IAdvertisingProvider provider, bool shown)
         {
+            RecordFullscreenCloseCooldown(shown);
+
             provider.AdState = AdvertisingAdState.Unavailable;
             loadedProvider = null;
 
             if (mode == AdvertisingMediationMode.Waterfall)
                 AdvanceProvider();
+        }
+
+        protected bool IsAppOpenBlockedByFullscreenCooldown(float delaySeconds)
+        {
+            return Time.unscaledTime - lastNonAppOpenFullscreenClosedTime < delaySeconds;
+        }
+
+        protected void RecordFullscreenCloseCooldown(bool shown)
+        {
+            if (shown && IsFullscreenAd(AdType) && AdType != AdvertisingAdType.AppOpen)
+                lastNonAppOpenFullscreenClosedTime = Time.unscaledTime;
         }
 
         protected IAdvertisingProvider GetCurrentProvider()
