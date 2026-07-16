@@ -11,7 +11,7 @@ public static class FileHandler
     public static void SaveToJSON<T>(List<T> toSave, string filename)
     {
         Debug.Log(GetPath(filename));
-        string content = JsonHelper.ToJson<T>(toSave.ToArray());
+        string content = UtilsJsonHelper.ToJsonArray(toSave.ToArray());
         WriteFile(GetPath(filename), content);
     }
 
@@ -40,7 +40,7 @@ public static class FileHandler
             return new List<T>();
         }
 
-        List<T> res = JsonHelper.FromJson<T>(content).ToList();
+        List<T> res = UtilsJsonHelper.FromJsonDataArray<T>(content).ToList();
 
         return res;
 
@@ -125,54 +125,5 @@ public static class FileHandler
         }
         
         return result;
-    }
-}
-
-public static class JsonHelper
-{
-    public static T[] FromJson<T>(string json)
-    {
-        WrapperArray<T> wrapper = JsonUtility.FromJson<WrapperArray<T>>(json);
-        return wrapper.Data;
-    }
-
-    public static T[] getJsonArray<T>(string json)
-    {
-        string newJson = "{ \"Data\": " + json + "}";
-        WrapperArray<T> wrapper = JsonUtility.FromJson<WrapperArray<T>>(newJson);
-        return wrapper.Data;
-    }
-
-    public static T getJson<T>(string json)
-    {
-        string newJson = "{ \"Data\": " + json + "}";
-        Wrapper<T> wrapper = JsonUtility.FromJson<Wrapper<T>>(newJson);
-        return wrapper.Data;
-    }
-
-    public static string ToJson<T>(T[] array)
-    {
-        WrapperArray<T> wrapper = new WrapperArray<T>();
-        wrapper.Data = array;
-        return JsonUtility.ToJson(wrapper);
-    }
-
-    public static string ToJson<T>(T[] array, bool prettyPrint)
-    {
-        WrapperArray<T> wrapper = new WrapperArray<T>();
-        wrapper.Data = array;
-        return JsonUtility.ToJson(wrapper, prettyPrint);
-    }
-
-    [Serializable]
-    private class WrapperArray<T>
-    {
-        public T[] Data;
-    }
-
-    [Serializable]
-    private class Wrapper<T>
-    {
-        public T Data;
     }
 }

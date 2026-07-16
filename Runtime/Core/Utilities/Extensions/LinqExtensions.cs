@@ -41,6 +41,7 @@ public static class LinqExtensions
     {
         var list = enumerable as IList<T> ?? enumerable?.ToList();
         if (list == null || list.Count == 0) return default;
+        factor = Mathf.Max(0f, factor);
     
         probabilityCache.Clear();
 
@@ -107,12 +108,13 @@ public static class LinqExtensions
 
     public static T GetAndRemove<T>(this IList<T> list, T item)
     {
+       if (list == null) return default;
        return list.GetAndRemove(list.IndexOf(item));
     }
 
     public static T GetAndRemove<T>(this IList<T> list, int index)
     {
-        if (index < 0 || index>=list.Count)
+        if (list == null || index < 0 || index>=list.Count)
             return default;
         var item = list[index];
         list.RemoveAt(index);
@@ -121,11 +123,13 @@ public static class LinqExtensions
 
     public static int ChildCount(this GameObject _parent)
     {
-        return _parent.transform.childCount;
+        return _parent != null ? _parent.transform.childCount : 0;
     }
 
     public static void ForChild(this Transform _parent, Action<Transform> action)
     {
+        if (_parent == null) return;
+
         for(int i = 0; i < _parent.childCount; i++)
         {
             action?.Invoke(_parent.GetChild(i));
@@ -134,6 +138,8 @@ public static class LinqExtensions
 
     public static void ForChild(this GameObject _parent, Action<Transform> action)
     {
+        if (_parent == null) return;
+
         for (int i = 0; i < _parent.transform.childCount; i++)
         {
             action?.Invoke(_parent.GetChildTransform(i));
@@ -142,6 +148,8 @@ public static class LinqExtensions
 
     public static void ForChild(this Transform _parent, Action<int, Transform> action)
     {
+        if (_parent == null) return;
+
         for (int i = 0; i < _parent.childCount; i++)
         {
             action?.Invoke(i, _parent.GetChild(i));
@@ -150,6 +158,8 @@ public static class LinqExtensions
 
     public static void ForChildReverse(this Transform parent, Action<Transform> action)
     {
+        if (parent == null) return;
+
         int count = parent.childCount;
         for(int i = count - 1; i >= 0; i--)
         {
@@ -159,6 +169,8 @@ public static class LinqExtensions
 
     public static void ForChildReverse(this Transform parent, Action<int, Transform> action)
     {
+        if (parent == null) return;
+
         int count = parent.childCount;
         for (int i = count - 1; i >= 0; i--)
         {
@@ -176,42 +188,10 @@ public static class LinqExtensions
     }
 
     public static Transform[] GetChilds(this Transform parent)
-    {
-        if (parent == null) return Array.Empty<Transform>();
-
-        // Lấy số lượng child
-        int childCount = parent.childCount;
-
-        // Khởi tạo mảng với số lượng child
-        Transform[] children = new Transform[childCount];
-
-        // Lặp qua tất cả các child và thêm vào mảng
-        for (int i = 0; i < childCount; i++)
-        {
-            children[i] = parent.GetChild(i);
-        }
-
-        return children;
-    }
+        => parent.GetChildren();
 
     public static Transform[] GetChilds(this GameObject parent)
-    {
-        if (parent == null) return Array.Empty<Transform>();
-
-        // Lấy số lượng child
-        int childCount = parent.transform.childCount;
-
-        // Khởi tạo mảng với số lượng child
-        Transform[] children = new Transform[childCount];
-
-        // Lặp qua tất cả các child và thêm vào mảng
-        for (int i = 0; i < childCount; i++)
-        {
-            children[i] = parent.GetChildTransform(i);
-        }
-
-        return children;
-    }
+        => parent != null ? parent.transform.GetChildren() : Array.Empty<Transform>();
 
     public static List<Transform> GetRandomChildren(this GameObject parent, int count)
     {
@@ -243,6 +223,8 @@ public static class LinqExtensions
 
     public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)
     {
+        if (enumerable == null) return;
+
         foreach (var item in enumerable)
         {
             action?.Invoke(item);
@@ -251,6 +233,8 @@ public static class LinqExtensions
 
     public static void ForEachReverse<T>(this T[] arr, Action<T> action)
     {
+        if (arr == null) return;
+
         int count = arr.Length;
         for (int i = count - 1; i >= 0; i--)
         {
@@ -260,6 +244,8 @@ public static class LinqExtensions
 
     public static void ForEachReverse<T>(this List<T> arr, Action<T> action)
     {
+        if (arr == null) return;
+
         int count = arr.Count;
         for (int i = count - 1; i >= 0; i--)
         {
@@ -268,17 +254,12 @@ public static class LinqExtensions
     }
 
     public static void SimpleForEach<T>(this T[] _array, Action<T> action)
-    {
-        for(int i = 0; i < _array.Length; i++)
-        {
-            if (_array[i] == null)
-                continue;
-            action?.Invoke(_array[i]);
-        }
-    }
+        => _array.ForEach(action);
 
     public static void ForEach<T>(this T[] _array, Action<T> action)
     {
+        if (_array == null) return;
+
         for (int i = 0; i < _array.Length; i++)
         {
             if (_array[i] == null)
@@ -289,6 +270,8 @@ public static class LinqExtensions
 
     public static void SimpleForEach<T>(this List<T> _array, Action<T> action)
     {
+        if (_array == null) return;
+
         for (int i = 0; i < _array.Count; i++)
         {
             action?.Invoke(_array[i]);
@@ -297,6 +280,8 @@ public static class LinqExtensions
 
     public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T, int> action)
     {
+        if (enumerable == null) return;
+
         int i = 0;
         foreach (var item in enumerable)
         {
@@ -307,6 +292,8 @@ public static class LinqExtensions
 
     public static void SimpleForEach<T>(this T[] _array, Action<T, int> action)
     {
+        if (_array == null) return;
+
         for (int i = 0; i < _array.Length; i++)
         {
             action?.Invoke(_array[i], i);
@@ -315,6 +302,8 @@ public static class LinqExtensions
 
     public static void SimpleForEach<T>(this List<T> _array, Action<T, int> action)
     {
+        if (_array == null) return;
+
         for (int i = 0; i < _array.Count; i++)
         {
             action?.Invoke(_array[i], i);
@@ -323,6 +312,8 @@ public static class LinqExtensions
 
     public static Transform FindOnce(this List<Transform> _array, bool _isActive)
     {
+        if (_array == null) return null;
+
         Transform _res = null;
         for (int i = 0; i < _array.Count; i++)
         {
@@ -341,6 +332,8 @@ public static class LinqExtensions
     // Shuffle extension
     public static void Shuffle<T>(this IList<T> list)
     {
+        if (list == null) return;
+
         for (int i = list.Count - 1; i > 0; i--)
         {
             int j = Random.Range(0, i + 1);

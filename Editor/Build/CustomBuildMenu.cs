@@ -34,6 +34,7 @@ public sealed class CustomBuildMenu : EditorWindow
     private bool appleAutomaticSigning;
 
     private bool developmentBuild;
+    private Action pendingGuiAction;
 
     private static string SigningPrefsPrefix => $"CustomBuildMenu.{Hash128.Compute(Application.dataPath)}.AndroidSigning.";
 
@@ -68,6 +69,7 @@ public sealed class CustomBuildMenu : EditorWindow
         DrawBuildSection();
 
         EditorGUILayout.EndScrollView();
+        RunPendingGuiAction();
     }
 
     private void DrawHeader()
@@ -187,33 +189,57 @@ public sealed class CustomBuildMenu : EditorWindow
         {
             if (GUILayout.Button("Áp dụng settings", GUILayout.Height(34f)))
             {
-                ApplySettings(true);
+                pendingGuiAction = () => ApplySettings(true);
             }
 
             if (GUILayout.Button("Mở Player Settings", GUILayout.Height(34f)))
             {
-                SettingsService.OpenProjectSettings("Project/Player");
+                pendingGuiAction = () => SettingsService.OpenProjectSettings("Project/Player");
             }
         }
 
         EditorGUILayout.Space(4f);
         using (new EditorGUILayout.HorizontalScope())
         {
-            GUI.backgroundColor = new Color(0.55f, 0.85f, 0.55f);
-            if (GUILayout.Button(buildAppBundle ? "Build Android (.aab)" : "Build Android (.apk)", GUILayout.Height(40f)))
+            Color previousBackgroundColor = GUI.backgroundColor;
+            try
             {
-                BuildAndroid();
-            }
+                GUI.backgroundColor = new Color(0.55f, 0.85f, 0.55f);
+                if (GUILayout.Button(buildAppBundle ? "Build Android (.aab)" : "Build Android (.apk)", GUILayout.Height(40f)))
+                {
+                    pendingGuiAction = BuildAndroid;
+                }
 
-            GUI.backgroundColor = new Color(0.55f, 0.72f, 0.95f);
-            if (GUILayout.Button("Build iOS (Xcode)", GUILayout.Height(40f)))
+                GUI.backgroundColor = new Color(0.55f, 0.72f, 0.95f);
+                if (GUILayout.Button("Build iOS (Xcode)", GUILayout.Height(40f)))
+                {
+                    pendingGuiAction = BuildIos;
+                }
+            }
+            finally
             {
-                BuildIos();
+                GUI.backgroundColor = previousBackgroundColor;
             }
-
-            GUI.backgroundColor = Color.white;
         }
         EndSection();
+    }
+
+    private void RunPendingGuiAction()
+    {
+        if (pendingGuiAction == null)
+        {
+            return;
+        }
+
+        Action action = pendingGuiAction;
+        pendingGuiAction = null;
+        EditorApplication.delayCall += () =>
+        {
+            if (this != null)
+            {
+                action();
+            }
+        };
     }
 
     private void LoadPlayerSettings()
