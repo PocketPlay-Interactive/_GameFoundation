@@ -4,6 +4,8 @@ All notable changes to this package are documented in this file.
 
 ## [Unreleased]
 
+## [1.0.17] - 2026-07-16
+
 ### Added
 
 - Added detailed extension module sample documentation with MonoBehaviour and runtime-registered module examples.
