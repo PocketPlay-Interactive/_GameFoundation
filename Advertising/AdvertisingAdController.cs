@@ -147,6 +147,12 @@ namespace Dann.GameFoundation
                 return;
             }
 
+            if (!CanProviderLoadAndShow(provider))
+            {
+                AdvanceProvider();
+                return;
+            }
+
             LoadProvider(provider);
         }
 
@@ -175,7 +181,7 @@ namespace Dann.GameFoundation
 
             IAdvertisingProvider provider = string.IsNullOrEmpty(providerName) ? loadedProvider : GetProvider(providerName);
 
-            if (provider == null || provider.AdState != AdvertisingAdState.Ready)
+            if (provider == null || !CanProviderLoadAndShow(provider) || provider.AdState != AdvertisingAdState.Ready)
             {
                 Load();
                 completed?.Invoke(false);
@@ -304,7 +310,7 @@ namespace Dann.GameFoundation
 
         protected void LoadProvider(IAdvertisingProvider provider)
         {
-            if (provider == null || !provider.IsInitialized || provider.AdState != AdvertisingAdState.Unavailable)
+            if (provider == null || !provider.IsInitialized || !CanProviderLoadAndShow(provider) || provider.AdState != AdvertisingAdState.Unavailable)
                 return;
 
             provider.AdState = AdvertisingAdState.Loading;
@@ -382,6 +388,12 @@ namespace Dann.GameFoundation
             }
 
             return null;
+        }
+
+        private static bool CanProviderLoadAndShow(IAdvertisingProvider provider)
+        {
+            AdvertisingProviderBase advertisingProvider = provider as AdvertisingProviderBase;
+            return advertisingProvider == null || advertisingProvider.CanLoadAndShow;
         }
 
         private AdvertisingAdState GetParallelState()

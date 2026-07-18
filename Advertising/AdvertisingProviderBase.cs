@@ -14,11 +14,16 @@ namespace Dann.GameFoundation
         [SerializeField] private string iosAdUnitId;
         [SerializeField] private string editorAdUnitId;
         [SerializeField] private string testAdUnitId;
+        [SerializeField] private int loadAndShowFromLevel = -1;
         [SerializeField] protected int retryAttempt = 0;
 
         public string ProviderName => string.IsNullOrEmpty(providerName) ? GetType().Name : providerName;
 
         public bool IsInitialized { get; protected set; }
+
+        public bool CanLoadAndShow => loadAndShowFromLevel < 0 ||
+                                      RuntimeStorageData.PLAYER != null &&
+                                      RuntimeStorageData.PLAYER.CurrentLevelIndex >= loadAndShowFromLevel;
 
         [field: SerializeField] public AdvertisingAdState AdState { get; set; } = AdvertisingAdState.Unavailable;
 
