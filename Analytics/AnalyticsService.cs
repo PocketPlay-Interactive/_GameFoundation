@@ -6,11 +6,11 @@ namespace Dann.GameFoundation
 {
     public sealed class AnalyticsService : SingletonGlobal<AnalyticsService>
     {
-        [SerializeField] private GameObject[] providerPrefabs;
+        [SerializeField] private GameObject[] providers;
 
         [Header("Setting")]
         [SerializeField] private bool enableEditorLogging = false;
-        private readonly List<IAnalyticsProvider> providers = new();
+        private readonly List<IAnalyticsProvider> providerInstances = new();
 
         public bool IsInitialized { get; private set; }
 
@@ -18,7 +18,7 @@ namespace Dann.GameFoundation
         {
             BuildProviders();
 
-            foreach (IAnalyticsProvider provider in providers)
+            foreach (IAnalyticsProvider provider in providerInstances)
             {
                 try
                 {
@@ -35,24 +35,23 @@ namespace Dann.GameFoundation
 
         private void BuildProviders()
         {
-            if (providers.Count > 0)
+            if (providerInstances.Count > 0)
                 return;
 
-            if (providerPrefabs == null)
+            if (providers == null)
                 return;
 
-            foreach (GameObject providerPrefab in providerPrefabs)
+            foreach (GameObject providerObject in providers)
             {
-                if (providerPrefab == null)
+                if (providerObject == null)
                     continue;
 
-                GameObject providerObject = Instantiate(providerPrefab, transform);
                 MonoBehaviour[] components = providerObject.GetComponentsInChildren<MonoBehaviour>(true);
 
                 foreach (MonoBehaviour component in components)
                 {
-                    if (component is IAnalyticsProvider provider && !providers.Contains(provider))
-                        providers.Add(provider);
+                    if (component is IAnalyticsProvider provider && !providerInstances.Contains(provider))
+                        providerInstances.Add(provider);
                 }
             }
         }
@@ -69,7 +68,7 @@ namespace Dann.GameFoundation
 
             if(enableEditorLogging) Debug.Log($"Analytics : {eventName}");
 
-            foreach (IAnalyticsProvider provider in providers)
+            foreach (IAnalyticsProvider provider in providerInstances)
             {
                 try
                 {
@@ -94,7 +93,7 @@ namespace Dann.GameFoundation
                 return;
             }
 
-            foreach (IAnalyticsProvider provider in providers)
+            foreach (IAnalyticsProvider provider in providerInstances)
             {
                 try
                 {
@@ -113,7 +112,7 @@ namespace Dann.GameFoundation
 
         public void SetUserId(string userId)
         {
-            foreach (IAnalyticsProvider provider in providers)
+            foreach (IAnalyticsProvider provider in providerInstances)
             {
                 try
                 {
@@ -130,7 +129,7 @@ namespace Dann.GameFoundation
 
         public void SetUserProperty(string key, string value)
         {
-            foreach (IAnalyticsProvider provider in providers)
+            foreach (IAnalyticsProvider provider in providerInstances)
             {
                 try
                 {
@@ -147,7 +146,7 @@ namespace Dann.GameFoundation
 
         public void Flush()
         {
-            foreach (IAnalyticsProvider provider in providers)
+            foreach (IAnalyticsProvider provider in providerInstances)
             {
                 try
                 {
