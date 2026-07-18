@@ -47,12 +47,16 @@ public class InappPurchase : GenericSingleton<InappPurchase>
 #if IAPPURCHASE_ENABLE
     private void OnProductsFetched(List<Product> products)
     {
-        Log("[InappPurchase] Products fetched: " + (products?.Count ?? 0));
+        var storeProducts = products?
+            .Where(product => product?.definition != null)
+            .ToList() ?? new List<Product>();
+
+        Log($"[InappPurchase] Store products ready: {storeProducts.Count}/{Products.Count}");
+        foreach (var product in storeProducts)
+            Log($"[InappPurchase] Store product: {product.definition.id} | {product.definition.type} | {product.metadata?.localizedPriceString}");
 #if !UNITY_EDITOR
-        if (products != null && products.Count > 0)
-            RuntimeStorageData.PLAYER.RemoveProductsExcept(products
-                .Where(product => product?.definition != null)
-                .Select(product => product.definition.id));
+        if (storeProducts.Count > 0)
+            RuntimeStorageData.PLAYER.RemoveProductsExcept(storeProducts.Select(product => product.definition.id));
 #endif
 
         storeController.FetchPurchases();

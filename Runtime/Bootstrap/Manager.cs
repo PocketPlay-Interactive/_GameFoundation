@@ -17,6 +17,9 @@ public class Manager : SingletonGlobal<Manager>
     public float MaxLoadingDuration = 15f;
     public float CurrentLoadingElapsed = 0f;
 
+    [Header("Logging")]
+    public bool DisableLogsInReleaseBuild = false;
+
     [Header("References")]
     [SerializeField] private LoadingCanvas loadingCanvas;
     [SerializeField] private MonoBehaviour[] extensionModules;
@@ -43,9 +46,8 @@ public class Manager : SingletonGlobal<Manager>
             RuntimeStorageData.SaveAllData();
         }
 
-#if !UNITY_EDITOR && !DEVELOPMENT_BUILD
-        Debug.unityLogger.logEnabled = false;
-#endif
+        if (DisableLogsInReleaseBuild)
+            Debug.unityLogger.logEnabled = false;
     }
 
     private void Start()
