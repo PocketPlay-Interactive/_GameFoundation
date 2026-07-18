@@ -1,15 +1,22 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 
 public class ButtonSound : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
-    public AudioClip _audio;
+    [SerializeField] private string soundKey;
+    [FormerlySerializedAs("_audio")]
+    [SerializeField] private AudioClip fallbackClip;
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        SoundService.Get().PlayOnShot(_audio);
+        if (!string.IsNullOrWhiteSpace(soundKey))
+        {
+            SoundService.Get().PlayOnShot(soundKey);
+            return;
+        }
+
+        SoundService.Get().PlayOnShot(fallbackClip);
     }
 
     public void OnPointerUp(PointerEventData eventData)

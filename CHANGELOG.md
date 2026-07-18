@@ -11,6 +11,7 @@ All notable changes to this package are documented in this file.
 - Added `AnalyticsBinder` support for `paid_ad_impression_value` events with game-provided level and placement context.
 - Added AdMob paid impression tracking from official `OnAdPaid` callbacks across banner, MREC, native, interstitial, rewarded, rewarded interstitial, and app open providers.
 - Added paid ad impression integration notes under `Documentation/paid-ad-impression-value.md`.
+- Added string-key playback support for `SoundService` and `MusicService`, plus a `ButtonSound` sound-key dropdown inspector.
 
 ### Changed
 

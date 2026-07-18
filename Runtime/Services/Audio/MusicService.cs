@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
@@ -6,22 +7,17 @@ using UnityEngine;
 [ExtensionModuleNotice("Drag this MusicService object into Manager -> Extension Modules.")]
 public class MusicService : SingletonGlobal<MusicService>, IGameFoundationModule
 {
-    public enum Music
-    {
-        NONE,
-    }
-
     [System.Serializable]
     public class MusicTable
     {
-        public Music music;
+        public string key;
         public AudioClip clip;
     }
 
     [SerializeField] private MusicTable[] musics;
     [SerializeField] private AudioSource audioSource;
 
-    private readonly Dictionary<Music, AudioClip> musicDics = new Dictionary<Music, AudioClip>();
+    private readonly Dictionary<string, AudioClip> musicKeyDics = new Dictionary<string, AudioClip>(StringComparer.Ordinal);
     private const string SettingKeyMusic = "MUSIC";
     private bool isInitialized;
 
@@ -34,10 +30,10 @@ public class MusicService : SingletonGlobal<MusicService>, IGameFoundationModule
         yield break;
     }
 
-    public void PlayMusic(Music music, float volume = 1.0f, bool loop = true)
+    public void PlayMusic(string key, float volume = 1.0f, bool loop = true)
     {
         EnsureInitialized();
-        if (!musicDics.TryGetValue(music, out var clip) || clip == null)
+        if (string.IsNullOrWhiteSpace(key) || !musicKeyDics.TryGetValue(key, out var clip) || clip == null)
             return;
 
         if (audioSource.isPlaying && audioSource.clip == clip)
@@ -125,13 +121,14 @@ public class MusicService : SingletonGlobal<MusicService>, IGameFoundationModule
             audioSource.loop = true;
         }
 
-        musicDics.Clear();
+        musicKeyDics.Clear();
         if (musics == null) return;
 
         foreach (var m in musics)
         {
-            if (m.clip && !musicDics.ContainsKey(m.music))
-                musicDics.Add(m.music, m.clip);
+            string key = m.key;
+            if (m.clip && !string.IsNullOrWhiteSpace(key) && !musicKeyDics.ContainsKey(key))
+                musicKeyDics.Add(key, m.clip);
         }
     }
 }

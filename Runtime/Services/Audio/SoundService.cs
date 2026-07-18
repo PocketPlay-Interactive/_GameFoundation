@@ -7,18 +7,10 @@ using UnityEngine;
 [ExtensionModuleNotice("Drag this SoundService object into Manager -> Extension Modules.")]
 public class SoundService : SingletonGlobal<SoundService>, IGameFoundationModule
 {
-    public enum Sound
-    {
-        NONE,
-        BUTTON,
-        LOSE,
-        WIN,
-    }
-
     [Serializable]
     public class SoundTable
     {
-        public Sound sound;
+        public string key;
         public AudioClip[] clips;
     }
 
@@ -29,8 +21,8 @@ public class SoundService : SingletonGlobal<SoundService>, IGameFoundationModule
     [SerializeField] private bool overrideAudioVoiceConfig = false;
 
     private readonly List<AudioSource> audioSources = new List<AudioSource>();
-    private readonly Dictionary<Sound, AudioClip[]> soundDics = new Dictionary<Sound, AudioClip[]>();
-    private readonly Dictionary<Sound, float> lastPlayTime = new Dictionary<Sound, float>();
+    private readonly Dictionary<string, AudioClip[]> soundKeyDics = new Dictionary<string, AudioClip[]>(StringComparer.Ordinal);
+    private readonly Dictionary<string, float> lastPlayKeyTime = new Dictionary<string, float>(StringComparer.Ordinal);
     private const string SettingKeySound = "SOUND";
     private int currentAudioSourceIndex;
     private bool isInitialized;
@@ -73,16 +65,16 @@ public class SoundService : SingletonGlobal<SoundService>, IGameFoundationModule
         }
     }
 
-    public void PlayOnShot(Sound sound, float volume = 1f)
+    public void PlayOnShot(string key, float volume = 1f)
     {
         EnsureInitialized();
-        if (!soundDics.TryGetValue(sound, out var clips) || clips.Length == 0) return;
+        if (string.IsNullOrWhiteSpace(key) || !soundKeyDics.TryGetValue(key, out var clips) || clips.Length == 0) return;
 
         float now = Time.unscaledTime;
-        if (lastPlayTime.TryGetValue(sound, out float last) && now - last < minIntervalSameSound)
+        if (lastPlayKeyTime.TryGetValue(key, out float last) && now - last < minIntervalSameSound)
             return;
 
-        lastPlayTime[sound] = now;
+        lastPlayKeyTime[key] = now;
         PlayClipDirect(clips[UnityEngine.Random.Range(0, clips.Length)], volume);
     }
 
@@ -91,10 +83,10 @@ public class SoundService : SingletonGlobal<SoundService>, IGameFoundationModule
         PlayClipDirect(clip, volume);
     }
 
-    public void PlaySpecialSound(Sound sound, float volume = 1.0f)
+    public void PlaySpecialSound(string key, float volume = 1.0f)
     {
         EnsureInitialized();
-        if (!soundDics.TryGetValue(sound, out var clips) || clips.Length == 0) return;
+        if (string.IsNullOrWhiteSpace(key) || !soundKeyDics.TryGetValue(key, out var clips) || clips.Length == 0) return;
 
         var clip = clips[UnityEngine.Random.Range(0, clips.Length)];
         if (!audioSourceSpecial || !clip) return;
@@ -109,17 +101,17 @@ public class SoundService : SingletonGlobal<SoundService>, IGameFoundationModule
         if (audioSourceSpecial) audioSourceSpecial.Stop();
     }
 
-    public AudioClip GetRandomClip(Sound sound)
+    public AudioClip GetRandomClip(string key)
     {
         EnsureInitialized();
 
-        if (soundDics.TryGetValue(sound, out var clips) && clips.Length > 0)
+        if (!string.IsNullOrWhiteSpace(key) && soundKeyDics.TryGetValue(key, out var clips) && clips.Length > 0)
             return clips[UnityEngine.Random.Range(0, clips.Length)];
 
         return null;
     }
 
-    public AudioClip ConvertToClip(Sound sound) => GetRandomClip(sound);
+    public AudioClip ConvertToClip(string key) => GetRandomClip(key);
 
     public void PlayClipDirect(AudioClip clip, float volume = 1f)
     {
@@ -162,13 +154,14 @@ public class SoundService : SingletonGlobal<SoundService>, IGameFoundationModule
             AudioSettings.Reset(config);
         }
 
-        soundDics.Clear();
+        soundKeyDics.Clear();
         if (sounds != null)
         {
             foreach (var s in sounds)
             {
-                if (s.clips != null && s.clips.Length > 0 && !soundDics.ContainsKey(s.sound))
-                    soundDics.Add(s.sound, s.clips);
+                string key = s.key;
+                if (s.clips != null && s.clips.Length > 0 && !string.IsNullOrWhiteSpace(key) && !soundKeyDics.ContainsKey(key))
+                    soundKeyDics.Add(key, s.clips);
             }
         }
 
