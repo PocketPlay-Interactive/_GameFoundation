@@ -37,10 +37,18 @@ public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
 #if ADMOB
         yield return null;
 #if ADMOB_UMP
-        yield return UMP.Instance.DOGatherConsent(EmptyCoroutine());
-        AnalyticsService.Get().TrackEvent("ump_consent_initialized_consent");
+        if (UMP.Instance != null)
+        {
+            yield return UMP.Instance.DOGatherConsent(EmptyCoroutine());
+            AnalyticsService.Get()?.TrackEvent("ump_consent_initialized_consent");
+        }
+        else
+        {
+            Debug.LogWarning("ADMOB_UMP is enabled but no UMP instance exists. Skipping UMP consent initialization.");
+            AnalyticsService.Get()?.TrackEvent("ump_consent_missing_instance");
+        }
 #else
-        AnalyticsService.Get().TrackEvent($"ump_consent_skipped_consent");
+        AnalyticsService.Get()?.TrackEvent("ump_consent_skipped_consent");
 #endif
 
         AdvertisingService.Get().Initialize();
