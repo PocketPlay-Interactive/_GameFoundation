@@ -207,13 +207,23 @@ public sealed class CustomBuildMenu : EditorWindow
                 GUI.backgroundColor = new Color(0.55f, 0.85f, 0.55f);
                 if (GUILayout.Button(buildAppBundle ? "Build Android (.aab)" : "Build Android (.apk)", GUILayout.Height(40f)))
                 {
-                    pendingGuiAction = BuildAndroid;
+                    pendingGuiAction = () => BuildAndroid(false);
+                }
+
+                if (GUILayout.Button("Build & Run Android (.apk)", GUILayout.Height(40f)))
+                {
+                    pendingGuiAction = () => BuildAndroid(true);
                 }
 
                 GUI.backgroundColor = new Color(0.55f, 0.72f, 0.95f);
                 if (GUILayout.Button("Build iOS (Xcode)", GUILayout.Height(40f)))
                 {
-                    pendingGuiAction = BuildIos;
+                    pendingGuiAction = () => BuildIos(false);
+                }
+
+                if (GUILayout.Button("Build & Run iOS", GUILayout.Height(40f)))
+                {
+                    pendingGuiAction = () => BuildIos(true);
                 }
             }
             finally
@@ -423,41 +433,50 @@ public sealed class CustomBuildMenu : EditorWindow
         return part.All(character => char.IsLetterOrDigit(character) || character == '_');
     }
 
-    private void BuildAndroid()
+    private void BuildAndroid(bool buildAndRun)
     {
         if (!ApplySettings(false) || !TryGetEnabledScenes(out string[] scenes))
         {
             return;
         }
 
-        string extension = buildAppBundle ? "aab" : "apk";
+        string extension = buildAndRun ? "apk" : buildAppBundle ? "aab" : "apk";
         string defaultName = GetAndroidBuildName(extension);
-        string outputPath = EditorUtility.SaveFilePanel("Chọn nơi lưu Android build", GetDefaultBuildDirectory("Android"), defaultName, extension);
+        string outputPath = EditorUtility.SaveFilePanel(buildAndRun ? "Chọn nơi lưu Android build & run" : "Chọn nơi lưu Android build", GetDefaultBuildDirectory("Android"), defaultName, extension);
         if (string.IsNullOrEmpty(outputPath))
         {
             return;
         }
 
-        BuildPlayer(scenes, outputPath, BuildTarget.Android);
+        bool previousBuildAppBundle = EditorUserBuildSettings.buildAppBundle;
+        EditorUserBuildSettings.buildAppBundle = !buildAndRun && buildAppBundle;
+        try
+        {
+            BuildPlayer(scenes, outputPath, BuildTarget.Android, buildAndRun);
+        }
+        finally
+        {
+            EditorUserBuildSettings.buildAppBundle = previousBuildAppBundle;
+        }
     }
 
-    private void BuildIos()
+    private void BuildIos(bool buildAndRun)
     {
         if (!ApplySettings(false) || !TryGetEnabledScenes(out string[] scenes))
         {
             return;
         }
 
-        string outputPath = EditorUtility.SaveFolderPanel("Chọn thư mục Xcode project", GetDefaultBuildDirectory("iOS"), GetSafeBuildName(string.Empty));
+        string outputPath = EditorUtility.SaveFolderPanel(buildAndRun ? "Chọn thư mục Xcode project build & run" : "Chọn thư mục Xcode project", GetDefaultBuildDirectory("iOS"), GetSafeBuildName(string.Empty));
         if (string.IsNullOrEmpty(outputPath))
         {
             return;
         }
 
-        BuildPlayer(scenes, outputPath, BuildTarget.iOS);
+        BuildPlayer(scenes, outputPath, BuildTarget.iOS, buildAndRun);
     }
 
-    private void BuildPlayer(string[] scenes, string outputPath, BuildTarget target)
+    private void BuildPlayer(string[] scenes, string outputPath, BuildTarget target, bool buildAndRun)
     {
         BuildTargetGroup targetGroup = target == BuildTarget.Android ? BuildTargetGroup.Android : BuildTargetGroup.iOS;
         if (EditorUserBuildSettings.activeBuildTarget != target &&
@@ -468,6 +487,10 @@ public sealed class CustomBuildMenu : EditorWindow
         }
 
         BuildOptions options = developmentBuild ? BuildOptions.Development : BuildOptions.None;
+        if (buildAndRun)
+        {
+            options |= BuildOptions.AutoRunPlayer;
+        }
         BuildReport report = BuildPipeline.BuildPlayer(new BuildPlayerOptions
         {
             scenes = scenes,
