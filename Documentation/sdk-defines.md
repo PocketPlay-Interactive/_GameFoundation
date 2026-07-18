@@ -6,7 +6,7 @@ Do not enable a define until the matching SDK exists in the Unity project.
 | --- | --- | --- |
 | `FIREBASE` | Firebase Unity SDK | `FirebaseAnalyticsProvider` for `AnalyticsService` |
 | `ADMOB` | Google Mobile Ads Unity SDK | AdMob providers for `AdvertisingService` |
-| `ADMOB_TEST` | `ADMOB` | Google test ad unit ids |
+| `ADVERSTING_TEST` | Advertising SDK | Test ad unit ids |
 | `ADMOB_UMP` | `ADMOB`, `UMP` | Omni UMP consent flow |
 | `USE_ADMOB_CUSTOM_PLUGIN` | `ADMOB`, JKit/custom native ads | Native/collapse ad adapters |
 | `APPFLYER` | AppsFlyer Unity SDK | AppsFlyer event/ad revenue forwarding |

@@ -13,7 +13,7 @@ public class GameFoundationDefineSymbolsWindow : EditorWindow
     {
         new DefineOption("FIREBASE", "Firebase Analytics"),
         new DefineOption("ADMOB", "Google Mobile Ads"),
-        new DefineOption("ADMOB_TEST", "Google test ad unit id"),
+        new DefineOption("ADVERSTING_TEST", "Advertising test ad unit id"),
         new DefineOption("ADMOB_UMP", "UMP consent flow"),
         new DefineOption("USE_ADMOB_CUSTOM_PLUGIN", "Native ads/JKit plugin"),
         new DefineOption("APPFLYER", "AppsFlyer SDK"),

@@ -13,6 +13,7 @@ namespace Dann.GameFoundation
         [SerializeField] private string androidAdUnitId;
         [SerializeField] private string iosAdUnitId;
         [SerializeField] private string editorAdUnitId;
+        [SerializeField] private string testAdUnitId;
         [SerializeField] protected int retryAttempt = 0;
 
         public string ProviderName => string.IsNullOrEmpty(providerName) ? GetType().Name : providerName;
@@ -25,6 +26,9 @@ namespace Dann.GameFoundation
         {
             get
             {
+#if ADVERSTING_TEST
+                return testAdUnitId;
+#endif
 #if UNITY_IOS
                 return iosAdUnitId;
 #elif UNITY_ANDROID

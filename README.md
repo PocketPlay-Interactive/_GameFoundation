@@ -403,7 +403,7 @@ Trên object có script `Manager`:
 | --- | --- | --- | --- |
 | Firebase Analytics | `Analytics` | `AnalyticsService` + `FirebaseAnalyticsProvider` prefab | `FIREBASE` |
 | AdMob | `Advertising` | `AdvertisingService`, ad controllers, `Admob*AdvertisingProvider` prefab | `ADMOB` |
-| AdMob test id | `Advertising` | `AdvertisingService` + AdMob provider prefab | `ADMOB;ADMOB_TEST` |
+| Ad test id | `Advertising` | `AdvertisingService` + provider prefab | `ADVERSTING_TEST` |
 | Native ads/JKit | `Advertising` | `AdvertisingService`, `NativeAdvertisingController`, custom provider prefab | `ADMOB;USE_ADMOB_CUSTOM_PLUGIN` |
 | Omni UMP consent flow | Bật qua `Manager` | SDK/script `UMP` phải tồn tại trong project | `ADMOB;ADMOB_UMP` |
 | AppsFlyer | `Analytics` | `AnalyticsService` + `AppflyerAnalyticsProvider` prefab | `APPFLYER` |
@@ -676,7 +676,7 @@ Nếu muốn chỉnh tay, vào `Project Settings > Player > Other Settings > Scr
 | --- | --- |
 | `FIREBASE` | Đã import Firebase Unity SDK. |
 | `ADMOB` | Đã import Google Mobile Ads SDK. |
-| `ADMOB_TEST` | Muốn dùng test ad unit id của Google. |
+| `ADVERSTING_TEST` | Muốn dùng test ad unit id của provider. |
 | `ADMOB_UMP` | Đã import flow UMP có API `UMP`. |
 | `USE_ADMOB_CUSTOM_PLUGIN` | Đã import plugin native ads/JKit. |
 | `APPFLYER` | Đã import AppsFlyer SDK. |
