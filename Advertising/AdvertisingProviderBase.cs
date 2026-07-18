@@ -1,4 +1,7 @@
 using System;
+#if ADMOB
+using GoogleMobileAds.Api;
+#endif
 using UnityEngine;
 
 namespace Dann.GameFoundation
@@ -42,5 +45,35 @@ namespace Dann.GameFoundation
         public abstract void Show(AdvertisingAdType adType, Action<bool> completed);
 
         public abstract void Hide(AdvertisingAdType adType);
+
+#if ADMOB
+        protected void TrackAdmobPaidAdImpression(AdvertisingAdType adType, AdValue adValue, ResponseInfo responseInfo)
+        {
+            AdapterResponseInfo adapter = responseInfo?.GetLoadedAdapterResponseInfo();
+            AnalyticsBinder.TrackPaidAdImpression(
+                "admob",
+                AdUnitId,
+                adapter?.AdSourceName,
+                adapter?.AdSourceInstanceId,
+                ToAnalyticsAdType(adType),
+                adValue.Value / 1_000_000d,
+                adValue.CurrencyCode);
+        }
+#endif
+
+        private static string ToAnalyticsAdType(AdvertisingAdType adType)
+        {
+            return adType switch
+            {
+                AdvertisingAdType.Native => "native",
+                AdvertisingAdType.Banner => "banner",
+                AdvertisingAdType.Interstitial => "interstitial",
+                AdvertisingAdType.RewardedVideo => "rewarded",
+                AdvertisingAdType.RewardedInterstitial => "rewarded",
+                AdvertisingAdType.MREC => "mrec",
+                AdvertisingAdType.AppOpen => "app_open",
+                _ => adType.ToString().ToLowerInvariant(),
+            };
+        }
     }
 }

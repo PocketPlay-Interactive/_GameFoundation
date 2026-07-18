@@ -47,11 +47,7 @@ namespace Dann.GameFoundation
 
                 rewardedInterstitialAd.OnAdPaid += (AdValue adValue) =>
                 {
-                    AnalyticsService.Get().TrackRevenue("paid_ads_rewarded_interstitial",
-                                                        "rewarded_interstitial",
-                                                        "admob",
-                                                        adValue.CurrencyCode.ToString(),
-                                                        (adValue.Value / 1000000.0));
+                    TrackAdmobPaidAdImpression(adType, adValue, rewardedInterstitialAd.GetResponseInfo());
                 };
                 rewardedInterstitialAd.OnAdFullScreenContentClosed += () => onRewardedInterstitialClosed?.Invoke(rewardEarned);
                 rewardedInterstitialAd.OnAdFullScreenContentFailed += (AdError error) => onRewardedInterstitialClosed?.Invoke(false);

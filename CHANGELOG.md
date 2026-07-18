@@ -4,6 +4,18 @@ All notable changes to this package are documented in this file.
 
 ## [Unreleased]
 
+## [1.0.18] - 2026-07-18
+
+### Added
+
+- Added `AnalyticsBinder` support for `paid_ad_impression_value` events with game-provided level and placement context.
+- Added AdMob paid impression tracking from official `OnAdPaid` callbacks across banner, MREC, native, interstitial, rewarded, rewarded interstitial, and app open providers.
+- Added paid ad impression integration notes under `Documentation/paid-ad-impression-value.md`.
+
+### Changed
+
+- Changed `AnalyticsService` provider setup from prefab instantiation to directly referenced provider objects.
+
 ## [1.0.17] - 2026-07-16
 
 ### Added

@@ -48,11 +48,7 @@ namespace Dann.GameFoundation
             };
             bannerView.OnAdPaid += (AdValue adValue) =>
             {
-                AnalyticsService.Get().TrackRevenue("paid_ads_banner",
-                                                    "banner",
-                                                    "admob",
-                                                    adValue.CurrencyCode.ToString(),
-                                                    (adValue.Value / 1000000.0));
+                TrackAdmobPaidAdImpression(adType, adValue, bannerView.GetResponseInfo());
             };
             bannerView.LoadAd(new AdRequest());
 #else

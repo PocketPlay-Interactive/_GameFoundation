@@ -46,11 +46,7 @@ namespace Dann.GameFoundation
 
                 appOpenAd.OnAdPaid += (AdValue adValue) =>
                 {
-                    AnalyticsService.Get().TrackRevenue("paid_ads_open",
-                                                        "ads_open",
-                                                        "admob",
-                                                        adValue.CurrencyCode.ToString(),
-                                                        (adValue.Value / 1000000.0));
+                    TrackAdmobPaidAdImpression(adType, adValue, appOpenAd.GetResponseInfo());
                 };
                 appOpenAd.OnAdFullScreenContentClosed += () => onAppOpenClosed?.Invoke(true);
                 appOpenAd.OnAdFullScreenContentFailed += (AdError error) => onAppOpenClosed?.Invoke(false);

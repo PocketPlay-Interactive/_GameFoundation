@@ -49,11 +49,7 @@ namespace Dann.GameFoundation
                 nativeOverlayAd.PlacementId = placementId;
                 nativeOverlayAd.OnAdPaid += (AdValue adValue) =>
                 {
-                    AnalyticsService.Get().TrackRevenue("paid_ads_native",
-                                                        "native",
-                                                        "admob",
-                                                        adValue.CurrencyCode.ToString(),
-                                                        (adValue.Value / 1000000.0));
+                    TrackAdmobPaidAdImpression(adType, adValue, nativeOverlayAd.GetResponseInfo());
                 };
 
                 completed?.Invoke(AdvertisingAdState.Ready);

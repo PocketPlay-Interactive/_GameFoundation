@@ -51,11 +51,7 @@ namespace Dann.GameFoundation
 
                 _rewardedAd.OnAdPaid += (AdValue adValue) =>
                 {
-                    AnalyticsService.Get().TrackRevenue("paid_ads_reward",
-                                                        "ads_reward",
-                                                        "admob",
-                                                        adValue.CurrencyCode.ToString(),
-                                                        (adValue.Value / 1000000.0));
+                    TrackAdmobPaidAdImpression(adType, adValue, _rewardedAd.GetResponseInfo());
                 };
 
                 _rewardedAd.OnAdFullScreenContentClosed += () =>
