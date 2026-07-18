@@ -17,10 +17,12 @@ namespace Dann.GameFoundation
         private const string PaidAdImpressionEventName = "paid_ad_impression_value";
         private static Func<PaidAdImpressionContext> paidAdImpressionContextProvider;
         private static PaidAdImpressionContext paidAdImpressionContext;
+        private static bool hasPaidAdImpressionContext;
 
         public static void SetPaidAdImpressionContextProvider(Func<PaidAdImpressionContext> provider)
         {
             paidAdImpressionContextProvider = provider;
+            hasPaidAdImpressionContext = provider != null;
         }
 
         public static void SetPaidAdImpressionContext(string levelId, string where, string levelType, string levelPattern)
@@ -33,6 +35,7 @@ namespace Dann.GameFoundation
                 LevelPattern = levelPattern,
             };
 
+            hasPaidAdImpressionContext = true;
             paidAdImpressionContextProvider = () => paidAdImpressionContext;
         }
 
@@ -56,6 +59,9 @@ namespace Dann.GameFoundation
                 Debug.LogWarning("Paid ad impression data is invalid.");
                 return;
             }
+
+            if (paidAdImpressionContextProvider == null && !hasPaidAdImpressionContext)
+                Debug.LogError("Paid ad impression context is not set. Call AnalyticsBinder.SetPaidAdImpressionContext before showing ads.");
 
             PaidAdImpressionContext context = paidAdImpressionContextProvider?.Invoke() ?? default;
             AnalyticsService.Get().TrackEvent(PaidAdImpressionEventName, new Dictionary<string, object>
