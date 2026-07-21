@@ -18,6 +18,9 @@ public class InappPurchase : GenericSingleton<InappPurchase>
     private StoreController storeController;
     private string currentProductId;
     private Action<bool> OnPurchaseComplete;
+    private bool isInitializing;
+    private bool isInitialized;
+    private bool storeEventsRegistered;
 #endif
 
     private bool logDebug = true;
@@ -26,38 +29,64 @@ public class InappPurchase : GenericSingleton<InappPurchase>
     public async void InitializePurchasing()
     {
 #if IAPPURCHASE_ENABLE
-        ProductList = ResourceHandle.Get().LoadData<InappProductList>("InappProductList");
-        storeController = UnityIAPServices.StoreController();
+        if (isInitialized || isInitializing)
+        {
+            Log("[InappPurchase] InitializePurchasing skipped. Already initialized or initializing.");
+            return;
+        }
 
-        // Đăng ký event handler trước khi connect
-        storeController.OnProductsFetched += OnProductsFetched;
-        storeController.OnPurchasesFetched += OnPurchasesFetched;
-        storeController.OnPurchasePending += OnPurchasePending;
-        storeController.OnPurchaseFailed += OnPurchaseFailed;
-        storeController.OnPurchaseConfirmed += OnPurchaseConfirmed;
-
-        await storeController.Connect();
-
-        var productDefs = Products.Select(p => new ProductDefinition(p.ProductId, p.Type)).ToList();
-        storeController.FetchProducts(productDefs);
+        isInitializing = true;
+        try
+        {
+            ProductList = ProductList ?? ResourceHandle.Get().LoadData<InappProductList>("InappProductList");
+            storeController = storeController ?? UnityIAPServices.StoreController();
+            RegisterStoreEvents();
+            await storeController.Connect();
+            isInitializing = false;
+            isInitialized = true;
+            var productDefs = Products.Select(p => new ProductDefinition(p.ProductId, p.Type)).ToList();
+            storeController.FetchProducts(productDefs);
+        }
+        catch (Exception exception)
+        {
+            isInitializing = false;
+            isInitialized = false;
+            Log("[InappPurchase] Initialization failed: " + exception.Message);
+        }
 #endif
         Log("[InappPurchase] InitializePurchasing called");
     }
 
 #if IAPPURCHASE_ENABLE
+    private void RegisterStoreEvents()
+    {
+        if (storeEventsRegistered) return;
+
+        storeController.OnProductsFetched -= OnProductsFetched;
+        storeController.OnPurchasesFetched -= OnPurchasesFetched;
+        storeController.OnPurchasePending -= OnPurchasePending;
+        storeController.OnPurchaseFailed -= OnPurchaseFailed;
+        storeController.OnPurchaseConfirmed -= OnPurchaseConfirmed;
+
+        storeController.OnProductsFetched += OnProductsFetched;
+        storeController.OnPurchasesFetched += OnPurchasesFetched;
+        storeController.OnPurchasePending += OnPurchasePending;
+        storeController.OnPurchaseFailed += OnPurchaseFailed;
+        storeController.OnPurchaseConfirmed += OnPurchaseConfirmed;
+        storeEventsRegistered = true;
+    }
+
     private void OnProductsFetched(List<Product> products)
     {
         var storeProducts = products?
             .Where(product => product?.definition != null)
             .ToList() ?? new List<Product>();
 
+        isInitializing = false;
+        isInitialized = true;
         Log($"[InappPurchase] Store products ready: {storeProducts.Count}/{Products.Count}");
         foreach (var product in storeProducts)
             Log($"[InappPurchase] Store product: {product.definition.id} | {product.definition.type} | {product.metadata?.localizedPriceString}");
-#if !UNITY_EDITOR
-        if (storeProducts.Count > 0)
-            RuntimeStorageData.PLAYER.RemoveProductsExcept(storeProducts.Select(product => product.definition.id));
-#endif
 
         storeController.FetchPurchases();
     }
@@ -71,12 +100,18 @@ public class InappPurchase : GenericSingleton<InappPurchase>
         Log("[InappPurchase] Purchases fetched: " + orders.ConfirmedOrders.Count);
         foreach (var order in orders.ConfirmedOrders)
         {
-            var product = order.CartOrdered.Items().FirstOrDefault()?.Product;
-            if (product == null) continue;
+            foreach (var item in order.CartOrdered.Items())
+            {
+                var product = item?.Product;
+                if (!IsRestorableNonConsumable(product)) continue;
 
-            Debug.Log($"[InappPurchase] Confirmed purchase found: {product.definition.id}");
-            RuntimeStorageData.PLAYER.AddProduct(product.definition.id);
-            EventBus.Publish(new PurchaseCompletedEvent { ProductId = product.definition.id });
+                var productId = product.definition.id;
+                Debug.Log($"[InappPurchase] Restorable purchase found: {productId}");
+                if (RuntimeStorageData.PLAYER.HasProduct(productId)) continue;
+
+                RuntimeStorageData.PLAYER.AddProduct(productId);
+                EventBus.Publish(new PurchaseCompletedEvent { ProductId = productId });
+            }
         }
 
         RuntimeStorageData.PLAYER.LogAllProducts();
@@ -98,14 +133,32 @@ public class InappPurchase : GenericSingleton<InappPurchase>
         if (product == null) return;
 
         Debug.Log($"[InappPurchase] Confirmed purchase: {product.definition.id}");
-
-        OnPurchaseComplete?.Invoke(true);
+        if (product.definition.id == currentProductId)
+            CompleteCurrentPurchase(true);
     }
     
     private void OnPurchaseFailed(FailedOrder order)
     {
         Log("[InappPurchase] Order info: " + order.Details);
-        OnPurchaseComplete?.Invoke(false);
+        CompleteCurrentPurchase(false);
+    }
+
+    private bool IsRestorableNonConsumable(Product product)
+    {
+        if (product?.definition == null || IsBattlePassProduct(product.definition.id)) return false;
+
+        var configuredProduct = Products.FirstOrDefault(item => item.ProductId == product.definition.id);
+        if (configuredProduct == null || configuredProduct.Type != ProductType.NonConsumable) return false;
+
+        return product.definition.type == ProductType.NonConsumable;
+    }
+
+    private void CompleteCurrentPurchase(bool complete)
+    {
+        var callback = OnPurchaseComplete;
+        OnPurchaseComplete = null;
+        currentProductId = null;
+        callback?.Invoke(complete);
     }
 #endif
 
@@ -137,6 +190,9 @@ public class InappPurchase : GenericSingleton<InappPurchase>
     private string GetLocalPrice(string productId) =>
         Products.FirstOrDefault(p => p.ProductId == productId)?.ProductPrice ?? "";
 
+    private bool IsBattlePassProduct(string productId) =>
+        Products.FirstOrDefault(item => item.ProductId == productId)?.BattlePass != BattlePassType.None;
+
     private bool throttleClick()
     {
         int now = UtilsTimerHelper.CurrentTimeInSeconds();
@@ -157,8 +213,34 @@ public class InappPurchase : GenericSingleton<InappPurchase>
         }
 
 #if IAPPURCHASE_ENABLE
-        if (throttleClick()) return;
+        if (throttleClick())
+        {
+            onComplete?.Invoke(false);
+            return;
+        }
+
+        if (OnPurchaseComplete != null)
+        {
+            onComplete?.Invoke(false);
+            return;
+        }
+
         Log($"[InappPurchase] Buy IAP: {productId}");
+        if (storeController == null || !isInitialized)
+        {
+            Log("[InappPurchase] Purchase failed. Store not initialized.");
+            onComplete?.Invoke(false);
+            return;
+        }
+
+        var product = storeController.GetProductById(productId);
+        if (product == null)
+        {
+            Log($"[InappPurchase] Product not found: {productId}");
+            onComplete?.Invoke(false);
+            return;
+        }
+
         currentProductId = productId;
         OnPurchaseComplete = complete =>
         {
@@ -168,38 +250,29 @@ public class InappPurchase : GenericSingleton<InappPurchase>
                 Log($"[InappPurchase] Purchase failed for product ID: {productId}");
                 return;
             }
+
+            if (IsBattlePassProduct(productId)) return;
+
             RuntimeStorageData.PLAYER.AddProduct(productId);
             EventBus.Publish(new PurchaseCompletedEvent { ProductId = productId });
         };
 
-// #if UNITY_EDITOR
-//         // Simulate purchase success in editor
-//         Debug.Log($"[InappPurchase] Simulating purchase for product ID: {productId}");
-//         OnPurchaseComplete?.Invoke(true);
-//         return;
-// #endif
-        
-        if (storeController != null)
+        try
         {
-            var product = storeController.GetProductById(productId);
-            if (product != null)
-            {
-                storeController.PurchaseProduct(product);
-                Log($"[InappPurchase] Purchasing: {productId}");
-            }
-            else
-            {
-                Log($"[InappPurchase] Product not found: {productId}");
-            }
+            storeController.PurchaseProduct(product);
+            Log($"[InappPurchase] Purchasing: {productId}");
         }
-        else
+        catch (Exception exception)
         {
-            Log("[InappPurchase] Not initialized, initializing now...");
-            InitializePurchasing();
+            Log("[InappPurchase] Purchase failed: " + exception.Message);
+            CompleteCurrentPurchase(false);
         }
 #else
-        RuntimeStorageData.PLAYER.AddProduct(productId);
-        EventBus.Publish(new PurchaseCompletedEvent { ProductId = productId });
+        if (!IsBattlePassProduct(productId))
+        {
+            RuntimeStorageData.PLAYER.AddProduct(productId);
+            EventBus.Publish(new PurchaseCompletedEvent { ProductId = productId });
+        }
         onComplete?.Invoke(true);
 #endif
     }
@@ -229,7 +302,15 @@ public class InappProduct
     public string ProductId;
     public string ProductName;
     public string ProductPrice;
+    public BattlePassType BattlePass = BattlePassType.None;
 #if IAPPURCHASE_ENABLE
     public UnityEngine.Purchasing.ProductType Type;
 #endif
+}
+
+public enum BattlePassType
+{
+    None,
+    Weekly,
+    Monthly
 }
