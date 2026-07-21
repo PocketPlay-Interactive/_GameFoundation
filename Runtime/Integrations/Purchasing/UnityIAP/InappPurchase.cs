@@ -191,7 +191,7 @@ public class InappPurchase : GenericSingleton<InappPurchase>
         Products.FirstOrDefault(p => p.ProductId == productId)?.ProductPrice ?? "";
 
     private bool IsBattlePassProduct(string productId) =>
-        Products.FirstOrDefault(item => item.ProductId == productId)?.BattlePass != BattlePassType.None;
+        Products.FirstOrDefault(item => item.ProductId == productId)?.Subscription != SubscriptionType.None;
 
     private bool throttleClick()
     {
@@ -302,13 +302,13 @@ public class InappProduct
     public string ProductId;
     public string ProductName;
     public string ProductPrice;
-    public BattlePassType BattlePass = BattlePassType.None;
+    public SubscriptionType Subscription = SubscriptionType.None;
 #if IAPPURCHASE_ENABLE
     public UnityEngine.Purchasing.ProductType Type;
 #endif
 }
 
-public enum BattlePassType
+public enum SubscriptionType
 {
     None,
     Weekly,
