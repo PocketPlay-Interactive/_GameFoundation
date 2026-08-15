@@ -9,6 +9,7 @@
   "changelogUrl": "https://github.com/PocketPlay-Interactive/_GameFoundation/blob/main/CHANGELOG.md",
   "licensesUrl": "https://github.com/PocketPlay-Interactive/_GameFoundation/blob/main/LICENSE.md",
   "dependencies": {
+    "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
     "com.unity.inputsystem": "1.7.0",
     "com.unity.nuget.newtonsoft-json": "3.2.1",
     "com.unity.modules.animation": "1.0.0",

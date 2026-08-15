@@ -1,6 +1,6 @@
 # Samples
 
-Samples are kept under `Samples` so they are visible after installing the package.
+Source samples are kept under `Samples`. Binary package builds copy their README files and code into `Documentation/Samples`; code uses `.cs.txt` so Unity cannot compile it.
 
 ## EditorCools
 
