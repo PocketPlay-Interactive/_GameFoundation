@@ -42,7 +42,11 @@ namespace Dann.GameFoundation
         [Header("Promise Advertising")]
         [SerializeField] private AdvertisingAdController PromiseAdvertising;
 
+        [Header("Startup Promise Advertising")]
+        [SerializeField] private bool skipPromiseAdvertisingOnFirstLaunch = false;
+
         private const float UpdateInterval = 1f;
+        private const string StartupPromiseSkippedKey = "ads.startup_promise_skipped_v1";
         private readonly Dictionary<AdvertisingAdType, AdvertisingAdController> adsByType = new();
         private float nextUpdateTime;
 
@@ -79,12 +83,31 @@ namespace Dann.GameFoundation
             InitializeProviders();
             LoadAllAds();
 
+            if (skipPromiseAdvertisingOnFirstLaunch && !PlayerPrefs.HasKey(StartupPromiseSkippedKey))
+            {
+                PlayerPrefs.SetInt(StartupPromiseSkippedKey, 1);
+                PlayerPrefs.Save();
+                IsInitialized = true;
+                Manager.Get().FinalizeAdSequence();
+                return;
+            }
+
             PromiseAdvertisingOnStartup(
                 shown => {
                     IsInitialized = true;
                     Manager.Get().FinalizeAdSequence();
                 },
-                () => IsInitialized = true).Forget();
+                () => {
+                    IsInitialized = true;
+                    Manager.Get().FinalizeAdSequence();
+                }).Forget();
+        }
+
+        [ContextMenu("Reset Promise Advertising Startup State")]
+        private void ResetPromiseAdvertisingStartupState()
+        {
+            PlayerPrefs.DeleteKey(StartupPromiseSkippedKey);
+            PlayerPrefs.Save();
         }
 
         private void LoadAllAds()
