@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Dann.GameFoundation
+namespace Dann.GameFoundation.Patterns
 {
     public class ObjectPool<T> where T : Component
     {
