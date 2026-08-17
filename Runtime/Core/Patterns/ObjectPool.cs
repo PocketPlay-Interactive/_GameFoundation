@@ -1,31 +1,34 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ObjectPool<T> where T : Component
+namespace Dann.GameFoundation
 {
-    private readonly T prefab;
-    private readonly Queue<T> pool = new();
-
-    public ObjectPool(T prefab, int initialSize = 10)
+    public class ObjectPool<T> where T : Component
     {
-        this.prefab = prefab;
-        for (int i = 0; i < initialSize; i++)
-            pool.Enqueue(Object.Instantiate(prefab));
-    }
+        private readonly T prefab;
+        private readonly Queue<T> pool = new();
 
-    public T Get()
-    {
-        if (pool.Count == 0)
-            pool.Enqueue(Object.Instantiate(prefab));
-        var obj = pool.Dequeue();
-        obj.gameObject.Show();
-        return obj;
-    }
+        public ObjectPool(T prefab, int initialSize = 10)
+        {
+            this.prefab = prefab;
+            for (int i = 0; i < initialSize; i++)
+                pool.Enqueue(Object.Instantiate(prefab));
+        }
 
-    public void Release(T obj)
-    {
-        obj.gameObject.Hide();
-        pool.Enqueue(obj);
+        public T Get()
+        {
+            if (pool.Count == 0)
+                pool.Enqueue(Object.Instantiate(prefab));
+            var obj = pool.Dequeue();
+            obj.gameObject.Show();
+            return obj;
+        }
+
+        public void Release(T obj)
+        {
+            obj.gameObject.Hide();
+            pool.Enqueue(obj);
+        }
     }
 }
 
