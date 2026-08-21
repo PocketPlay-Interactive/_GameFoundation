@@ -276,9 +276,9 @@ public sealed class CustomBuildMenu : EditorWindow
         appleAutomaticSigning = PlayerSettings.iOS.appleEnableAutomaticSigning;
     }
 
-    private bool ApplySettings(bool showSuccessDialog)
+    private bool ApplySettings(bool showSuccessDialog, BuildTarget? target = null)
     {
-        if (!ValidateSettings(out string validationError))
+        if (!ValidateSettings(target, out string validationError))
         {
             EditorUtility.DisplayDialog("Settings chưa hợp lệ", validationError, "OK");
             return false;
@@ -288,20 +288,28 @@ public sealed class CustomBuildMenu : EditorWindow
         PlayerSettings.productName = productName.Trim();
         PlayerSettings.bundleVersion = version.Trim();
 
-        PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, androidApplicationId.Trim());
-        PlayerSettings.Android.bundleVersionCode = androidVersionCode;
-        PlayerSettings.Android.minSdkVersion = androidMinSdkVersion;
-        PlayerSettings.Android.targetSdkVersion = androidTargetSdkVersion;
-        PlayerSettings.Android.targetArchitectures = androidArchitectures;
-        EditorUserBuildSettings.buildAppBundle = buildAppBundle;
-        ApplyAndroidSigning();
-        SaveSigningPreferences();
+        bool applyAndroid = !target.HasValue || target.Value == BuildTarget.Android;
+        bool applyIos = !target.HasValue || target.Value == BuildTarget.iOS;
+        if (applyAndroid)
+        {
+            PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, androidApplicationId.Trim());
+            PlayerSettings.Android.bundleVersionCode = androidVersionCode;
+            PlayerSettings.Android.minSdkVersion = androidMinSdkVersion;
+            PlayerSettings.Android.targetSdkVersion = androidTargetSdkVersion;
+            PlayerSettings.Android.targetArchitectures = androidArchitectures;
+            EditorUserBuildSettings.buildAppBundle = buildAppBundle;
+            ApplyAndroidSigning();
+            SaveSigningPreferences();
+        }
 
-        PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.iOS, iosApplicationId.Trim());
-        PlayerSettings.iOS.buildNumber = iosBuildNumber.Trim();
-        PlayerSettings.iOS.targetOSVersionString = iosMinimumVersion.Trim();
-        PlayerSettings.iOS.appleDeveloperTeamID = appleDeveloperTeamId.Trim();
-        PlayerSettings.iOS.appleEnableAutomaticSigning = appleAutomaticSigning;
+        if (applyIos)
+        {
+            PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.iOS, iosApplicationId.Trim());
+            PlayerSettings.iOS.buildNumber = iosBuildNumber.Trim();
+            PlayerSettings.iOS.targetOSVersionString = iosMinimumVersion.Trim();
+            PlayerSettings.iOS.appleDeveloperTeamID = appleDeveloperTeamId.Trim();
+            PlayerSettings.iOS.appleEnableAutomaticSigning = appleAutomaticSigning;
+        }
 
         AssetDatabase.SaveAssets();
 
@@ -352,8 +360,11 @@ public sealed class CustomBuildMenu : EditorWindow
         EditorPrefs.SetString(SigningPrefsPrefix + "KeyAliasPassword", keyAliasPassword ?? string.Empty);
     }
 
-    private bool ValidateSettings(out string error)
+    private bool ValidateSettings(BuildTarget? target, out string error)
     {
+        bool validateAndroid = !target.HasValue || target.Value == BuildTarget.Android;
+        bool validateIos = !target.HasValue || target.Value == BuildTarget.iOS;
+
         if (string.IsNullOrWhiteSpace(companyName) || string.IsNullOrWhiteSpace(productName))
         {
             error = "Company Name và Product Name không được để trống.";
@@ -366,43 +377,44 @@ public sealed class CustomBuildMenu : EditorWindow
             return false;
         }
 
-        if (!IsValidApplicationId(androidApplicationId) || !IsValidApplicationId(iosApplicationId))
+        if ((validateAndroid && !IsValidApplicationId(androidApplicationId)) ||
+            (validateIos && !IsValidApplicationId(iosApplicationId)))
         {
             error = "Application ID / Bundle Identifier phải có ít nhất hai phần, chỉ dùng chữ, số, dấu chấm hoặc dấu gạch dưới; mỗi phần phải bắt đầu bằng chữ.";
             return false;
         }
 
-        if (androidVersionCode < 1)
+        if (validateAndroid && androidVersionCode < 1)
         {
             error = "Android Version Code phải lớn hơn hoặc bằng 1.";
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(iosBuildNumber))
+        if (validateIos && string.IsNullOrWhiteSpace(iosBuildNumber))
         {
             error = "iOS Build Number không được để trống.";
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(iosMinimumVersion))
+        if (validateIos && string.IsNullOrWhiteSpace(iosMinimumVersion))
         {
             error = "Minimum iOS Version không được để trống.";
             return false;
         }
 
-        if ((androidArchitectures & AndroidArchitecture.ARM64) == 0)
+        if (validateAndroid && (androidArchitectures & AndroidArchitecture.ARM64) == 0)
         {
             error = "Target Architectures phải có ARM64 để phát hành trên Google Play.";
             return false;
         }
 
-        if (!string.IsNullOrWhiteSpace(keystorePath) && !File.Exists(keystorePath))
+        if (validateAndroid && !string.IsNullOrWhiteSpace(keystorePath) && !File.Exists(keystorePath))
         {
             error = "Không tìm thấy file Android Keystore đã chọn.";
             return false;
         }
 
-        if (!string.IsNullOrWhiteSpace(keystorePath) && string.IsNullOrWhiteSpace(keyAlias))
+        if (validateAndroid && !string.IsNullOrWhiteSpace(keystorePath) && string.IsNullOrWhiteSpace(keyAlias))
         {
             error = "Key Alias không được để trống khi dùng custom keystore.";
             return false;
@@ -435,7 +447,7 @@ public sealed class CustomBuildMenu : EditorWindow
 
     private void BuildAndroid(bool buildAndRun)
     {
-        if (!ApplySettings(false) || !TryGetEnabledScenes(out string[] scenes))
+        if (!ApplySettings(false, BuildTarget.Android) || !TryGetEnabledScenes(out string[] scenes))
         {
             return;
         }
@@ -462,7 +474,7 @@ public sealed class CustomBuildMenu : EditorWindow
 
     private void BuildIos(bool buildAndRun)
     {
-        if (!ApplySettings(false) || !TryGetEnabledScenes(out string[] scenes))
+        if (!ApplySettings(false, BuildTarget.iOS) || !TryGetEnabledScenes(out string[] scenes))
         {
             return;
         }

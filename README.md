@@ -300,10 +300,13 @@ Có thể thêm trực tiếp vào `Packages/manifest.json`:
 ```json
 {
   "dependencies": {
-    "com.dann.gamefoundation": "git+ssh://git@github.com/PocketPlay-Interactive/_GameFoundation.git#v1.0.0"
+    "com.dann.gamefoundation": "git+ssh://git@github.com/PocketPlay-Interactive/_GameFoundation.git#v1.0.22",
+    "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask"
   }
 }
 ```
+
+`UniTask` is intentionally a direct project dependency. Unity does not accept a Git URL as a dependency value inside a package's own `package.json`.
 
 SSH là cách khuyến nghị cho repository private. Nếu máy đã cấu hình Git credential cho GitHub HTTPS, có thể dùng:
 
