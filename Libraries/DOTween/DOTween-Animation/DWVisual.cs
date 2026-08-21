@@ -20,7 +20,7 @@ public enum DWPopupEffect
 
 public static class DWVisual
 {
-    public static void PlayPopupEffect(GameObject popup, DWPopupEffect effect, float duration = 0.5f, bool outParent = false, System.Action onComplete = null)
+    public static void PlayPopupEffect(GameObject popup, DWPopupEffect effect, float duration = 0.5f, bool outParent = false, System.Action onComplete = null, bool useUnscaledTime = false)
     {
         var rect = popup.transform as RectTransform;
         Tween tween = null;
@@ -96,7 +96,7 @@ public static class DWVisual
                 cg.blocksRaycasts = false;
                 cg.interactable = false;
                 rect.localScale = Vector3.one * 0.8f;
-                cg.DOFade(1f, duration).SetEase(Ease.OutBack);
+                cg.DOFade(1f, duration).SetEase(Ease.OutBack).SetUpdate(useUnscaledTime);
                 tween = rect.DOScale(Vector3.one, duration)
                     .SetEase(Ease.OutBack)
                     .OnComplete(() => {
@@ -127,7 +127,11 @@ public static class DWVisual
             }
         }
 
-        if (tween != null && effect != DWPopupEffect.FadeInScaleOutParent)
-            tween.OnComplete(() => onComplete?.Invoke());
+        if (tween != null)
+        {
+            tween.SetUpdate(useUnscaledTime);
+            if (effect != DWPopupEffect.FadeInScaleOutParent)
+                tween.OnComplete(() => onComplete?.Invoke());
+        }
     }
 }
