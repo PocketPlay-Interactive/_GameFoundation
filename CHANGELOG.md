@@ -8,6 +8,12 @@ All notable changes to this package are documented in this file.
 
 - Removed the invalid Git URL from `package.json` dependency metadata. Unity UPM accepts semantic versions there; UniTask must be installed as a direct project Git dependency.
 
+## [1.0.23] - 2026-08-24
+
+### Fixed
+
+- Hardened advertising lifecycle synchronization for Unity main-thread execution, fullscreen ad serialization, delayed UI/game restoration, and stale AdMob callbacks.
+
 ## [1.0.18] - 2026-07-18
 
 ### Added
