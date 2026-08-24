@@ -45,11 +45,13 @@ namespace Dann.GameFoundation
                 }
 
                 nativeOverlayAd = ad;
-                nativeOverlayAd.SetTemplatePosition(position);
-                nativeOverlayAd.PlacementId = placementId;
-                nativeOverlayAd.OnAdPaid += (AdValue adValue) =>
+                NativeOverlayAd loadedAd = ad;
+                loadedAd.SetTemplatePosition(position);
+                loadedAd.PlacementId = placementId;
+                loadedAd.OnAdPaid += (AdValue adValue) =>
                 {
-                    TrackAdmobPaidAdImpression(adType, adValue, nativeOverlayAd.GetResponseInfo());
+                    if (ReferenceEquals(nativeOverlayAd, loadedAd))
+                        TrackAdmobPaidAdImpression(adType, adValue, loadedAd.GetResponseInfo());
                 };
 
                 completed?.Invoke(AdvertisingAdState.Ready);
@@ -64,8 +66,14 @@ namespace Dann.GameFoundation
         {
 #if ADMOB
             Debug.Log($"Show Advertising Provide {this.name} - {this.AdUnitId}");
-            nativeOverlayAd?.Show();
-            completed?.Invoke(nativeOverlayAd != null);
+            if (nativeOverlayAd == null)
+            {
+                completed?.Invoke(false);
+                return;
+            }
+
+            nativeOverlayAd.Show();
+            completed?.Invoke(true);
 #else
             completed?.Invoke(false);
 #endif

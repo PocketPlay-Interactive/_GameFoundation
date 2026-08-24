@@ -13,6 +13,7 @@ namespace Dann.GameFoundation
 #endif
         private Action<bool> onRewardedInterstitialClosed;
         private bool rewardEarned;
+        private bool showCompletionSent;
 
         public override void Initialize()
         {
@@ -42,15 +43,33 @@ namespace Dann.GameFoundation
                 }
 
                 rewardedInterstitialAd = ad;
+                RewardedInterstitialAd loadedAd = ad;
                 completed?.Invoke(AdvertisingAdState.Ready);
                 retryAttempt = 0;
 
-                rewardedInterstitialAd.OnAdPaid += (AdValue adValue) =>
+                loadedAd.OnAdPaid += (AdValue adValue) =>
                 {
-                    TrackAdmobPaidAdImpression(adType, adValue, rewardedInterstitialAd.GetResponseInfo());
+                    if (ReferenceEquals(rewardedInterstitialAd, loadedAd))
+                        TrackAdmobPaidAdImpression(adType, adValue, loadedAd.GetResponseInfo());
                 };
-                rewardedInterstitialAd.OnAdFullScreenContentClosed += () => onRewardedInterstitialClosed?.Invoke(rewardEarned);
-                rewardedInterstitialAd.OnAdFullScreenContentFailed += (AdError error) => onRewardedInterstitialClosed?.Invoke(false);
+                loadedAd.OnAdFullScreenContentClosed += () =>
+                {
+                    if (!ReferenceEquals(rewardedInterstitialAd, loadedAd))
+                        return;
+
+                    rewardedInterstitialAd = null;
+                    loadedAd.Destroy();
+                    CompleteShow(rewardEarned);
+                };
+                loadedAd.OnAdFullScreenContentFailed += (AdError error) =>
+                {
+                    if (!ReferenceEquals(rewardedInterstitialAd, loadedAd))
+                        return;
+
+                    rewardedInterstitialAd = null;
+                    loadedAd.Destroy();
+                    CompleteShow(false);
+                };
             });
 #else
             completed?.Invoke(AdvertisingAdState.Unavailable);
@@ -69,6 +88,7 @@ namespace Dann.GameFoundation
 
             rewardEarned = false;
             onRewardedInterstitialClosed = completed;
+            showCompletionSent = false;
             rewardedInterstitialAd.Show((Reward reward) =>
             {
                 rewardEarned = true;
@@ -76,6 +96,17 @@ namespace Dann.GameFoundation
 #else
             completed?.Invoke(false);
 #endif
+        }
+
+        private void CompleteShow(bool shown)
+        {
+            if (showCompletionSent)
+                return;
+
+            showCompletionSent = true;
+            Action<bool> completed = onRewardedInterstitialClosed;
+            onRewardedInterstitialClosed = null;
+            completed?.Invoke(shown);
         }
     }
 }

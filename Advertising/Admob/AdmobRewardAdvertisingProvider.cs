@@ -13,6 +13,7 @@ namespace Dann.GameFoundation
 #endif
         private Action<bool> onRewardClosed;
         private bool rewardEarned;
+        private bool showCompletionSent;
 
         public override void Initialize()
         {
@@ -46,22 +47,34 @@ namespace Dann.GameFoundation
                 }
 
                 _rewardedAd = ad;
+                RewardedAd loadedAd = ad;
                 completed?.Invoke(AdvertisingAdState.Ready);
                 retryAttempt = 0;
 
-                _rewardedAd.OnAdPaid += (AdValue adValue) =>
+                loadedAd.OnAdPaid += (AdValue adValue) =>
                 {
-                    TrackAdmobPaidAdImpression(adType, adValue, _rewardedAd.GetResponseInfo());
+                    if (ReferenceEquals(_rewardedAd, loadedAd))
+                        TrackAdmobPaidAdImpression(adType, adValue, loadedAd.GetResponseInfo());
                 };
 
-                _rewardedAd.OnAdFullScreenContentClosed += () =>
+                loadedAd.OnAdFullScreenContentClosed += () =>
                 {
-                    onRewardClosed?.Invoke(rewardEarned);
+                    if (!ReferenceEquals(_rewardedAd, loadedAd))
+                        return;
+
+                    _rewardedAd = null;
+                    loadedAd.Destroy();
+                    CompleteShow(rewardEarned);
                 };
 
-                _rewardedAd.OnAdFullScreenContentFailed += (AdError error) =>
+                loadedAd.OnAdFullScreenContentFailed += (AdError error) =>
                 {
-                    onRewardClosed?.Invoke(false);
+                    if (!ReferenceEquals(_rewardedAd, loadedAd))
+                        return;
+
+                    _rewardedAd = null;
+                    loadedAd.Destroy();
+                    CompleteShow(false);
                 };
             });
 #endif
@@ -79,6 +92,7 @@ namespace Dann.GameFoundation
 
             rewardEarned = false;
             onRewardClosed = completed;
+            showCompletionSent = false;
             _rewardedAd.Show((Reward reward) =>
             {
                 rewardEarned = true;
@@ -86,6 +100,17 @@ namespace Dann.GameFoundation
 #else
             completed?.Invoke(false);
 #endif
+        }
+
+        private void CompleteShow(bool shown)
+        {
+            if (showCompletionSent)
+                return;
+
+            showCompletionSent = true;
+            Action<bool> completed = onRewardClosed;
+            onRewardClosed = null;
+            completed?.Invoke(shown);
         }
     }
 }

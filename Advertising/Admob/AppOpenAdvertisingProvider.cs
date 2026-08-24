@@ -12,6 +12,7 @@ namespace Dann.GameFoundation
         private AppOpenAd appOpenAd;
 #endif
         private Action<bool> onAppOpenClosed;
+        private bool showCompletionSent;
 
         public override void Initialize()
         {
@@ -41,15 +42,33 @@ namespace Dann.GameFoundation
                 }
 
                 appOpenAd = ad;
-                completed?.Invoke(appOpenAd.CanShowAd() ? AdvertisingAdState.Ready : AdvertisingAdState.Unavailable);
+                AppOpenAd loadedAd = ad;
+                completed?.Invoke(loadedAd.CanShowAd() ? AdvertisingAdState.Ready : AdvertisingAdState.Unavailable);
                 retryAttempt = 0;
 
-                appOpenAd.OnAdPaid += (AdValue adValue) =>
+                loadedAd.OnAdPaid += (AdValue adValue) =>
                 {
-                    TrackAdmobPaidAdImpression(adType, adValue, appOpenAd.GetResponseInfo());
+                    if (ReferenceEquals(appOpenAd, loadedAd))
+                        TrackAdmobPaidAdImpression(adType, adValue, loadedAd.GetResponseInfo());
                 };
-                appOpenAd.OnAdFullScreenContentClosed += () => onAppOpenClosed?.Invoke(true);
-                appOpenAd.OnAdFullScreenContentFailed += (AdError error) => onAppOpenClosed?.Invoke(false);
+                loadedAd.OnAdFullScreenContentClosed += () =>
+                {
+                    if (!ReferenceEquals(appOpenAd, loadedAd))
+                        return;
+
+                    appOpenAd = null;
+                    loadedAd.Destroy();
+                    CompleteShow(true);
+                };
+                loadedAd.OnAdFullScreenContentFailed += (AdError error) =>
+                {
+                    if (!ReferenceEquals(appOpenAd, loadedAd))
+                        return;
+
+                    appOpenAd = null;
+                    loadedAd.Destroy();
+                    CompleteShow(false);
+                };
             });
 #else
             completed?.Invoke(AdvertisingAdState.Unavailable);
@@ -67,10 +86,22 @@ namespace Dann.GameFoundation
             }
 
             onAppOpenClosed = completed;
+            showCompletionSent = false;
             appOpenAd.Show();
 #else
             completed?.Invoke(false);
 #endif
+        }
+
+        private void CompleteShow(bool shown)
+        {
+            if (showCompletionSent)
+                return;
+
+            showCompletionSent = true;
+            Action<bool> completed = onAppOpenClosed;
+            onAppOpenClosed = null;
+            completed?.Invoke(shown);
         }
     }
 }

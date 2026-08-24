@@ -12,6 +12,7 @@ namespace Dann.GameFoundation
         private InterstitialAd _interstitialAd;
 #endif
         private Action<bool> onInterstitialClosed;
+        private bool showCompletionSent;
         public override void Initialize()
         {
             base.Initialize();
@@ -44,22 +45,34 @@ namespace Dann.GameFoundation
                 }
 
                 _interstitialAd = ad;
+                InterstitialAd loadedAd = ad;
                 completed?.Invoke(AdvertisingAdState.Ready);
                 retryAttempt = 0;
 
-                _interstitialAd.OnAdPaid += (AdValue adValue) =>
+                loadedAd.OnAdPaid += (AdValue adValue) =>
                 {
-                    TrackAdmobPaidAdImpression(adType, adValue, _interstitialAd.GetResponseInfo());
+                    if (ReferenceEquals(_interstitialAd, loadedAd))
+                        TrackAdmobPaidAdImpression(adType, adValue, loadedAd.GetResponseInfo());
                 };
 
-                _interstitialAd.OnAdFullScreenContentClosed += () =>
+                loadedAd.OnAdFullScreenContentClosed += () =>
                 {
-                    onInterstitialClosed?.Invoke(true);
+                    if (!ReferenceEquals(_interstitialAd, loadedAd))
+                        return;
+
+                    _interstitialAd = null;
+                    loadedAd.Destroy();
+                    CompleteShow(true);
                 };
 
-                _interstitialAd.OnAdFullScreenContentFailed += (AdError error) =>
+                loadedAd.OnAdFullScreenContentFailed += (AdError error) =>
                 {
-                    onInterstitialClosed?.Invoke(false);
+                    if (!ReferenceEquals(_interstitialAd, loadedAd))
+                        return;
+
+                    _interstitialAd = null;
+                    loadedAd.Destroy();
+                    CompleteShow(false);
                 };
             });
 #endif
@@ -69,9 +82,27 @@ namespace Dann.GameFoundation
         {
 #if ADMOB
             Debug.Log($"Show Advertising Provide {this.name} - {this.AdUnitId}");
-            _interstitialAd.Show();
+            if (_interstitialAd == null || !_interstitialAd.CanShowAd())
+            {
+                completed?.Invoke(false);
+                return;
+            }
+
             onInterstitialClosed = completed;
+            showCompletionSent = false;
+            _interstitialAd.Show();
 #endif
+        }
+
+        private void CompleteShow(bool shown)
+        {
+            if (showCompletionSent)
+                return;
+
+            showCompletionSent = true;
+            Action<bool> completed = onInterstitialClosed;
+            onInterstitialClosed = null;
+            completed?.Invoke(shown);
         }
     }
 }

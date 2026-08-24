@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using DG.Tweening;
 using UnityEngine;
 
@@ -16,6 +17,9 @@ namespace Dann.GameFoundation
         private IAdvertisingProvider loadedProvider;
         private int providerIndex;
         private bool isShowing;
+        private int completionQueued;
+        private int mainThreadId = -1;
+        private static AdvertisingAdController activeFullscreenController;
         private static int adPauseDepth;
         private static float previousTimeScale = 1f;
         private static int previousTargetFrameRate = -1;
@@ -73,8 +77,16 @@ namespace Dann.GameFoundation
             set => isShowing = value;
         }
 
+        private void Awake()
+        {
+            mainThreadId = Thread.CurrentThread.ManagedThreadId;
+        }
+
         public virtual void ExecuteUpdate()
         {
+            if (!IsMainThread)
+                return;
+
             if (autoReload && !isShowing && (AdState == AdvertisingAdState.Unavailable || mode == AdvertisingMediationMode.Parallel))
                 Load();
         }
@@ -98,6 +110,14 @@ namespace Dann.GameFoundation
 
         public void InitializeProviders()
         {
+            if (!IsMainThread)
+            {
+                EnqueueOnMainThread(InitializeProviders);
+                return;
+            }
+
+            mainThreadId = Thread.CurrentThread.ManagedThreadId;
+
             foreach (IAdvertisingProvider provider in providers)
             {
                 if (provider == null)
@@ -124,6 +144,12 @@ namespace Dann.GameFoundation
 
         public virtual void Load()
         {
+            if (!IsMainThread)
+            {
+                EnqueueOnMainThread(Load);
+                return;
+            }
+
             if (mode == AdvertisingMediationMode.Parallel)
             {
                 LoadParallel();
@@ -131,6 +157,9 @@ namespace Dann.GameFoundation
             }
 
             if (isShowing || AdState != AdvertisingAdState.Unavailable)
+                return;
+
+            if (activeFullscreenController != null && activeFullscreenController != this)
                 return;
 
             if (providers.Count == 0)
@@ -158,6 +187,12 @@ namespace Dann.GameFoundation
 
         public virtual void Show(Action<bool> completed = null, string providerName = null)
         {
+            if (!IsMainThread)
+            {
+                EnqueueOnMainThread(() => Show(completed, providerName), () => completed?.Invoke(false));
+                return;
+            }
+
             if (mode == AdvertisingMediationMode.Parallel && string.IsNullOrEmpty(providerName))
             {
                 Debug.LogError($"Advertising parallel show requires providerName: {AdType}", this);
@@ -168,6 +203,12 @@ namespace Dann.GameFoundation
             if (isShowing)
             {
                 Debug.LogError($"Advertising show skipped, another ad is already showing: {AdType}", this);
+                completed?.Invoke(false);
+                return;
+            }
+
+            if (activeFullscreenController != null && activeFullscreenController != this)
+            {
                 completed?.Invoke(false);
                 return;
             }
@@ -190,6 +231,10 @@ namespace Dann.GameFoundation
 
             loadedProvider = provider;
             isShowing = true;
+            completionQueued = 0;
+
+            if (IsFullscreenAd(AdType))
+                activeFullscreenController = this;
 
             if (Concurrency.Exists())
                 Concurrency.Instance().Enqueue(ShowProvider(provider, completed));
@@ -218,6 +263,9 @@ namespace Dann.GameFoundation
                     ResumeGameAfterAd();
 
                 isShowing = false;
+                Interlocked.Exchange(ref completionQueued, 1);
+                if (ReferenceEquals(activeFullscreenController, this))
+                    activeFullscreenController = null;
                 Debug.LogError(
                     $"Advertising show failed on {provider.ProviderName}: {AdType}\n{exception}");
                 OnShowCompleted(provider, false);
@@ -227,8 +275,19 @@ namespace Dann.GameFoundation
 
         private void CompleteShowOnMainThread(IAdvertisingProvider provider, bool shown, Action<bool> completed, bool pausesGame)
         {
+            if (!IsMainThread)
+            {
+                EnqueueOnMainThread(() => CompleteShowOnMainThread(provider, shown, completed, pausesGame));
+                return;
+            }
+
+            if (Interlocked.Exchange(ref completionQueued, 1) != 0)
+                return;
+
             IEnumerator Complete()
             {
+                yield return new WaitForEndOfFrame();
+
                 if (pausesGame)
                     ResumeGameAfterAd();
 
@@ -236,6 +295,8 @@ namespace Dann.GameFoundation
 
                 isShowing = false;
                 OnShowCompleted(provider, shown);
+                if (ReferenceEquals(activeFullscreenController, this))
+                    activeFullscreenController = null;
                 completed?.Invoke(shown);
             }
 
@@ -288,6 +349,12 @@ namespace Dann.GameFoundation
 
         public virtual void Hide()
         {
+            if (!IsMainThread)
+            {
+                EnqueueOnMainThread(Hide);
+                return;
+            }
+
             if (mode == AdvertisingMediationMode.Parallel)
             {
                 HideParallel();
@@ -317,7 +384,13 @@ namespace Dann.GameFoundation
 
             try
             {
-                provider.Load(AdType, state => OnProviderLoaded(provider, state));
+                provider.Load(AdType, state =>
+                {
+                    if (IsMainThread)
+                        OnProviderLoaded(provider, state);
+                    else
+                        EnqueueOnMainThread(() => OnProviderLoaded(provider, state));
+                });
             }
             catch (Exception exception)
             {
@@ -444,6 +517,20 @@ namespace Dann.GameFoundation
                 return;
 
             providerIndex = PositiveModulo(providerIndex + 1, providers.Count);
+        }
+
+        private bool IsMainThread => mainThreadId > 0 && Thread.CurrentThread.ManagedThreadId == mainThreadId;
+
+        private void EnqueueOnMainThread(Action action, Action fallback = null)
+        {
+            if (Concurrency.Exists())
+            {
+                Concurrency.Instance().Enqueue(action);
+                return;
+            }
+
+            if (IsMainThread)
+                fallback?.Invoke();
         }
 
         private static int PositiveModulo(int value, int length)

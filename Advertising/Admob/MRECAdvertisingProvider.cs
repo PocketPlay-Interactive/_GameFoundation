@@ -31,23 +31,31 @@ namespace Dann.GameFoundation
 #if ADMOB
             Debug.Log($"Load Advertising Provide {this.name} - {this.AdUnitId}");
             bannerView?.Destroy();
-            bannerView = new BannerView(this.AdUnitId, AdSize.MediumRectangle, AdPosition.Bottom);
-            bannerView.Hide();
-            bannerView.OnBannerAdLoaded += () =>
+            BannerView loadedBanner = new BannerView(this.AdUnitId, AdSize.MediumRectangle, AdPosition.Bottom);
+            bannerView = loadedBanner;
+            loadedBanner.Hide();
+            loadedBanner.OnBannerAdLoaded += () =>
             {
+                if (!ReferenceEquals(bannerView, loadedBanner))
+                    return;
+
                 completed?.Invoke(AdvertisingAdState.Ready);
                 retryAttempt = 0;
             };
-            bannerView.OnBannerAdLoadFailed += (LoadAdError error) =>
+            loadedBanner.OnBannerAdLoadFailed += (LoadAdError error) =>
             {
+                if (!ReferenceEquals(bannerView, loadedBanner))
+                    return;
+
                 completed?.Invoke(AdvertisingAdState.Unavailable);
                 retryAttempt += 1;
             };
-            bannerView.OnAdPaid += (AdValue adValue) =>
+            loadedBanner.OnAdPaid += (AdValue adValue) =>
             {
-                TrackAdmobPaidAdImpression(adType, adValue, bannerView.GetResponseInfo());
+                if (ReferenceEquals(bannerView, loadedBanner))
+                    TrackAdmobPaidAdImpression(adType, adValue, loadedBanner.GetResponseInfo());
             };
-            bannerView.LoadAd(new AdRequest());
+            loadedBanner.LoadAd(new AdRequest());
 #else
             completed?.Invoke(AdvertisingAdState.Unavailable);
 #endif
@@ -57,8 +65,14 @@ namespace Dann.GameFoundation
         {
 #if ADMOB
             Debug.Log($"Show Advertising Provide {this.name} - {this.AdUnitId}");
-            bannerView?.Show();
-            completed?.Invoke(bannerView != null);
+            if (bannerView == null)
+            {
+                completed?.Invoke(false);
+                return;
+            }
+
+            bannerView.Show();
+            completed?.Invoke(true);
 #else
             completed?.Invoke(false);
 #endif
