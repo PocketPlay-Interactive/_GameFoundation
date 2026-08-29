@@ -16,6 +16,8 @@ public class MusicService : SingletonGlobal<MusicService>, IGameFoundationModule
 
     [SerializeField] private MusicTable[] musics;
     [SerializeField] private AudioSource audioSource;
+    [Range(0f, 1f)]
+    [SerializeField] private float maxVolume = 1f;
 
     private readonly Dictionary<string, AudioClip> musicKeyDics = new Dictionary<string, AudioClip>(StringComparer.Ordinal);
     private const string SettingKeyMusic = "MUSIC";
@@ -42,7 +44,7 @@ public class MusicService : SingletonGlobal<MusicService>, IGameFoundationModule
         audioSource.Stop();
         audioSource.clip = clip;
         audioSource.loop = loop;
-        audioSource.volume = volume;
+        audioSource.volume = Mathf.Clamp(volume, 0f, maxVolume);
         audioSource.Play();
     }
 
@@ -79,7 +81,7 @@ public class MusicService : SingletonGlobal<MusicService>, IGameFoundationModule
     {
         EnsureInitialized();
         DOTween.Kill(audioSource);
-        DOTween.To(() => audioSource.volume, x => audioSource.volume = x, toVolume, duration).SetTarget(audioSource);
+        DOTween.To(() => audioSource.volume, x => audioSource.volume = x, Mathf.Clamp(toVolume, 0f, maxVolume), duration).SetTarget(audioSource);
     }
 
     public bool IsPlaying
