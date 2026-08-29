@@ -1,13 +1,13 @@
-<p align="center">
+﻿<p align="center">
   <img src="Documentation/Images~/banner_1.jpg" alt="Game Foundation Banner" width="100%">
 </p>
 
-<h1 align="center">? Game Foundation</h1>
+<h1 align="center">⚡ Game Foundation</h1>
 
 <p align="center">
-  <strong>N?n t?ng Unity d�ng chung cho h? sinh th�i game c?a PocketPlay Interactive.</strong>
+  <strong>Nền tảng Unity dùng chung cho hệ sinh thái game của PocketPlay Interactive.</strong>
   <br/>
-  T�i s? d?ng nhanh hon. M? r?ng s?ch hon. Kh?i d?ng d? �n m?i g?n hon.
+  Tái sử dụng nhanh hơn. Mở rộng sạch hơn. Khởi động dự án mới gọn hơn.
 </p>
 
 <p align="center">
@@ -21,11 +21,11 @@
 
 ---
 
-**Game Foundation** l� package n?n t?ng n?i b? d�ng chung cho nhi?u Unity project c?a **PocketPlay Interactive**.
+**Game Foundation** là package nền tảng nội bộ dùng chung cho nhiều Unity project của **PocketPlay Interactive**.
 
-Package gom c�c ph?n l?p l?i gi?a d? �n: bootstrap, helper, manager, pattern, save/load, security utilities, SDK wrapper, optional feature v� editor tool. M?c ti�u l� gi?m code copy-paste, chu?n h�a workflow, d?ng project m?i nhanh hon v� v?n gi? kh? nang m? r?ng theo t?ng game.
+Package gom các phần lặp lại giữa dự án: bootstrap, helper, manager, pattern, save/load, security utilities, SDK wrapper, optional feature và editor tool. Mục tiêu là giảm code copy-paste, chuẩn hóa workflow, dựng project mới nhanh hơn và vẫn giữ khả năng mở rộng theo từng game.
 
-> M?t foundation t?t kh�ng c? l�m game thay b?n. N� d?n s?ch ph?n l?p l?i d? team t?p trung v�o gameplay, content v� v?n h�nh.
+> Một foundation tốt không cố làm game thay bạn. Nó dọn sạch phần lặp lại để team tập trung vào gameplay, content và vận hành.
 
 ## Table of Contents
 
@@ -33,44 +33,44 @@ Package gom c�c ph?n l?p l?i gi?a d? �n: bootstrap, helper, manager, pattern, sa
 - [Core Modules](#core-modules)
 - [Architecture](#architecture)
 - [Documentation](#documentation)
-- [C?u Tr�c](#c?u-tr�c)
-- [C�i �?t](#c�i-d?t)
-- [T?o Scene M?i](#t?o-scene-m?i)
-- [M? R?ng Cho D? �n M?i](#m?-r?ng-cho-d?-�n-m?i)
+- [Cấu Trúc](#cấu-trúc)
+- [Cài Đặt](#cài-đặt)
+- [Tạo Scene Mới](#tạo-scene-mới)
+- [Mở Rộng Cho Dự Án Mới](#mở-rộng-cho-dự-án-mới)
 - [Scripting Define Symbols](#scripting-define-symbols)
 - [Roadmap](#roadmap)
 - [Troubleshooting](#troubleshooting)
 
 ## Overview
 
-Game Foundation cung c?p m?t l?p n?n d�ng l?i du?c cho gameplay, service c?p ?ng d?ng, integration SDK v� tooling trong Unity Editor.
+Game Foundation cung cấp một lớp nền dùng lại được cho gameplay, service cấp ứng dụng, integration SDK và tooling trong Unity Editor.
 
-- Gi?m l?p code gi?a c�c d? �n.
-- Chu?n h�a bootstrap scene, save data, audio, UI v� SDK define.
-- Cho ph�p project ri�ng m? r?ng qua module thay v� s?a tr?c ti?p foundation.
-- Gi? SDK t�y ch?n sau define d? project chua import SDK v?n compile du?c.
+- Giảm lặp code giữa các dự án.
+- Chuẩn hóa bootstrap scene, save data, audio, UI và SDK define.
+- Cho phép project riêng mở rộng qua module thay vì sửa trực tiếp foundation.
+- Giữ SDK tùy chọn sau define để project chưa import SDK vẫn compile được.
 
-Quy u?c t�n:
+Quy ước tên:
 
-| Lo?i | T�n d�ng trong repo |
+| Loại | Tên dùng trong repo |
 | --- | --- |
-| T�n hi?n th? | `Game Foundation` |
-| T�n module/API | `GameFoundation` |
+| Tên hiển thị | `Game Foundation` |
+| Tên module/API | `GameFoundation` |
 | Package ID | `com.dann.gamefoundation` |
-| Ch? s? h?u | `PocketPlay Interactive` |
+| Chủ sở hữu | `PocketPlay Interactive` |
 
 ## Core Modules
 
 | Module | Purpose |
 | --- | --- |
-| Core | Pattern, contract, utility, diagnostics, threading v� I/O n?n. |
-| Services | Save/load, audio, asset loading, pooling v� network time. |
-| Features | UI, interaction, pathfinding, combat text v� common behaviour t�y ch?n. |
-| Bootstrap | Composition root, loading flow v� extension module init qua `Manager`. |
-| Integrations | SDK/native adapter nhu IAP, haptics, device API, ads v� analytics. |
-| Security | Integrity, memory obfuscation v� legacy save compatibility. |
-| Editor | Build tool, importer, inspector v� data tool cho developer workflow. |
-| Libraries | Source vendor gi? ri�ng kh?i code GameFoundation. |
+| Core | Pattern, contract, utility, diagnostics, threading và I/O nền. |
+| Services | Save/load, audio, asset loading, pooling và network time. |
+| Features | UI, interaction, pathfinding, combat text và common behaviour tùy chọn. |
+| Bootstrap | Composition root, loading flow và extension module init qua `Manager`. |
+| Integrations | SDK/native adapter như IAP, haptics, device API, ads và analytics. |
+| Security | Integrity, memory obfuscation và legacy save compatibility. |
+| Editor | Build tool, importer, inspector và data tool cho developer workflow. |
+| Libraries | Source vendor giữ riêng khỏi code GameFoundation. |
 
 <p align="center">
   <img src="Documentation/Images~/banner_2.jpg" alt="Game Foundation Core Modules" width="100%">
@@ -177,28 +177,28 @@ Design principles:
 
 ## Documentation
 
-| Guide | N?i dung |
+| Guide | Nội dung |
 | --- | --- |
-| [Documentation Index](Documentation/index.md) | �i?m v�o t�i li?u package. |
-| [Quick Start](Documentation/quick-start.md) | C�i package v� t?o scene d?u ti�n. |
-| [SDK Defines](Documentation/sdk-defines.md) | Define cho Firebase, AdMob, AppsFlyer, IAP v� plugin t�y ch?n. |
-| [Samples](Documentation/samples.md) | C�ch import v� d�ng sample scene/code. |
+| [Documentation Index](Documentation/index.md) | Điểm vào tài liệu package. |
+| [Quick Start](Documentation/quick-start.md) | Cài package và tạo scene đầu tiên. |
+| [SDK Defines](Documentation/sdk-defines.md) | Define cho Firebase, AdMob, AppsFlyer, IAP và plugin tùy chọn. |
+| [Samples](Documentation/samples.md) | Cách import và dùng sample scene/code. |
 
-## C?u Tr�c
+## Cấu Trúc
 
-| Folder | Vai tr� |
+| Folder | Vai trò |
 | --- | --- |
-| `Runtime/Core` | Primitive v� h? t?ng th?p nh?t: pattern, extensibility, threading, I/O v� utility. |
-| `Runtime/Services` | Capability d�ng chung c?p ?ng d?ng: persistence, audio, asset loading, pooling v� network time. |
-| `Runtime/Features` | Feature Unity t�y ch?n: UI, interaction, pathfinding, combat text v� common behaviour. |
-| `Runtime/Bootstrap` | Composition root v� loading flow c?a `Manager`. |
-| `Advertising` | AdMob v� native ad adapter, du?c compile v�o runtime assembly qua asmref. |
-| `Analytics` | Firebase v� AppsFlyer analytics adapter, d?t ? package root. |
-| `Runtime/Integrations` | Adapter SDK/native API: IAP, haptics v� device API. |
-| `Runtime/Security` | Integrity, obfuscation v� compatibility v?i save encryption cu. |
-| `Editor` | Build tool, importer, inspector v� data tool ch? ch?y trong Unity Editor. |
-| `Libraries` | Source vendor gi? t�ch bi?t kh?i code GameFoundation. |
-| `Samples` | Scene v� code m?u, kh�ng thu?c runtime production. |
+| `Runtime/Core` | Primitive và hạ tầng thấp nhất: pattern, extensibility, threading, I/O và utility. |
+| `Runtime/Services` | Capability dùng chung cấp ứng dụng: persistence, audio, asset loading, pooling và network time. |
+| `Runtime/Features` | Feature Unity tùy chọn: UI, interaction, pathfinding, combat text và common behaviour. |
+| `Runtime/Bootstrap` | Composition root và loading flow của `Manager`. |
+| `Advertising` | AdMob và native ad adapter, được compile vào runtime assembly qua asmref. |
+| `Analytics` | Firebase và AppsFlyer analytics adapter, đặt ở package root. |
+| `Runtime/Integrations` | Adapter SDK/native API: IAP, haptics và device API. |
+| `Runtime/Security` | Integrity, obfuscation và compatibility với save encryption cũ. |
+| `Editor` | Build tool, importer, inspector và data tool chỉ chạy trong Unity Editor. |
+| `Libraries` | Source vendor giữ tách biệt khỏi code GameFoundation. |
+| `Samples` | Scene và code mẫu, không thuộc runtime production. |
 
 ```text
 Packages/com.dann.gamefoundation
@@ -246,17 +246,17 @@ Packages/com.dann.gamefoundation
 `-- Samples
 ```
 
-Kh�ng d?i t�n file, class ho?c public API trong d?t t? ch?c folder n�y. Code cu ti?p t?c g?i API b?ng t�n hi?n c�.
+Không đổi tên file, class hoặc public API trong đợt tổ chức folder này. Code cũ tiếp tục gọi API bằng tên hiện có.
 
-M?t s? t�n nhu `RuntimeStorageExtention`, `AdmobInterstitalOpen`, `AdMobInterstital`, `AdmobNativeCollap`, `Firebases` v� `EditorCools` l� t�n legacy dang t?n t?i trong code. T�i li?u gi? nguy�n t�n API/path d? ngu?i d�ng t�m d�ng symbol; kh�ng rename n?u chua c� migration ri�ng.
+Một số tên như `RuntimeStorageExtention`, `AdmobInterstitalOpen`, `AdMobInterstital`, `AdmobNativeCollap`, `Firebases` và `EditorCools` là tên legacy đang tồn tại trong code. Tài liệu giữ nguyên tên API/path để người dùng tìm đúng symbol; không rename nếu chưa có migration riêng.
 
 <p align="center">
   <img src="Documentation/Images~/banner_4.jpg" alt="Game Foundation Package Structure" width="100%">
 </p>
 
-### Quy T?c Ph�n Lo?i
+### Quy Tắc Phân Loại
 
-Kh�ng ph�n lo?i theo t�n class c� ch? `Manager` hay kh�ng. Ph�n lo?i theo tr�ch nhi?m v� chi?u dependency:
+Không phân loại theo tên class có chữ `Manager` hay không. Phân loại theo trách nhiệm và chiều dependency:
 
 ```text
 Project / Features
@@ -268,86 +268,88 @@ Project / Features
        Core
 ```
 
-- `Core` l� l?p n?n th?p nh?t: contract, data structure, pattern, helper thu?n, serialization, concurrency v� Unity adapter co b?n. Core kh�ng du?c ph? thu?c ngu?c v�o Services ho?c logic ri�ng c?a m?t game.
-- `Services` cung c?p m?t capability ho�n ch?nh cho gameplay s? d?ng, thu?ng c� state/cache, truy c?p file/network/resource ho?c di?u ph?i nhi?u utility. Service c� th? l� static class, plain C# object ho?c `MonoBehaviour` n?u th?c s? c?n Unity lifecycle.
-- `Integrations` ch?a code ch?m tr?c ti?p SDK/package/native API b�n ngo�i nhu AdMob, Firebase, Unity IAP ho?c camera torch c?a t?ng platform.
-- Logic ch? ph?c v? m?t game, ID s?n ph?m, enum �m thanh, event gameplay v� config economy ph?i n?m trong `Assets/_Project`, kh�ng n?m trong Core hay Services d�ng chung.
+- `Core` là lớp nền thấp nhất: contract, data structure, pattern, helper thuần, serialization, concurrency và Unity adapter cơ bản. Core không được phụ thuộc ngược vào Services hoặc logic riêng của một game.
+- `Services` cung cấp một capability hoàn chỉnh cho gameplay sử dụng, thường có state/cache, truy cập file/network/resource hoặc điều phối nhiều utility. Service có thể là static class, plain C# object hoặc `MonoBehaviour` nếu thực sự cần Unity lifecycle.
+- `Integrations` chứa code chạm trực tiếp SDK/package/native API bên ngoài như AdMob, Firebase, Unity IAP hoặc camera torch của từng platform.
+- Logic chỉ phục vụ một game, ID sản phẩm, enum âm thanh, event gameplay và config economy phải nằm trong `Assets/_Project`, không nằm trong Core hay Services dùng chung.
 
-Quy t?c dependency mong mu?n:
+Quy tắc dependency mong muốn:
 
-- `Services` du?c ph�p ph? thu?c `Core`; `Core` kh�ng du?c g?i ngu?c l�n `Services`.
-- Integration n�n du?c b?c sau interface/facade c� fallback khi define t?t.
-- Bootstrap (`Manager`) l� composition root, du?c ph�p n?i Core, Services v� Integrations v?i nhau; kh�ng l?y dependency c?a `Manager` l�m l� do dua m?i th? v�o Core.
+- `Services` được phép phụ thuộc `Core`; `Core` không được gọi ngược lên `Services`.
+- Integration nên được bọc sau interface/facade có fallback khi define tắt.
+- Bootstrap (`Manager`) là composition root, được phép nối Core, Services và Integrations với nhau; không lấy dependency của `Manager` làm lý do đưa mọi thứ vào Core.
 
-V?i project m?i, product ID, gameplay event v� economy config n�n d?t trong `Assets/_Project` ho?c ScriptableObject ri�ng.
+Với project mới, product ID, gameplay event và economy config nên đặt trong `Assets/_Project` hoặc ScriptableObject riêng.
 
-`Runtime/Security/Legacy/HashLib.cs` t?n t?i d? tuong th�ch save hi?n t?i. Ph?n TripleDES/MD5 trong d� l� legacy compatibility, kh�ng n�n d�ng l�m primitive b?o m?t m?i.
+`Runtime/Security/Legacy/HashLib.cs` tồn tại để tương thích save hiện tại. Phần TripleDES/MD5 trong đó là legacy compatibility, không nên dùng làm primitive bảo mật mới.
 
-## C�i �?t
+## Cài Đặt
 
 ### Qua Package Manager
 
-1. M? `Window > Package Manager`.
-2. Ch?n n�t `+` r?i ch?n `Add package from git URL...`.
-3. Nh?p:
+1. Mở `Window > Package Manager`.
+2. Chọn nút `+` rồi chọn `Add package from git URL...`.
+3. Nhập:
 
 ```text
 git+ssh://git@github.com/PocketPlay-Interactive/_GameFoundation.git
 ```
 
-C� th? th�m tr?c ti?p v�o `Packages/manifest.json`:
+Có thể thêm trực tiếp vào `Packages/manifest.json`:
 
 ```json
 {
   "dependencies": {
-    "com.dann.gamefoundation": "git+ssh://git@github.com/PocketPlay-Interactive/_GameFoundation.git#v1.0.22",
-    "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask"
+    "com.dann.gamefoundation": "git+ssh://git@github.com/PocketPlay-Interactive/_GameFoundation.git#v1.0.0"
   }
 }
 ```
 
-`UniTask` is intentionally a direct project dependency. Unity does not accept a Git URL as a dependency value inside a package's own `package.json`.
-
-SSH l� c�ch khuy?n ngh? cho repository private. N?u m�y d� c?u h�nh Git credential cho GitHub HTTPS, c� th? d�ng:
+SSH là cách khuyến nghị cho repository private. Nếu máy đã cấu hình Git credential cho GitHub HTTPS, có thể dùng:
 
 ```text
 https://github.com/PocketPlay-Interactive/_GameFoundation.git#v1.0.0
 ```
 
-Sau khi Unity resolve package, ch?n Game Foundation trong Package Manager d? import n?i dung ? m?c Samples. Gi? to�n b? `.meta` c?a package trong Git d? GUID asset ?n d?nh.
+Sau khi Unity resolve package, chọn Game Foundation trong Package Manager để import nội dung ở mục Samples. Giữ toàn bộ `.meta` của package trong Git để GUID asset ổn định.
 
 ### Qua Local Package
 
-Trong Package Manager, ch?n `Add package from disk...` r?i ch?n file `package.json` ? root repository.
+Trong Package Manager, chọn `Add package from disk...` rồi chọn file `package.json` ở root repository.
 
-Sau khi c�i d?t:
+Sau khi cài đặt:
 
-1. T?o scene bootstrap theo m?c [T?o Scene M?i](#t?o-scene-m?i).
-2. Ch? b?t define cho SDK d� import th?t s?.
+1. Tạo scene bootstrap theo mục [Tạo Scene Mới](#tạo-scene-mới).
+2. Chỉ bật define cho SDK đã import thật sự.
 
-Package Manager t? resolve c�c dependency b?t bu?c g?m Input System, TextMesh Pro,
-UGUI v� c�c Unity built-in module du?c runtime s? d?ng. Firebase, Google Mobile
-Ads, AppsFlyer, Unity IAP v� JKit v?n l� integration t�y ch?n; ch? b?t define
-tuong ?ng sau khi SDK d� d� du?c c�i.
+Package Manager tự resolve các dependency bắt buộc gồm Input System, TextMesh Pro,
+UGUI và các Unity built-in module được runtime sử dụng. Firebase, Google Mobile
+Ads, AppsFlyer, Unity IAP và JKit vẫn là integration tùy chọn; chỉ bật define
+tương ứng sau khi SDK đó đã được cài.
 
-## T?o Scene M?i
+> **Bắt buộc:** Nếu copy source vào `Assets` hoặc Package Manager không resolve
+> được dependency, phải cài/kiểm tra thủ công `com.cysharp.unitask`, Input System,
+> Newtonsoft JSON, TextMesh Pro và UGUI. Unity built-in modules phải được giữ
+> trong Editor đã chọn.
 
-### Checklist Script M?c �?nh
+## Tạo Scene Mới
 
-V?i m?t scene bootstrap m?i, m?c d?nh n�n c� c�c script sau:
+### Checklist Script Mặc Định
 
-| B?t bu?c? | Script | G?n v�o GameObject | L� do |
+Với một scene bootstrap mới, mặc định nên có các script sau:
+
+| Bắt buộc? | Script | Gắn vào GameObject | Lý do |
 | --- | --- | --- | --- |
-| B?t bu?c | `Manager` | `GameFoundation` ho?c `Manager` | Kh?i t?o save, SDK, extension modules, loading state. |
-| B?t bu?c | `Concurrency` | `Concurrency` | Ch?y callback/coroutine v? main thread. Nhi?u manager d�ng `Concurrency.Instance()`. |
-| N�n c� | `LoadingCanvas` | `LoadingCanvas` ho?c child UI c?a `Manager` | UI loading m?c d?nh cho bootstrap. C� th? b? tr?ng n?u project t? qu?n l� loading. |
-| T�y game | `CanvasManager` | `CanvasManager` | Qu?n l� screen/popup n?u d�ng h? UI c� s?n c?a foundation. |
-| T�y game | `SoundService` | `SoundService` | Qu?n l� sound effect d�ng chung. |
-| T�y game | `MusicService` | `MusicService` | Qu?n l� background music d�ng chung. |
-| T�y game | `InputManager` | `InputManager` | D�ng input wrapper trong `Runtime/Features/Interaction/Input`. |
-| T�y game | `RaycastSystem` | `RaycastSystem` | D�ng raycast/touch interaction helper. |
+| Bắt buộc | `Manager` | `GameFoundation` hoặc `Manager` | Khởi tạo save, SDK, extension modules, loading state. |
+| Bắt buộc | `Concurrency` | `Concurrency` | Chạy callback/coroutine về main thread. Nhiều manager dùng `Concurrency.Instance()`. |
+| Nên có | `LoadingCanvas` | `LoadingCanvas` hoặc child UI của `Manager` | UI loading mặc định cho bootstrap. Có thể bỏ trống nếu project tự quản lý loading. |
+| Tùy game | `CanvasManager` | `CanvasManager` | Quản lý screen/popup nếu dùng hệ UI có sẵn của foundation. |
+| Tùy game | `SoundService` | `SoundService` | Quản lý sound effect dùng chung. |
+| Tùy game | `MusicService` | `MusicService` | Quản lý background music dùng chung. |
+| Tùy game | `InputManager` | `InputManager` | Dùng input wrapper trong `Runtime/Features/Interaction/Input`. |
+| Tùy game | `RaycastSystem` | `RaycastSystem` | Dùng raycast/touch interaction helper. |
 
-Setup t?i thi?u kh�ng ads/Firebase:
+Setup tối thiểu không ads/Firebase:
 
 ```text
 Scene
@@ -357,7 +359,7 @@ Scene
     `-- Concurrency
 ```
 
-Setup d?y d? hay d�ng cho mobile game:
+Setup đầy đủ hay dùng cho mobile game:
 
 ```text
 Scene
@@ -377,53 +379,54 @@ Scene
 |-- Analytics
 |   `-- AnalyticsService         # Provider prefabs: Firebase / AppsFlyer
 `-- Advertising
-    |-- AdvertisingService       # N?u b?t ADMOB ho?c provider ads kh�c
+    |-- AdvertisingService       # Nếu bật ADMOB hoặc provider ads khác
     |-- BannerAdvertisingController
     |-- InterstitialAdvertisingController
     |-- RewardedVideoAdvertisingController
     `-- AppOpenAdvertisingController
 ```
 
-N?u ch? mu?n d�ng core helper v� save/load, ch? c?n `Manager` + `Concurrency`. C�c script c�n l?i th�m theo t�nh nang project th?c s? d�ng.
+Nếu chỉ muốn dùng core helper và save/load, chỉ cần `Manager` + `Concurrency`. Các script còn lại thêm theo tính năng project thực sự dùng.
 
-### B?t Bu?c
+### Bắt Buộc
 
-T?o c�c GameObject sau trong scene d?u ti�n:
+Tạo các GameObject sau trong scene đầu tiên:
 
-| GameObject g?i � | Script c?n g?n | Ghi ch� |
+| GameObject gợi ý | Script cần gắn | Ghi chú |
 | --- | --- | --- |
-| `GameFoundation` ho?c `Manager` | `Manager` | Bootstrap ch�nh: d?c save, init SDK, init extension modules, qu?n l� loading. |
-| `Concurrency` | `Concurrency` | C?n cho action/coroutine ch?y v? Unity main thread. Nhi?u flow ads, callback, delayed action ph? thu?c object n�y. |
+| `GameFoundation` hoặc `Manager` | `Manager` | Bootstrap chính: đọc save, init SDK, init extension modules, quản lý loading. |
+| `Concurrency` | `Concurrency` | Cần cho action/coroutine chạy về Unity main thread. Nhiều flow ads, callback, delayed action phụ thuộc object này. |
 
-Tr�n object c� script `Manager`:
+Trên object có script `Manager`:
 
-- Field `Loading Canvas`: k�o object c� script `LoadingCanvas` v�o n?u d�ng UI loading m?c d?nh. C� th? d? tr?ng n?u scene kh�ng c?n loading UI.
-- Field `Extension Modules`: k�o c�c script project ri�ng k? th?a `GameFoundationModuleBehaviour` v�o d�y n?u c?n init th�m data, remote config, scene service, economy, tutorial, v.v.
+- Field `Loading Canvas`: kéo object có script `LoadingCanvas` vào nếu dùng UI loading mặc định. Có thể để trống nếu scene không cần loading UI.
+- Field `Extension Modules`: kéo các script project riêng kế thừa `GameFoundationModuleBehaviour` vào đây nếu cần init thêm data, remote config, scene service, economy, tutorial, v.v.
 
-### Optional Theo Nhu C?u
+### Optional Theo Nhu Cầu
 
-| Khi d�ng | GameObject g?i � | Script c?n g?n | Define c?n b?t |
+| Khi dùng | GameObject gợi ý | Script cần gắn | Define cần bật |
 | --- | --- | --- | --- |
 | Firebase Analytics | `Analytics` | `AnalyticsService` + `FirebaseAnalyticsProvider` prefab | `FIREBASE` |
 | AdMob | `Advertising` | `AdvertisingService`, ad controllers, `Admob*AdvertisingProvider` prefab | `ADMOB` |
-| Ad test id | `Advertising` | `AdvertisingService` + provider prefab | `ADVERSTING_TEST` |
-| Omni UMP consent flow | B?t qua `Manager` | SDK/script `UMP` ph?i t?n t?i trong project | `ADMOB;ADMOB_UMP` |
+| AdMob test id | `Advertising` | `AdvertisingService` + AdMob provider prefab | `ADMOB;ADMOB_TEST` |
+| Native ads/JKit | `Advertising` | `AdvertisingService`, `NativeAdvertisingController`, custom provider prefab | `ADMOB;USE_ADMOB_CUSTOM_PLUGIN` |
+| Omni UMP consent flow | Bật qua `Manager` | SDK/script `UMP` phải tồn tại trong project | `ADMOB;ADMOB_UMP` |
 | AppsFlyer | `Analytics` | `AnalyticsService` + `AppflyerAnalyticsProvider` prefab | `APPFLYER` |
-| IAP | Kh�ng c?n scene object | G?i qua `InappPurchase.I` | `IAPPURCHASE_ENABLE` |
-| Audio d�ng chung | `SoundService`, `MusicService` | `SoundService`, `MusicService` | Kh�ng c?n |
-| UI d�ng chung | `CanvasManager` | `CanvasManager` | Kh�ng c?n |
+| IAP | Không cần scene object | Gọi qua `InappPurchase.I` | `IAPPURCHASE_ENABLE` |
+| Audio dùng chung | `SoundService`, `MusicService` | `SoundService`, `MusicService` | Không cần |
+| UI dùng chung | `CanvasManager` | `CanvasManager` | Không cần |
 
-N?u kh�ng b?t `ADMOB`, `Manager` s? t? finalize bootstrap sau khi init extension modules. N?u d�ng `AdvertisingService`, flow ads c� th? g?i `Manager.FinalizeAdSequence()` sau promise ad startup; callback b? g?i l?p du?c ch?n s?n.
+Nếu không bật `ADMOB`, `Manager` sẽ tự finalize bootstrap sau khi init extension modules. Nếu dùng `AdvertisingService`, flow ads có thể gọi `Manager.FinalizeAdSequence()` sau promise ad startup; callback bị gọi lặp được chặn sẵn.
 
-## M? R?ng Cho D? �n M?i
+## Mở Rộng Cho Dự Án Mới
 
-Kh�ng s?a tr?c ti?p `Manager`, `RuntimeStorageData`, `AnalyticsService` ho?c `AdvertisingService` cho logic ri�ng c?a t?ng game n?u c� th? tr�nh du?c. �?t code ri�ng c?a project v�o:
+Không sửa trực tiếp `Manager`, `RuntimeStorageData`, `AnalyticsService` hoặc `AdvertisingService` cho logic riêng của từng game nếu có thể tránh được. Đặt code riêng của project vào:
 
 ```text
 Assets/_Project/GameFoundationExtensions
 ```
 
-T?o module m?i b?ng c�ch k? th?a `GameFoundationModuleBehaviour`:
+Tạo module mới bằng cách kế thừa `GameFoundationModuleBehaviour`:
 
 ```csharp
 using System.Collections;
@@ -439,11 +442,11 @@ public class ProjectBootstrapModule : GameFoundationModuleBehaviour
 }
 ```
 
-Sau d� g?n script n�y l�n m?t GameObject trong scene v� k�o component d� v�o `Manager > Extension Modules`.
+Sau đó gắn script này lên một GameObject trong scene và kéo component đó vào `Manager > Extension Modules`.
 
-N?u mu?n dang k� b?ng code thay v� k�o tr�n Inspector, d�ng `GameFoundationModuleRegistry.Register(...)`. Tham s? truy?n v�o ph?i l� m?t object implement `IGameFoundationModule`, thu?ng l� component k? th?a `GameFoundationModuleBehaviour`.
+Nếu muốn đăng ký bằng code thay vì kéo trên Inspector, dùng `GameFoundationModuleRegistry.Register(...)`. Tham số truyền vào phải là một object implement `IGameFoundationModule`, thường là component kế thừa `GameFoundationModuleBehaviour`.
 
-V� d? dang k� ch�nh component hi?n t?i:
+Ví dụ đăng ký chính component hiện tại:
 
 ```csharp
 using System.Collections;
@@ -469,19 +472,19 @@ public class ProjectBootstrapModule : GameFoundationModuleBehaviour
 }
 ```
 
-`Register(this)` nghia l� dang k� ch�nh module n�y v�o danh s�ch extension modules d? `Manager` g?i `Initialize()`. C�ch n�y ch? c?n khi module kh�ng ti?n k�o v�o `Manager > Extension Modules`, v� d? module du?c t?o b?ng code, n?m trong prefab spawn s?m, ho?c mu?n t? b?t/t?t module theo di?u ki?n.
+`Register(this)` nghĩa là đăng ký chính module này vào danh sách extension modules để `Manager` gọi `Initialize()`. Cách này chỉ cần khi module không tiện kéo vào `Manager > Extension Modules`, ví dụ module được tạo bằng code, nằm trong prefab spawn sớm, hoặc muốn tự bật/tắt module theo điều kiện.
 
-Luu �: module ph?i du?c register tru?c khi `Manager` ch?y bu?c init extension modules th� m?i du?c g?i trong lu?t bootstrap hi?n t?i. V?i scene setup b�nh thu?ng, c�ch d? nh? v� �t l?i nh?t v?n l� k�o component v�o `Manager > Extension Modules`.
+Lưu ý: module phải được register trước khi `Manager` chạy bước init extension modules thì mới được gọi trong lượt bootstrap hiện tại. Với scene setup bình thường, cách dễ nhớ và ít lỗi nhất vẫn là kéo component vào `Manager > Extension Modules`.
 
-### Th�m User Data Ri�ng M� Kh�ng S?a GameFoundation
+### Thêm User Data Riêng Mà Không Sửa GameFoundation
 
-Kh�ng th�m field ri�ng c?a t?ng game v�o `PlayerSerializable`, `RuntimeStorageData` ho?c file n�o trong `Assets/GameFoundation/Runtime`. N?u c?n luu th�m data ngu?i choi cho m?t game c? th?, d�ng s?n `RuntimeStorageData.Player.ExtensionData` r?i b?c l?i b?ng class ri�ng trong:
+Không thêm field riêng của từng game vào `PlayerSerializable`, `RuntimeStorageData` hoặc file nào trong `Assets/GameFoundation/Runtime`. Nếu cần lưu thêm data người chơi cho một game cụ thể, dùng sẵn `RuntimeStorageData.Player.ExtensionData` rồi bọc lại bằng class riêng trong:
 
 ```text
 Assets/_Project/GameFoundationExtensions
 ```
 
-V� d? t?o file:
+Ví dụ tạo file:
 
 ```text
 Assets/_Project/GameFoundationExtensions/UserProjectData.cs
@@ -519,7 +522,7 @@ public static class UserProjectData
 }
 ```
 
-Gameplay ch? g?i class ri�ng n�y, kh�ng g?i key string r?i r�c kh?p project:
+Gameplay chỉ gọi class riêng này, không gọi key string rải rác khắp project:
 
 ```csharp
 UserProjectData.BestScore = 1200;
@@ -527,11 +530,11 @@ UserProjectData.TutorialDone = true;
 UserProjectData.Save();
 ```
 
-#### Luu M?t Object B?ng JSON
+#### Lưu Một Object Bằng JSON
 
-`ExtensionData` ch? luu tr?c ti?p `string`, `int`, `float` v� `bool`. Mu?n luu m?t object, serialize object th�nh JSON string, luu string d� b?ng `ExtensionData.Set`, r?i deserialize khi d?c.
+`ExtensionData` chỉ lưu trực tiếp `string`, `int`, `float` và `bool`. Muốn lưu một object, serialize object thành JSON string, lưu string đó bằng `ExtensionData.Set`, rồi deserialize khi đọc.
 
-V� d? model ri�ng c?a project:
+Ví dụ model riêng của project:
 
 ```csharp
 using System;
@@ -546,7 +549,7 @@ public class InventorySaveData
 }
 ```
 
-B?c to�n b? key v� logic JSON trong `UserProjectData`, kh�ng serialize r?i r�c ? gameplay:
+Bọc toàn bộ key và logic JSON trong `UserProjectData`, không serialize rải rác ở gameplay:
 
 ```csharp
 using UnityEngine;
@@ -589,7 +592,7 @@ public static class UserProjectData
 }
 ```
 
-Gameplay s? d?ng object b�nh thu?ng v� ch? g?i wrapper d? load/save:
+Gameplay sử dụng object bình thường và chỉ gọi wrapper để load/save:
 
 ```csharp
 InventorySaveData inventory = UserProjectData.LoadInventory();
@@ -598,32 +601,32 @@ inventory.ownedSkinIds.Add("skin_red");
 UserProjectData.SaveInventory(inventory);
 ```
 
-Lu?ng d? li?u th?c t?:
+Luồng dữ liệu thực tế:
 
 ```text
 InventorySaveData
     -> JsonUtility.ToJson
     -> ExtensionData.Set("project.inventory", json)
     -> RuntimeStorageData.SaveAllData
-    -> file player save d� du?c b?o v? b?i GameFoundation
+    -> file player save đã được bảo vệ bởi GameFoundation
 ```
 
-JSON n�y l� m?t string n?m b�n trong player save, kh�ng ph?i file `.json` ri�ng trong `Application.persistentDataPath`.
-Kh�ng c?n t? m� h�a ho?c Base64 JSON tru?c khi g?i `Set`; `ExtensionData` v� runtime storage s? x? l� l?p b?o v? save hi?n c�.
+JSON này là một string nằm bên trong player save, không phải file `.json` riêng trong `Application.persistentDataPath`.
+Không cần tự mã hóa hoặc Base64 JSON trước khi gọi `Set`; `ExtensionData` và runtime storage sẽ xử lý lớp bảo vệ save hiện có.
 
-Gi?i h?n c?a `JsonUtility`:
+Giới hạn của `JsonUtility`:
 
-- Class c?n c� `[Serializable]`.
-- D? li?u c?n luu ph?i l� field; property kh�ng du?c serialize.
-- `List<T>` v� array du?c h? tr?. `Dictionary<TKey, TValue>` kh�ng du?c h? tr? tr?c ti?p; chuy?n dictionary th�nh m?t list entry c� `key` v� `value`.
-- H?n ch? d�ng interface ho?c ki?u da h�nh trong save model.
-- N�n c� field `version` d? migrate khi c?u tr�c object thay d?i.
+- Class cần có `[Serializable]`.
+- Dữ liệu cần lưu phải là field; property không được serialize.
+- `List<T>` và array được hỗ trợ. `Dictionary<TKey, TValue>` không được hỗ trợ trực tiếp; chuyển dictionary thành một list entry có `key` và `value`.
+- Hạn chế dùng interface hoặc kiểu đa hình trong save model.
+- Nên có field `version` để migrate khi cấu trúc object thay đổi.
 
-Ch? g?i wrapper sau khi `Manager.Awake()` d� ch?y `RuntimeStorageData.ReadData()`. V?i flow m?c d?nh, c� th? load default v� migrate object trong m?t `GameFoundationModuleBehaviour`, v� extension modules du?c kh?i t?o sau khi player save d� du?c d?c.
+Chỉ gọi wrapper sau khi `Manager.Awake()` đã chạy `RuntimeStorageData.ReadData()`. Với flow mặc định, có thể load default và migrate object trong một `GameFoundationModuleBehaviour`, vì extension modules được khởi tạo sau khi player save đã được đọc.
 
-V?i object nh? v� lu�n thay d?i c�ng nhau, luu m?t JSON blob l� d?. V?i data l?n ho?c c�c ph?n c� v�ng d?i kh�c nhau, chia th�nh nhi?u key nhu `project.inventory`, `project.progress`, `project.settings` d? tr�nh ph?i serialize l?i to�n b? data m?i l?n.
+Với object nhỏ và luôn thay đổi cùng nhau, lưu một JSON blob là đủ. Với data lớn hoặc các phần có vòng đời khác nhau, chia thành nhiều key như `project.inventory`, `project.progress`, `project.settings` để tránh phải serialize lại toàn bộ data mỗi lần.
 
-N?u data c?n init default ho?c migrate khi m? game, t?o th�m module trong `_Project`:
+Nếu data cần init default hoặc migrate khi mở game, tạo thêm module trong `_Project`:
 
 ```csharp
 using System.Collections;
@@ -640,54 +643,55 @@ public class ProjectUserDataModule : GameFoundationModuleBehaviour
 }
 ```
 
-Sau d� g?n `ProjectUserDataModule` l�n m?t GameObject trong scene v� k�o v�o `Manager > Extension Modules`.
+Sau đó gắn `ProjectUserDataModule` lên một GameObject trong scene và kéo vào `Manager > Extension Modules`.
 
-Quy t?c cho user data ri�ng:
+Quy tắc cho user data riêng:
 
-- Key n�n c� prefix ri�ng c?a project, v� d? `project.best_score`, `project.skin_id`, d? tr�nh tr�ng key v?i module kh�c.
-- Data don gi?n d�ng `ExtensionData.Set`, `SetInt`, `SetFloat`, `SetBool` v� c�c h�m `Get` tuong ?ng.
-- Sau khi d?i data quan tr?ng, g?i `RuntimeStorageData.SaveAllData()` ho?c b?c qua h�m `UserProjectData.Save()`.
-- N?u data ph?c t?p, nhi?u field ho?c c?n migration r� r�ng, v?n d?t code trong `_Project` v� serialize th�nh string/json r?i luu qua `ExtensionData.Set`.
-- Ch? s?a model g?c trong `GameFoundation` khi data d� th?t s? l� t�nh nang d�ng chung cho m?i game.
+- Key nên có prefix riêng của project, ví dụ `project.best_score`, `project.skin_id`, để tránh trùng key với module khác.
+- Data đơn giản dùng `ExtensionData.Set`, `SetInt`, `SetFloat`, `SetBool` và các hàm `Get` tương ứng.
+- Sau khi đổi data quan trọng, gọi `RuntimeStorageData.SaveAllData()` hoặc bọc qua hàm `UserProjectData.Save()`.
+- Nếu data phức tạp, nhiều field hoặc cần migration rõ ràng, vẫn đặt code trong `_Project` và serialize thành string/json rồi lưu qua `ExtensionData.Set`.
+- Chỉ sửa model gốc trong `GameFoundation` khi data đó thật sự là tính năng dùng chung cho mọi game.
 
-Quy t?c:
+Quy tắc:
 
-- Primitive v� h? t?ng d�ng chung d?t trong `GameFoundation/Runtime/Core`.
-- Capability c?p ?ng d?ng d?t trong `GameFoundation/Runtime/Services`.
-- Component gameplay/UI t�y ch?n d?t trong `GameFoundation/Runtime/Features`.
-- Th? n�o ch? c?a m?t game d?t trong `Assets/_Project/GameFoundationExtensions`.
-- Analytics adapter d?t trong `GameFoundation/Analytics`; SDK/native API c�n l?i d?t trong `GameFoundation/Runtime/Integrations` v� b?c b?ng define.
-- Source vendor kh�ng ch?nh s?a d?t trong `GameFoundation/Libraries`.
-- Public API m� gameplay g?i n�n c� fallback/no-op khi define t?t.
-- Config c?a t?ng game nhu ad unit id, product id, economy, level, remote flag n�n n?m trong ScriptableObject ho?c folder `_Project`, kh�ng hard-code v�o foundation.
-- Khi ph�n ph?i qua UPM, ph?i commit to�n b? `.meta` d? gi? GUID asset ?n d?nh.
+- Primitive và hạ tầng dùng chung đặt trong `GameFoundation/Runtime/Core`.
+- Capability cấp ứng dụng đặt trong `GameFoundation/Runtime/Services`.
+- Component gameplay/UI tùy chọn đặt trong `GameFoundation/Runtime/Features`.
+- Thứ nào chỉ của một game đặt trong `Assets/_Project/GameFoundationExtensions`.
+- Analytics adapter đặt trong `GameFoundation/Analytics`; SDK/native API còn lại đặt trong `GameFoundation/Runtime/Integrations` và bọc bằng define.
+- Source vendor không chỉnh sửa đặt trong `GameFoundation/Libraries`.
+- Public API mà gameplay gọi nên có fallback/no-op khi define tắt.
+- Config của từng game như ad unit id, product id, economy, level, remote flag nên nằm trong ScriptableObject hoặc folder `_Project`, không hard-code vào foundation.
+- Khi phân phối qua UPM, phải commit toàn bộ `.meta` để giữ GUID asset ổn định.
 
 ## Scripting Define Symbols
 
-C� th? b?t/t?t define b?ng editor window:
+Có thể bật/tắt define bằng editor window:
 
 ```text
 Unity menu > GameFoundation > Configuration > SDK Defines
 ```
 
-Window n�y d?c define c?a selected build target hi?n t?i, cho tick/b? tick c�c SDK define thu?ng d�ng, r?i b?m `Apply Defines` d? luu.
+Window này đọc define của selected build target hiện tại, cho tick/bỏ tick các SDK define thường dùng, rồi bấm `Apply Defines` để lưu.
 
-N?u mu?n ch?nh tay, v�o `Project Settings > Player > Other Settings > Scripting Define Symbols`, th�m symbol theo SDK dang d�ng.
+Nếu muốn chỉnh tay, vào `Project Settings > Player > Other Settings > Scripting Define Symbols`, thêm symbol theo SDK đang dùng.
 
-| Define | D�ng khi |
+| Define | Dùng khi |
 | --- | --- |
-| `FIREBASE` | �� import Firebase Unity SDK. |
-| `ADMOB` | �� import Google Mobile Ads SDK. |
-| `ADVERSTING_TEST` | Mu?n d�ng test ad unit id c?a provider. |
-| `ADMOB_UMP` | �� import flow UMP c� API `UMP`. |
-| `APPFLYER` | �� import AppsFlyer SDK. |
-| `IAPPURCHASE_ENABLE` | �� import Unity IAP. |
+| `FIREBASE` | Đã import Firebase Unity SDK. |
+| `ADMOB` | Đã import Google Mobile Ads SDK. |
+| `ADMOB_TEST` | Muốn dùng test ad unit id của Google. |
+| `ADMOB_UMP` | Đã import flow UMP có API `UMP`. |
+| `USE_ADMOB_CUSTOM_PLUGIN` | Đã import plugin native ads/JKit. |
+| `APPFLYER` | Đã import AppsFlyer SDK. |
+| `IAPPURCHASE_ENABLE` | Đã import Unity IAP. |
 
-N?u chua import SDK, kh�ng b?t define tuong ?ng.
+Nếu chưa import SDK, không bật define tương ứng.
 
 ## Core
 
-Code n?n n?m trong `Runtime/Core`. Nh�m n�y kh�ng ch?a SDK, gameplay feature hay state c?p ?ng d?ng.
+Code nền nằm trong `Runtime/Core`. Nhóm này không chứa SDK, gameplay feature hay state cấp ứng dụng.
 
 ### Singleton
 
@@ -710,7 +714,7 @@ InventoryService.I.ToString();
 
 ### Concurrency
 
-`Concurrency` d�ng d? enqueue action/coroutine v? Unity main thread.
+`Concurrency` dùng để enqueue action/coroutine về Unity main thread.
 
 ```csharp
 Concurrency.Instance().Enqueue(() =>
@@ -721,23 +725,23 @@ Concurrency.Instance().Enqueue(() =>
 Concurrency.Instance().Enqueue(MyCoroutine(), 0.5f);
 ```
 
-Scene ph?i c� object g?n script `Concurrency` tru?c khi g?i `Concurrency.Instance()`.
+Scene phải có object gắn script `Concurrency` trước khi gọi `Concurrency.Instance()`.
 
 ## Services
 
-C�c service n?m trong `Runtime/Services` v� cung c?p API c?p ?ng d?ng cho gameplay:
+Các service nằm trong `Runtime/Services` và cung cấp API cấp ứng dụng cho gameplay:
 
-| Folder | Tr�ch nhi?m |
+| Folder | Trách nhiệm |
 | --- | --- |
-| `Assets` | Load/cache Unity resource v� download image. |
-| `Audio` | Music, sound effect v� audio UI adapter. |
-| `Persistence` | Player/setting model, runtime save v� PlayerPrefs wrapper. |
-| `Pooling` | Facade pool prefab d�ng chung. |
-| `Time` | L?y network time v� cache th?i gian g?n nh?t. |
+| `Assets` | Load/cache Unity resource và download image. |
+| `Audio` | Music, sound effect và audio UI adapter. |
+| `Persistence` | Player/setting model, runtime save và PlayerPrefs wrapper. |
+| `Pooling` | Facade pool prefab dùng chung. |
+| `Time` | Lấy network time và cache thời gian gần nhất. |
 
-### Runtime Storage V� Save
+### Runtime Storage Và Save
 
-`RuntimeStorageData` d?c/ghi `SettingSerializable` v� `PlayerSerializable`.
+`RuntimeStorageData` đọc/ghi `SettingSerializable` và `PlayerSerializable`.
 
 ```csharp
 RuntimeStorageData.ReadData();
@@ -745,13 +749,13 @@ RuntimeStorageData.Player.ExtensionData.SetInt("score", 1234);
 RuntimeStorageData.SaveAllData();
 ```
 
-V?i d? �n m?i, n?u c?n data ri�ng, uu ti�n t?o wrapper trong `Assets/_Project/GameFoundationExtensions` d�ng `PlayerSerializable.ExtensionData`. Xem m?c [Th�m User Data Ri�ng M� Kh�ng S?a GameFoundation](#th�m-user-data-ri�ng-m�-kh�ng-s?a-gamefoundation) tru?c khi s?a model g?c.
+Với dự án mới, nếu cần data riêng, ưu tiên tạo wrapper trong `Assets/_Project/GameFoundationExtensions` dùng `PlayerSerializable.ExtensionData`. Xem mục [Thêm User Data Riêng Mà Không Sửa GameFoundation](#thêm-user-data-riêng-mà-không-sửa-gamefoundation) trước khi sửa model gốc.
 
 #### RuntimeStorageExtension
 
-`RuntimeStorageExtension` l� API r�t g?n d? luu v� d?c data ri�ng c?a project qua `Player.ExtensionData`. API h? tr? tr?c ti?p `string`, `int`, `float`, `bool`; c�c ki?u c�n l?i du?c serialize b?ng `JsonUtility`.
+`RuntimeStorageExtension` là API rút gọn để lưu và đọc data riêng của project qua `Player.ExtensionData`. API hỗ trợ trực tiếp `string`, `int`, `float`, `bool`; các kiểu còn lại được serialize bằng `JsonUtility`.
 
-`RuntimeStorageExtention` v?n t?n t?i nhu alias legacy d? code cu kh�ng g�y.
+`RuntimeStorageExtention` vẫn tồn tại như alias legacy để code cũ không gãy.
 
 ```csharp
 RuntimeStorageExtension.Set("project.best_score", 1200);
@@ -764,18 +768,18 @@ InventorySaveData inventory =
 bool hasInventory = RuntimeStorageExtension.Has("project.inventory");
 ```
 
-`Set<T>` t? g?i `RuntimeStorageData.SaveAllData()` sau khi c?p nh?t. V?i object, class ph?i tuong th�ch v?i `JsonUtility`, c� constructor kh�ng tham s? v� du?c d�nh d?u `[Serializable]`; n?u key kh�ng t?n t?i ho?c JSON kh�ng h?p l?, `Object<T>` tr? v? default value. Ch? g?i API sau khi `RuntimeStorageData.ReadData()` d� kh?i t?o player data.
+`Set<T>` tự gọi `RuntimeStorageData.SaveAllData()` sau khi cập nhật. Với object, class phải tương thích với `JsonUtility`, có constructor không tham số và được đánh dấu `[Serializable]`; nếu key không tồn tại hoặc JSON không hợp lệ, `Object<T>` trả về default value. Chỉ gọi API sau khi `RuntimeStorageData.ReadData()` đã khởi tạo player data.
 
 ### Time/NetworkTime
 
-`NetworkTime` l?y th?i gian UTC t? network, cache l?n l?y th�nh c�ng g?n nh?t trong `RuntimeStorageData.Player.ExtensionData`, r?i tr? k?t qu? d� d?i sang m�i gi? local c?a thi?t b?.
+`NetworkTime` lấy thời gian UTC từ network, cache lần lấy thành công gần nhất trong `RuntimeStorageData.Player.ExtensionData`, rồi trả kết quả đã đổi sang múi giờ local của thiết bị.
 
-Y�u c?u:
+Yêu cầu:
 
-- `RuntimeStorageData.ReadData()` d� ch?y. Trong scene bootstrap m?c d?nh, `Manager.Awake()` th?c hi?n bu?c n�y.
-- Thi?t b? c?n network d? l?y th?i gian m?i. Khi request l?i, service d�ng th?i gian cache; n?u chua c� cache h?p l? th� d�ng `DateTime.UtcNow` c?a thi?t b?.
+- `RuntimeStorageData.ReadData()` đã chạy. Trong scene bootstrap mặc định, `Manager.Awake()` thực hiện bước này.
+- Thiết bị cần network để lấy thời gian mới. Khi request lỗi, service dùng thời gian cache; nếu chưa có cache hợp lệ thì dùng `DateTime.UtcNow` của thiết bị.
 
-C�ch d�ng:
+Cách dùng:
 
 ```csharp
 using System;
@@ -792,38 +796,38 @@ public class DailyRewardController : MonoBehaviour
 }
 ```
 
-`GetTimeAsync()` b?t l?i network, log warning v� tr? v? th?i gian fallback thay v� d?y l?i network ra caller.
+`GetTimeAsync()` bắt lỗi network, log warning và trả về thời gian fallback thay vì đẩy lỗi network ra caller.
 
-#### Cache V� Save
+#### Cache Và Save
 
-Cache d�ng key `NetworkTime_UTC` trong `Player.ExtensionData` v� luu UTC theo d?nh d?ng round-trip (`"o"`). Khi l?y gi? m?ng th�nh c�ng, `NetworkTime` ch? c?p nh?t cache trong runtime, kh�ng t? g?i `RuntimeStorageData.SaveAllData()`.
+Cache dùng key `NetworkTime_UTC` trong `Player.ExtensionData` và lưu UTC theo định dạng round-trip (`"o"`). Khi lấy giờ mạng thành công, `NetworkTime` chỉ cập nhật cache trong runtime, không tự gọi `RuntimeStorageData.SaveAllData()`.
 
-`Manager` m?c d?nh save khi application pause ho?c quit. N?u project c?n ghi cache xu?ng disk ngay l?p t?c:
+`Manager` mặc định save khi application pause hoặc quit. Nếu project cần ghi cache xuống disk ngay lập tức:
 
 ```csharp
 await NetworkTime.GetTimeAsync();
 RuntimeStorageData.SaveAllData();
 ```
 
-#### Gi� Tr? Tr? V?
+#### Giá Trị Trả Về
 
-Method tr? `DateTime` d� c?ng offset local hi?n t?i c?a thi?t b? v� c� `DateTimeKind.Unspecified`. N?u gameplay c?n so s�nh deadline tuy?t d?i gi?a c�c m�i gi?, project n�n chu?n h�a quy u?c UTC ri�ng thay v� d?a v�o `DateTime.Kind` c?a gi� tr? tr? v?.
+Method trả `DateTime` đã cộng offset local hiện tại của thiết bị và có `DateTimeKind.Unspecified`. Nếu gameplay cần so sánh deadline tuyệt đối giữa các múi giờ, project nên chuẩn hóa quy ước UTC riêng thay vì dựa vào `DateTime.Kind` của giá trị trả về.
 
-Network time gi�p gi?m ph? thu?c v�o d?ng h? thi?t b? nhung cache local v?n ch? l� fallback. Kh�ng d�ng service n�y l�m ngu?n x�c th?c duy nh?t cho economy ho?c giao d?ch c� gi� tr?; quy?t d?nh quan tr?ng n�n du?c ki?m tra ? server.
+Network time giúp giảm phụ thuộc vào đồng hồ thiết bị nhưng cache local vẫn chỉ là fallback. Không dùng service này làm nguồn xác thực duy nhất cho economy hoặc giao dịch có giá trị; quyết định quan trọng nên được kiểm tra ở server.
 
 ## Features
 
-Feature Unity t�y ch?n n?m trong `Runtime/Features`. Ch? dua feature th?c s? d�ng v�o scene/project:
+Feature Unity tùy chọn nằm trong `Runtime/Features`. Chỉ đưa feature thực sự dùng vào scene/project:
 
-- `UI`: screen, popup, button guard v� shader UI d�ng chung.
-- `Interaction`: input, touch, shake v� raycast system.
-- `Pathfinding`: A* graph/pathfinding component v� editor tool di k�m.
+- `UI`: screen, popup, button guard và shader UI dùng chung.
+- `Interaction`: input, touch, shake và raycast system.
+- `Pathfinding`: A* graph/pathfinding component và editor tool đi kèm.
 - `CombatText`: floating damage prefab/component.
-- `CommonBehaviours`: c�c `MonoBehaviour` ti?n d?ng cho move, rotation, popup v� reset state.
+- `CommonBehaviours`: các `MonoBehaviour` tiện dụng cho move, rotation, popup và reset state.
 
 ### Raycast Listener
 
-G?n `RaycastSystem` v�o scene, sau d� component nh?n event implement `IRaycastEventsListener` v� t? register theo lifecycle:
+Gắn `RaycastSystem` vào scene, sau đó component nhận event implement `IRaycastEventsListener` và tự register theo lifecycle:
 
 ```csharp
 using UnityEngine;
@@ -843,25 +847,25 @@ public class MyRaycastHandler : MonoBehaviour, IRaycastEventsListener
 
 ## Integrations
 
-Analytics v� advertising n?m ? package root; SDK/native API c�n l?i n?m trong `Runtime/Integrations`:
+Analytics và advertising nằm ở package root; SDK/native API còn lại nằm trong `Runtime/Integrations`:
 
-| Folder | Provider/ch?c nang |
+| Folder | Provider/chức năng |
 | --- | --- |
-| `Advertising/Admob` | AdMob provider d�ng Google Mobile Ads. |
-| `Advertising/Module` | C�c ad controller: banner, interstitial, rewarded, app open, native, MREC. |
-| `Analytics/Firebases` | Firebase initialization v� analytics. |
-| `Analytics/AppsFlyer` | AppsFlyer v� ad revenue forwarding. |
+| `Advertising/Admob` | AdMob provider dùng Google Mobile Ads. |
+| `Advertising/Module` | Các ad controller: banner, interstitial, rewarded, app open, native, MREC. |
+| `Analytics/Firebases` | Firebase initialization và analytics. |
+| `Analytics/AppsFlyer` | AppsFlyer và ad revenue forwarding. |
 | `Runtime/Integrations/Purchasing/UnityIAP` | Unity In-App Purchasing. |
 | `Runtime/Integrations/Device/Torch` | Android/iOS torch native bridge. |
-| `Haptics` | Facade g?i haptic provider. |
+| `Haptics` | Facade gọi haptic provider. |
 
 ### Firebase
 
 Setup:
 
 1. Import Firebase Analytics SDK.
-2. Th�m `google-services.json` cho Android ho?c `GoogleService-Info.plist` cho iOS v�o `Assets/`.
-3. Th�m `FIREBASE` v�o Scripting Define Symbols.
+2. Thêm `google-services.json` cho Android hoặc `GoogleService-Info.plist` cho iOS vào `Assets/`.
+3. Thêm `FIREBASE` vào Scripting Define Symbols.
 
 ```text
 FIREBASE
@@ -881,9 +885,9 @@ AnalyticsService.Get().TrackEvent("level_complete", new Dictionary<string, objec
 AnalyticsService.Get().TrackRevenue("paid_ads_banner", "home_banner", "ads", "USD", 0.0012);
 ```
 
-Khi kh�ng c� provider ho?c provider chua initialize, `AnalyticsService` b? qua event cho provider d�.
+Khi không có provider hoặc provider chưa initialize, `AnalyticsService` bỏ qua event cho provider đó.
 
-Ki?m tra event trong `Firebase Console > Analytics > Events`.
+Kiểm tra event trong `Firebase Console > Analytics > Events`.
 
 ### AdMob
 
@@ -891,7 +895,7 @@ Ki?m tra event trong `Firebase Console > Analytics > Events`.
 ADMOB
 ```
 
-API hay d�ng:
+API hay dùng:
 
 ```csharp
 using Dann.GameFoundation;
@@ -913,7 +917,7 @@ AdvertisingService.Get().ShowRewardedVideo(success =>
 });
 ```
 
-Luu �: ki?m tra l?i ad unit id tr�n provider prefab cho t?ng project m?i. Kh�ng n�n gi? production id c?a project kh�c.
+Lưu ý: kiểm tra lại ad unit id trên provider prefab cho từng project mới. Không nên giữ production id của project khác.
 
 ### AppsFlyer
 
@@ -921,13 +925,13 @@ Luu �: ki?m tra l?i ad unit id tr�n provider prefab cho t?ng project m?i. Kh�ng 
 APPFLYER
 ```
 
-Tracking ad revenue c?n c? AppsFlyer v� AdMob:
+Tracking ad revenue cần cả AppsFlyer và AdMob:
 
 ```text
 APPFLYER;ADMOB
 ```
 
-`AppflyerAnalyticsProvider` nh?n revenue qua `AnalyticsService.TrackRevenue(...)` v� forward sang AppsFlyer.
+`AppflyerAnalyticsProvider` nhận revenue qua `AnalyticsService.TrackRevenue(...)` và forward sang AppsFlyer.
 
 ### In-App Purchase
 
@@ -935,11 +939,11 @@ APPFLYER;ADMOB
 IAPPURCHASE_ENABLE
 ```
 
-Ch? b?t define n�y sau khi d� import Unity IAP. Product list n�n d? trong asset/project config ri�ng c?a game.
+Chỉ bật define này sau khi đã import Unity IAP. Product list nên để trong asset/project config riêng của game.
 
-### Torch Tr�n Android
+### Torch Trên Android
 
-N?u project d�ng `Torch`, Android manifest c?n khai b�o camera/flash:
+Nếu project dùng `Torch`, Android manifest cần khai báo camera/flash:
 
 ```xml
 <uses-permission android:name="android.permission.CAMERA" />
@@ -949,11 +953,11 @@ N?u project d�ng `Torch`, Android manifest c?n khai b�o camera/flash:
 
 ## Security
 
-Security runtime n?m trong `Runtime/Security`:
+Security runtime nằm trong `Runtime/Security`:
 
-- `Integrity`: checksum v� ki?m tra d? li?u b? thay d?i.
-- `Obfuscation`: che gi?u value trong memory; d�y kh�ng ph?i encryption ch?ng attacker c� ch? d�ch.
-- `Legacy`: thu?t to�n gi? l?i d? d?c/ghi save format hi?n t?i. Kh�ng d�ng l�m API b?o m?t m?i.
+- `Integrity`: checksum và kiểm tra dữ liệu bị thay đổi.
+- `Obfuscation`: che giấu value trong memory; đây không phải encryption chống attacker có chủ đích.
+- `Legacy`: thuật toán giữ lại để đọc/ghi save format hiện tại. Không dùng làm API bảo mật mới.
 
 ```csharp
 int key = MemoryObfuscation.GenerateKey();
@@ -964,54 +968,54 @@ int checksum = MemoryChecksum.GenerateChecksum(value);
 bool valid = MemoryChecksum.VerifyChecksum(value, checksum);
 ```
 
-`MemoryChecksum` d�ng device-bound HMAC cho value m?i v� v?n ch?p nh?n legacy checksum khi d?c save cu.
+`MemoryChecksum` dùng device-bound HMAC cho value mới và vẫn chấp nhận legacy checksum khi đọc save cũ.
 
 ## Libraries
 
-Source nguy�n b?n c?a DOTween, EditorCools v� NiceVibrations n?m trong `Libraries`. Kh�ng d?t code GameFoundation ho?c code project v�o d�y; khi update vendor n�n thay nguy�n package v� ki?m tra l?i integration tuong ?ng.
+Source nguyên bản của DOTween, EditorCools và NiceVibrations nằm trong `Libraries`. Không đặt code GameFoundation hoặc code project vào đây; khi update vendor nên thay nguyên package và kiểm tra lại integration tương ứng.
 
-C�c th�nh ph?n trong `Libraries` gi? license v� di?u kho?n ph�n ph?i ri�ng. Xem
-`Library Notices.md` tru?c khi public ho?c ph�n ph?i repository cho b�n kh�c.
+Các thành phần trong `Libraries` giữ license và điều khoản phân phối riêng. Xem
+`Library Notices.md` trước khi public hoặc phân phối repository cho bên khác.
 
-Editor tool n?m trong `Editor`, t�ch kh?i runtime build. Scene/code demo c?a inspector helper n?m trong `Samples`.
+Editor tool nằm trong `Editor`, tách khỏi runtime build. Scene/code demo của inspector helper nằm trong `Samples`.
 
 ## Roadmap
 
 - [x] UPM package structure.
-- [x] Bootstrap scene flow v?i `Manager` v� extension modules.
-- [x] Save/load foundation qua `RuntimeStorageData` v� `ExtensionData`.
+- [x] Bootstrap scene flow với `Manager` và extension modules.
+- [x] Save/load foundation qua `RuntimeStorageData` và `ExtensionData`.
 - [x] Optional SDK integrations qua scripting define symbols.
-- [ ] T�i li?u chi ti?t cho t?ng module l?n.
-- [ ] Sample scene chu?n cho bootstrap, save, UI v� ads flow.
-- [ ] Test coverage cho c�c service c?t l�i.
+- [ ] Tài liệu chi tiết cho từng module lớn.
+- [ ] Sample scene chuẩn cho bootstrap, save, UI và ads flow.
+- [ ] Test coverage cho các service cốt lõi.
 
-## Ki?m Tra Sau Khi Import
+## Kiểm Tra Sau Khi Import
 
-1. M? Unity v� d?i reimport xong.
-2. Ki?m tra Console kh�ng c� compile error.
-3. Ki?m tra scene d?u ti�n c� object `Manager` v� `Concurrency`.
-4. N?u d�ng loading m?c d?nh, `Manager.Loading Canvas` ph?i tr? t?i object c� script `LoadingCanvas`.
-5. N?u b?t define SDK, d?m b?o SDK d� import tru?c.
-6. Regenerate `.csproj` t? Unity n?u IDE v?n d?c path cu.
+1. Mở Unity và đợi reimport xong.
+2. Kiểm tra Console không có compile error.
+3. Kiểm tra scene đầu tiên có object `Manager` và `Concurrency`.
+4. Nếu dùng loading mặc định, `Manager.Loading Canvas` phải trỏ tới object có script `LoadingCanvas`.
+5. Nếu bật define SDK, đảm bảo SDK đã import trước.
+6. Regenerate `.csproj` từ Unity nếu IDE vẫn đọc path cũ.
 
 ## Troubleshooting
 
-### L?i namespace Firebase/GoogleMobileAds/AppsFlyer/JKit kh�ng t?n t?i
+### Lỗi namespace Firebase/GoogleMobileAds/AppsFlyer/JKit không tồn tại
 
-T?t define tuong ?ng ho?c import d�ng SDK tru?c khi b?t define.
+Tắt define tương ứng hoặc import đúng SDK trước khi bật define.
 
-### L?i `Omni` kh�ng t?n t?i khi b?t AdMob
+### Lỗi `Omni` không tồn tại khi bật AdMob
 
-Ch? b?t `ADMOB_UMP` khi project d� c� SDK/script cung c?p `UMP`. N?u ch? d�ng Google Mobile Ads co b?n, b?t `ADMOB` l� d?.
+Chỉ bật `ADMOB_UMP` khi project đã có SDK/script cung cấp `UMP`. Nếu chỉ dùng Google Mobile Ads cơ bản, bật `ADMOB` là đủ.
 
-### Gameplay kh�ng ti?p t?c sau ads
+### Gameplay không tiếp tục sau ads
 
-Ki?m tra callback truy?n v�o `ShowInterstitialAdWithSpaceTime` / `ShowRewardedAd`, d?m b?o scene c� `Concurrency`, v� d?m b?o `Manager.FinalizeAdSequence()` du?c g?i khi flow ads k?t th�c.
+Kiểm tra callback truyền vào `ShowInterstitialAdWithSpaceTime` / `ShowRewardedAd`, đảm bảo scene có `Concurrency`, và đảm bảo `Manager.FinalizeAdSequence()` được gọi khi flow ads kết thúc.
 
-### Manager initialize b? treo
+### Manager initialize bị treo
 
-Ki?m tra scene c� `AdvertisingService`, ad controller v� provider prefab khi b?t `ADMOB`. N?u kh�ng d�ng ads, b? define `ADMOB` d? `Manager` t? finalize bootstrap.
+Kiểm tra scene có `AdvertisingService`, ad controller và provider prefab khi bật `ADMOB`. Nếu không dùng ads, bỏ define `ADMOB` để `Manager` tự finalize bootstrap.
 
-### M?t reference prefab/script sau khi rename ho?c move
+### Mất reference prefab/script sau khi rename hoặc move
 
-N?u import `GameFoundation` nhu source shared kh�ng k�m `.meta`, Unity s? t? sinh GUID m?i cho t?ng project. H?n ch? d? prefab/scene trong foundation reference tr?c ti?p t?i asset ngo�i foundation; n?u c?n prefab d�ng chung ?n d?nh GUID th� n�n d�ng g�i th�nh Unity package ri�ng v� qu?n l� `.meta` theo package d�.
+Nếu import `GameFoundation` như source shared không kèm `.meta`, Unity sẽ tự sinh GUID mới cho từng project. Hạn chế để prefab/scene trong foundation reference trực tiếp tới asset ngoài foundation; nếu cần prefab dùng chung ổn định GUID thì nên đóng gói thành Unity package riêng và quản lý `.meta` theo package đó.
