@@ -1,0 +1,47 @@
+{
+  "name": "com.dann.gamefoundation",
+  "version": "1.0.23",
+  "displayName": "Game Foundation",
+  "description": "Shared foundation library for Unity projects, including helpers, managers, patterns, save/load, security utilities, SDK wrappers, optional features, and editor tools.",
+  "unity": "2022.3",
+  "hideInEditor": false,
+  "documentationUrl": "https://github.com/PocketPlay-Interactive/_GameFoundation/blob/main/README.md",
+  "changelogUrl": "https://github.com/PocketPlay-Interactive/_GameFoundation/blob/main/CHANGELOG.md",
+  "licensesUrl": "https://github.com/PocketPlay-Interactive/_GameFoundation/blob/main/LICENSE.md",
+  "dependencies": {
+    "com.unity.inputsystem": "1.7.0",
+    "com.unity.nuget.newtonsoft-json": "3.2.1",
+    "com.unity.modules.animation": "1.0.0",
+    "com.unity.modules.androidjni": "1.0.0",
+    "com.unity.modules.audio": "1.0.0",
+    "com.unity.modules.particlesystem": "1.0.0",
+    "com.unity.modules.physics": "1.0.0",
+    "com.unity.modules.physics2d": "1.0.0",
+    "com.unity.modules.unitywebrequest": "1.0.0",
+    "com.unity.modules.unitywebrequesttexture": "1.0.0",
+    "com.unity.textmeshpro": "3.0.6",
+    "com.unity.ugui": "1.0.0"
+  },
+  "author": {
+    "name": "DannOfficial",
+    "email": "trinhvanbo87@gmail.com",
+    "url": "https://github.com/PocketPlay-Interactive"
+  },
+  "keywords": [
+    "unity",
+    "foundation",
+    "save",
+    "manager",
+    "ads",
+    "analytics",
+    "iap",
+    "utilities"
+  ],
+  "samples": [
+    {
+      "displayName": "Game Foundation Samples",
+      "description": "Sample scenes and code for using Game Foundation.",
+      "path": "Samples"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "name": "Dann.GameFoundation.Editor",
+  "rootNamespace": "Dann.GameFoundation.Editor",
+  "references": [
+    "Dann.GameFoundation",
+    "UnityEngine.UI"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

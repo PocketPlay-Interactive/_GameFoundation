@@ -1,0 +1,18 @@
+{
+  "name": "Dann.GameFoundation.Pathfinding.Editor",
+  "rootNamespace": "Dann.GameFoundation.Editor",
+  "references": [
+    "Dann.GameFoundation"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
