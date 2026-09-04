@@ -38,8 +38,7 @@ namespace Dann.GameFoundation
 
             foreach (var item in parameters)
             {
-                firebaseParameters.Add(
-                    new Parameter(item.Key, item.Value?.ToString() ?? string.Empty));
+                firebaseParameters.Add(CreateParameter(item.Key, item.Value));
             }
 
             FirebaseAnalytics.LogEvent(
@@ -47,6 +46,28 @@ namespace Dann.GameFoundation
                 firebaseParameters.ToArray());
 #endif
         }
+
+#if FIREBASE
+        private static Parameter CreateParameter(string key, object value)
+        {
+            return value switch
+            {
+                string stringValue => new Parameter(key, stringValue),
+                double doubleValue => new Parameter(key, doubleValue),
+                float floatValue => new Parameter(key, (double)floatValue),
+                decimal decimalValue => new Parameter(key, (double)decimalValue),
+                byte byteValue => new Parameter(key, (long)byteValue),
+                sbyte sbyteValue => new Parameter(key, (long)sbyteValue),
+                short shortValue => new Parameter(key, (long)shortValue),
+                ushort ushortValue => new Parameter(key, (long)ushortValue),
+                int intValue => new Parameter(key, (long)intValue),
+                uint uintValue => new Parameter(key, (long)uintValue),
+                long longValue => new Parameter(key, longValue),
+                ulong ulongValue => new Parameter(key, checked((long)ulongValue)),
+                _ => new Parameter(key, value?.ToString() ?? string.Empty)
+            };
+        }
+#endif
 
         public void SetUserId(string userId)
         {
