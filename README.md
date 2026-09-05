@@ -868,9 +868,9 @@ Editor tool nằm trong `Editor`, tách khỏi runtime build. Scene/code demo c�
 - [x] Bootstrap scene flow với `Manager` và extension modules.
 - [x] Save/load foundation qua `RuntimeStorageData` và `ExtensionData`.
 - [x] Optional SDK integrations qua scripting define symbols.
-- [ ] Tài liệu chi tiết cho từng module lớn.
-- [ ] Sample scene chuẩn cho bootstrap, save, UI và integration flow.
-- [ ] Test coverage cho các service cốt lõi.
+- [x] Tài liệu chi tiết cho từng module lớn.
+- [x] Sample scene chuẩn cho bootstrap, save, UI và integration flow.
+- [x] Test coverage cho các service cốt lõi.
 
 ## Kiểm Tra Sau Khi Import
 

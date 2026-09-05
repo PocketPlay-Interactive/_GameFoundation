@@ -9,6 +9,7 @@ Các sample này là ví dụ nhỏ để copy cách dùng API, không phải pr
 | `EditorCools` | `EditorCools/Scenes/Demo.unity` | Dropdown, min-max slider, inspector button. |
 | `ExtensionData` | `ExtensionData/Scenes/Demo.unity` | Lưu/đọc data mở rộng qua `RuntimeStorageData.PLAYER.ExtensionData`. |
 | `ExtentionModules` | Không có scene | Code mẫu extension module có MonoBehaviour và không cần MonoBehaviour. |
+| `FoundationBasics` | `FoundationBasics/Scenes/FoundationBasics.unity` | Bootstrap, UI, save/load, EventBus, haptics và torch integration. |
 
 ## Cách dùng
 
