@@ -62,13 +62,8 @@ public class Manager : SingletonGlobal<Manager>
         yield return InitializeSdkThroughCoordinator();
         yield return InitializeExtensionModules();
 
-#if !ADMOB
-        yield return null;
-        FinalizeAdSequence();
-#else
         if (!hasSdkInitializationHandler)
             FinalizeAdSequence();
-#endif
     }
 
     private IEnumerator InitializeSdkThroughCoordinator()

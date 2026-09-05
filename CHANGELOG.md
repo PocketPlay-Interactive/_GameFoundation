@@ -4,6 +4,14 @@ All notable changes to this package are documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Added a menu item to install Unity IAP from `GameFoundation/Packages/Install InappPurchase`.
+
+### Removed
+
+- Removed obsolete SDK define toggles for Firebase, AdMob, advertising test IDs, AdMob UMP, and AppsFlyer.
+
 ## [1.0.24] - 2026-09-05
 
 ### Added
@@ -140,7 +148,7 @@ All notable changes to this package are documented in this file.
 
 ### Added
 
-- Added package upgrade menu at `GameFoundation/Packages/Upgrade Game Foundation`.
+- Added package upgrade menu at `GameFoundation/Packages/Upgrade GameFoundation`.
 - Added documentation pages for quick start, SDK defines, and samples.
 - Added README files for package samples.
 

@@ -8,6 +8,7 @@ using UnityEngine;
 public static class AutoPackageDownloader
 {
     private const string DefaultGameFoundationRepositoryUrl = "https://github.com/PocketPlay-Interactive/_GameFoundation.git";
+    private const string UnityIapPackageName = "com.unity.purchasing";
 
     // Danh sach cac package can tai.
     private static readonly string[] PackagesToInstall =
@@ -29,11 +30,19 @@ public static class AutoPackageDownloader
         EditorApplication.update += CheckAndInstall;
     }
 
-    [MenuItem("GameFoundation/Packages/Upgrade Game Foundation")]
+    [MenuItem("GameFoundation/Packages/Upgrade GameFoundation")]
     public static void UpgradeGameFoundation()
     {
         Debug.Log("[AutoPackageDownloader] Upgrading GameFoundation: " + DefaultGameFoundationRepositoryUrl);
         _currentRequest = Client.Add(DefaultGameFoundationRepositoryUrl);
+        EditorApplication.update += Progress;
+    }
+
+    [MenuItem("GameFoundation/Packages/Install InappPurchase")]
+    public static void InstallInappPurchase()
+    {
+        Debug.Log("[AutoPackageDownloader] Installing Unity IAP: " + UnityIapPackageName);
+        _currentRequest = Client.Add(UnityIapPackageName);
         EditorApplication.update += Progress;
     }
 
