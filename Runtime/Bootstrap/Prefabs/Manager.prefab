@@ -105,6 +105,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7643055558205950407}
   - component: {fileID: 7502614379250196245}
+  - component: {fileID: 2483627422981794774}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -141,16 +142,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd220801284f30b49a6b05594c0ac14f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Manager
-  AlwayShowInterstitialAd: 1
-  IsLoadingActive: 0
-  AutoHideLoadingAfterTimeout: 1
-  MaxLoadingDuration: 15
-  CurrentLoadingElapsed: 0
   DisableLogsInReleaseBuild: 0
-  loadingCanvas: {fileID: 4909262649744664235}
+  managerCoordinator: {fileID: 2483627422981794774}
   extensionModules:
   - {fileID: 0}
   - {fileID: 0}
+--- !u!114 &2483627422981794774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1639776016276752850}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 51a8fb748a494d99a92719f7ac8a3d7b, type: 3}
+  m_Name: ''
+  m_EditorClassIdentifier: Dann.GameFoundation::ManagerCoordinator
+  loadingCanvas: {fileID: 4909262649744664235}
+  waitForExternalCompletion: 1
+  autoCompleteOnTimeout: 1
+  completionDelaySeconds: 15
 --- !u!1 &3977181263697738829
 GameObject:
   m_ObjectHideFlags: 0

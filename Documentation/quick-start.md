@@ -1,35 +1,34 @@
-# Quick Start
+﻿# Quick Start
 
 ## Import
 
-Add the package by Git URL in `Packages/manifest.json` or through Unity Package Manager.
+Thêm package qua Unity Package Manager hoặc `Packages/manifest.json`:
 
 ```json
 "com.dann.gamefoundation": "https://github.com/PocketPlay-Interactive/_GameFoundation.git"
 ```
 
-After import, add a `Manager` prefab or GameObject with `Manager` to the first scene.
+## Scene tối thiểu
 
-## Minimal Scene
+`ManagerCoordinator` giữ loading tối thiểu `15` giây theo mặc định. Có thể đổi bằng `Manager.Get().SetBootstrapCompletionDelay(14f)`. Để chờ flow bên ngoài, bật `Wait For External Completion`, override `IsCompletionReady()` và gọi `CompleteLoading()` khi flow hoàn tất. `Auto Complete On Timeout` vẫn cứu flow nếu quá thời gian.
 
-1. Add `Manager`.
-2. Add `LoadingCanvas` if the scene needs the built-in loading flow.
-3. Keep SDK defines disabled until the matching SDK is imported.
-4. Press Play and check the Console for `Manager` startup logs.
+1. Kéo `Runtime/Bootstrap/Prefabs/Manager.prefab` vào scene đầu tiên.
+2. Gán `LoadingCanvas` nếu cần loading UI mặc định.
+3. Thêm các extension module cần dùng vào `Manager`.
+4. Chạy scene, kiểm tra Console.
 
-## Common Calls
+## API thường dùng
 
 ```csharp
 RuntimeStorageData.SaveAllData();
-SoundService.Get().PlayOnShot(SoundService.Sound.BUTTON);
-MusicService.Get().PlayMusic(MusicService.Music.NONE);
-EventBus.Publish(new GameMessageEvent { Key = "hello", Value = null });
+SoundService.Get().PlayOnShot("button");
+MusicService.Get().PlayMusic("menu");
 ```
 
-## Package Layout
+## Cấu trúc package
 
-- `Runtime`: core runtime, services, features, integrations.
-- `Advertising`: AdMob and native ad adapters.
-- `Analytics`: Firebase and AppsFlyer adapters.
-- `Libraries`: bundled libraries and editor helper packages.
-- `Samples`: example scenes and scripts.
+- `Runtime`: runtime code, services, features và integrations.
+- `Editor`: Unity Editor tools.
+- `Libraries`: thư viện bundled.
+- `Samples`: scene và code mẫu.
+- `Tests`: runtime và editor tests.

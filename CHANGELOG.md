@@ -4,6 +4,21 @@ All notable changes to this package are documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Added a menu item to install Unity IAP from `GameFoundation/Packages/Install InappPurchase`.
+- Added generic `ManagerCoordinator` completion hooks with a 15-second minimum loading duration and fallback for external startup flows.
+
+### Removed
+
+- Removed obsolete SDK define toggles for Firebase, AdMob, advertising test IDs, AdMob UMP, and AppsFlyer.
+
+## [1.0.24] - 2026-09-05
+
+### Added
+
+- Added a scene installer menu that adds `Manager`, `SoundService`, and `MusicService` prefabs and wires the audio services into `Manager`.
+
 ### Fixed
 
 - Removed the invalid Git URL from `package.json` dependency metadata. Unity UPM accepts semantic versions there; UniTask must be installed as a direct project Git dependency.
@@ -134,7 +149,7 @@ All notable changes to this package are documented in this file.
 
 ### Added
 
-- Added package upgrade menu at `GameFoundation/Packages/Upgrade Game Foundation`.
+- Added package upgrade menu at `GameFoundation/Packages/Upgrade GameFoundation`.
 - Added documentation pages for quick start, SDK defines, and samples.
 - Added README files for package samples.
 

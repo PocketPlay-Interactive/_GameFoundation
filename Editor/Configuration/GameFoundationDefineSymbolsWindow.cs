@@ -11,11 +11,6 @@ public class GameFoundationDefineSymbolsWindow : EditorWindow
 {
     private static readonly DefineOption[] DefineOptions =
     {
-        new DefineOption("FIREBASE", "Firebase Analytics"),
-        new DefineOption("ADMOB", "Google Mobile Ads"),
-        new DefineOption("ADVERSTING_TEST", "Advertising test ad unit id"),
-        new DefineOption("ADMOB_UMP", "UMP consent flow"),
-        new DefineOption("APPFLYER", "AppsFlyer SDK"),
         new DefineOption("IAPPURCHASE_ENABLE", "Unity IAP"),
     };
 
@@ -265,8 +260,7 @@ public class GameFoundationDefineSymbolsWindow : EditorWindow
 
     private static string NormalizeDefine(string define)
     {
-        define = TrimDefine(define);
-        return define == "ADMOB_UMP" ? "ADMOB_UMP" : define;
+        return TrimDefine(define);
     }
 
     private static string[] GetCurrentDefines()
