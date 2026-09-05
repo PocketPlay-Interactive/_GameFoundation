@@ -16,7 +16,7 @@
   <img src="https://img.shields.io/badge/Package-com.dann.gamefoundation-6A5ACD?style=flat-square">
   <img src="https://img.shields.io/badge/Status-Active-2EA44F?style=flat-square">
   <img src="https://img.shields.io/badge/Owner-PocketPlay-FF6B6B?style=flat-square">
-  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/Changelog-1.0.23-0366D6?style=flat-square"></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/Changelog-1.0.24-0366D6?style=flat-square"></a>
 </p>
 
 ---

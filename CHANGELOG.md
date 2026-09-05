@@ -4,6 +4,12 @@ All notable changes to this package are documented in this file.
 
 ## [Unreleased]
 
+## [1.0.24] - 2026-09-05
+
+### Added
+
+- Added a scene installer menu that adds `Manager`, `SoundService`, and `MusicService` prefabs and wires the audio services into `Manager`.
+
 ### Fixed
 
 - Removed the invalid Git URL from `package.json` dependency metadata. Unity UPM accepts semantic versions there; UniTask must be installed as a direct project Git dependency.
