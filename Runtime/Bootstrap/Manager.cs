@@ -7,26 +7,13 @@ using UnityEngine;
 [DefaultExecutionOrder(-100)]
 public class Manager : SingletonGlobal<Manager>
 {
-    [Header("Intertitial Ad Open")]
-    public bool AlwayShowInterstitialAd = true;
-
-    [Header("Loading State")]
-    public bool IsLoadingActive = false;
-    public bool AutoHideLoadingAfterTimeout = true;
-
-    public float MaxLoadingDuration = 15f;
-    public float CurrentLoadingElapsed = 0f;
-
     [Header("Logging")]
     public bool DisableLogsInReleaseBuild = false;
 
     [Header("References")]
-    [SerializeField] private LoadingCanvas loadingCanvas;
     [SerializeField] private MonoBehaviour[] extensionModules;
 
-    private bool hasAdCallbackCompleted = false;
-    [Header("SDK Initialization State")]
-    private bool hasSdkInitializationHandler = false;
+    private bool foundationCompleted;
     public event Func<IEnumerator> OnSdkInitializationRequested;
     public event Action OnFoundationReady;
     public event Action OnApplicationResumed;
@@ -53,7 +40,7 @@ public class Manager : SingletonGlobal<Manager>
     private void Start()
     {
         Time.timeScale = 1;
-        ShowLoading();
+        ManagerCoordinator.Get()?.BeginLoading();
         StartCoroutine(InitializeBootstrap());
     }
 
@@ -62,15 +49,21 @@ public class Manager : SingletonGlobal<Manager>
         yield return InitializeSdkThroughCoordinator();
         yield return InitializeExtensionModules();
 
-        if (!hasSdkInitializationHandler)
-            FinalizeAdSequence();
+        ManagerCoordinator coordinator = ManagerCoordinator.Get();
+        if (coordinator == null)
+        {
+            CompleteBootstrap();
+            yield break;
+        }
+
+        coordinator.BeginCompletion();
+        yield return new WaitUntil(() => foundationCompleted);
     }
 
     private IEnumerator InitializeSdkThroughCoordinator()
     {
         var handlers = OnSdkInitializationRequested?.GetInvocationList();
-        hasSdkInitializationHandler = handlers != null;
-        if (!hasSdkInitializationHandler) yield break;
+        if (handlers == null) yield break;
 
         foreach (Func<IEnumerator> handler in handlers)
         {
@@ -96,42 +89,15 @@ public class Manager : SingletonGlobal<Manager>
         return GameFoundationModuleRegistry.MergeWith(sceneModules);
     }
 
-    private void Update()
-    {
-        if (IsLoadingActive && AutoHideLoadingAfterTimeout)
-        {
-            CurrentLoadingElapsed += Time.deltaTime;
-            if (CurrentLoadingElapsed >= MaxLoadingDuration)
-            {
-                HideLoading(0.0f);
-            }
-        }
-    }
+    public bool IsFoundationReady => foundationCompleted;
 
-    private void ShowLoading()
+    public void CompleteBootstrap()
     {
-        IsLoadingActive = true;
-        if (loadingCanvas != null)
-            loadingCanvas.Show(null, 0.0f, 0.9f);
-    }
-
-    public void HideLoading(float delay = 1.0f)
-    {
-        IsLoadingActive = false;
-        if (loadingCanvas != null)
-            loadingCanvas.Hide(delay);
-    }
-
-    public LoadingCanvas LoadingUI() => loadingCanvas;
-
-    public void FinalizeAdSequence()
-    {
-        if (hasAdCallbackCompleted) return;
-        hasAdCallbackCompleted = true;
-        CurrentLoadingElapsed = 14.0f;
+        if (foundationCompleted) return;
+        foundationCompleted = true;
         OnFoundationReady?.Invoke();
 
-        LogSystem.LogSuccess("Finalize AdSequence");
+        LogSystem.LogSuccess("Foundation ready");
     }
 
     private void OnApplicationPause(bool pause)

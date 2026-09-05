@@ -10,6 +10,8 @@ Thêm package qua Unity Package Manager hoặc `Packages/manifest.json`:
 
 ## Scene tối thiểu
 
+`ManagerCoordinator` hoàn tất loading ngay sau bootstrap theo mặc định. Để chờ flow bên ngoài, bật `Wait For External Completion`, override `IsCompletionReady()` và gọi `CompleteLoading()` khi flow hoàn tất. `Max Completion Wait Seconds` mặc định là `15` để tránh loading bị treo.
+
 1. Kéo `Runtime/Bootstrap/Prefabs/Manager.prefab` vào scene đầu tiên.
 2. Gán `LoadingCanvas` nếu cần loading UI mặc định.
 3. Thêm các extension module cần dùng vào `Manager`.

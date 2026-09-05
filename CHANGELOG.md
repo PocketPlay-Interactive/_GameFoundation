@@ -7,6 +7,7 @@ All notable changes to this package are documented in this file.
 ### Added
 
 - Added a menu item to install Unity IAP from `GameFoundation/Packages/Install InappPurchase`.
+- Added generic `ManagerCoordinator` completion hooks with a 15-second timeout fallback for external startup flows.
 
 ### Removed
 
