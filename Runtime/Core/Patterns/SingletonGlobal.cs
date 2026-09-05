@@ -44,7 +44,7 @@ public abstract class SingletonGlobal<T> : MonoBehaviour where T : SingletonGlob
             DestroyImmediate(gameObject);
             return;
         }
-        DontDestroyOnLoad(this);
+        DontDestroyOnLoad(gameObject);
     }
 
     protected virtual void OnDestroy()
