@@ -11,6 +11,7 @@ public class Manager : SingletonGlobal<Manager>
     public bool DisableLogsInReleaseBuild = false;
 
     [Header("References")]
+    [SerializeField] private ManagerCoordinator managerCoordinator;
     [SerializeField] private MonoBehaviour[] extensionModules;
 
     private bool foundationCompleted;
@@ -40,7 +41,7 @@ public class Manager : SingletonGlobal<Manager>
     private void Start()
     {
         Time.timeScale = 1;
-        ManagerCoordinator.Get()?.BeginLoading();
+        managerCoordinator?.BeginLoading();
         StartCoroutine(InitializeBootstrap());
     }
 
@@ -49,14 +50,13 @@ public class Manager : SingletonGlobal<Manager>
         yield return InitializeSdkThroughCoordinator();
         yield return InitializeExtensionModules();
 
-        ManagerCoordinator coordinator = ManagerCoordinator.Get();
-        if (coordinator == null)
+        if (managerCoordinator == null)
         {
             CompleteBootstrap();
             yield break;
         }
 
-        coordinator.BeginCompletion();
+        managerCoordinator.BeginCompletion();
         yield return new WaitUntil(() => foundationCompleted);
     }
 
@@ -90,6 +90,11 @@ public class Manager : SingletonGlobal<Manager>
     }
 
     public bool IsFoundationReady => foundationCompleted;
+
+    public void SetBootstrapCompletion()
+    {
+        managerCoordinator?.SetCompletionDelay(14.0f);
+    }
 
     public void CompleteBootstrap()
     {

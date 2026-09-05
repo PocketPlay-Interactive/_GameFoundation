@@ -143,6 +143,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Manager
   DisableLogsInReleaseBuild: 0
+  managerCoordinator: {fileID: 2483627422981794774}
   extensionModules:
   - {fileID: 0}
   - {fileID: 0}
@@ -159,9 +160,9 @@ MonoBehaviour:
   m_Name: ''
   m_EditorClassIdentifier: Dann.GameFoundation::ManagerCoordinator
   loadingCanvas: {fileID: 4909262649744664235}
-  waitForExternalCompletion: 0
+  waitForExternalCompletion: 1
   autoCompleteOnTimeout: 1
-  maxCompletionWaitSeconds: 15
+  completionDelaySeconds: 15
 --- !u!1 &3977181263697738829
 GameObject:
   m_ObjectHideFlags: 0

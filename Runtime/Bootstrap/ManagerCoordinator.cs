@@ -2,18 +2,19 @@ using System.Collections;
 using UnityEngine;
 
 [DefaultExecutionOrder(-90)]
-public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
+public class ManagerCoordinator : MonoBehaviour
 {
     [Header("Loading")]
     [SerializeField] private LoadingCanvas loadingCanvas;
-    [SerializeField] private bool waitForExternalCompletion;
+    [SerializeField] private bool waitForExternalCompletion = true;
     [SerializeField] private bool autoCompleteOnTimeout = true;
-    [SerializeField] private float maxCompletionWaitSeconds = 15f;
+    [SerializeField] private float completionDelaySeconds = 15f;
 
     private Manager manager;
     private bool completionStarted;
     private bool completionRequested;
-    private float completionElapsed;
+    private bool loadingStarted;
+    private float loadingElapsed;
 
     protected virtual void OnEnable()
     {
@@ -33,7 +34,7 @@ public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
     {
         if (manager != null) return;
 
-        manager = Manager.Get();
+        manager = GetComponent<Manager>();
         if (manager == null) return;
 
         manager.OnSdkInitializationRequested += InitializeSdkAsync;
@@ -42,11 +43,17 @@ public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
 
     private void Update()
     {
-        if (!completionStarted || manager == null || manager.IsFoundationReady)
+        if (!loadingStarted || manager == null || manager.IsFoundationReady)
             return;
 
-        completionElapsed += Time.unscaledDeltaTime;
-        if (!IsCompletionReady() && (!autoCompleteOnTimeout || completionElapsed < Mathf.Max(0f, maxCompletionWaitSeconds)))
+        loadingElapsed += Time.unscaledDeltaTime;
+        if (!completionStarted)
+            return;
+
+        if (loadingElapsed < Mathf.Max(0f, completionDelaySeconds))
+            return;
+
+        if (!IsCompletionReady() && !autoCompleteOnTimeout)
             return;
 
         manager.CompleteBootstrap();
@@ -56,6 +63,8 @@ public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
     public void BeginLoading()
     {
         BindManager();
+        loadingStarted = true;
+        loadingElapsed = 0f;
         loadingCanvas?.Show(null, 0.0f, 0.9f);
     }
 
@@ -63,8 +72,13 @@ public class ManagerCoordinator : SingletonGlobal<ManagerCoordinator>
     {
         BindManager();
         completionStarted = true;
-        completionElapsed = 0f;
+        completionRequested = false;
         OnCompletionStarted();
+    }
+
+    public void SetCompletionDelay(float seconds)
+    {
+        completionDelaySeconds = Mathf.Max(0f, seconds);
     }
 
     public void CompleteLoading()
