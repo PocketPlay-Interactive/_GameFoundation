@@ -1,16 +1,11 @@
-# SDK Defines
+﻿# Scripting Define
 
-Do not enable a define until the matching SDK exists in the Unity project.
+## Unity IAP
 
-| Define | Needs | Enables |
+Chỉ bật define sau khi project đã cài Unity IAP `5.x`:
+
+| Define | Yêu cầu | Kích hoạt |
 | --- | --- | --- |
-| `FIREBASE` | Firebase Unity SDK | `FirebaseAnalyticsProvider` for `AnalyticsService` |
-| `ADMOB` | Google Mobile Ads Unity SDK | AdMob providers for `AdvertisingService` |
-| `ADVERSTING_TEST` | Advertising SDK | Test ad unit ids |
-| `ADMOB_UMP` | `ADMOB`, `UMP` | Omni UMP consent flow |
-| `APPFLYER` | AppsFlyer Unity SDK | AppsFlyer event/ad revenue forwarding |
-| `IAPPURCHASE_ENABLE` | Unity IAP | `InappPurchase` |
+| `IAPPURCHASE_ENABLE` | Unity IAP | `InappPurchase` và `InappPurchaseModule` |
 
-Use `GameFoundation/Configuration/SDK Defines` to toggle these defines.
-
-Legacy projects that still have `ADMOB_UMP` are normalized to `ADMOB_UMP` by the define window.
+Mở `GameFoundation/Configuration/SDK Defines` trong Unity, bật define, sau đó nhấn `Apply Defines`.

@@ -32,9 +32,9 @@
     "foundation",
     "save",
     "manager",
-    "ads",
-    "analytics",
     "iap",
+    "audio",
+    "haptics",
     "utilities"
   ],
   "samples": [

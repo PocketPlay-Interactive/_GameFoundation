@@ -16,7 +16,7 @@
   <img src="https://img.shields.io/badge/Package-com.dann.gamefoundation-6A5ACD?style=flat-square">
   <img src="https://img.shields.io/badge/Status-Active-2EA44F?style=flat-square">
   <img src="https://img.shields.io/badge/Owner-PocketPlay-FF6B6B?style=flat-square">
-  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/Changelog-1.0.16-0366D6?style=flat-square"></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/Changelog-1.0.23-0366D6?style=flat-square"></a>
 </p>
 
 ---
@@ -67,7 +67,7 @@ Quy ước tên:
 | Services | Save/load, audio, asset loading, pooling và network time. |
 | Features | UI, interaction, pathfinding, combat text và common behaviour tùy chọn. |
 | Bootstrap | Composition root, loading flow và extension module init qua `Manager`. |
-| Integrations | SDK/native adapter như IAP, haptics, device API, ads và analytics. |
+| Integrations | Optional integration cho IAP, haptics và device API. |
 | Security | Integrity, memory obfuscation và legacy save compatibility. |
 | Editor | Build tool, importer, inspector và data tool cho developer workflow. |
 | Libraries | Source vendor giữ riêng khỏi code GameFoundation. |
@@ -86,13 +86,13 @@ flowchart TD
     Scene --> Manager[Manager<br/>Composition Root]
     Scene --> Concurrency[Concurrency<br/>Main-thread Queue]
     Scene --> Loading[LoadingCanvas<br/>Loading UI]
-    Scene --> OptionalSceneServices[Scene Services<br/>Audio / Ads / Analytics / UI]
+    Scene --> OptionalSceneServices[Scene Services<br/>Audio / UI]
 
     Manager --> ReadSave[RuntimeStorageData.ReadData]
     Manager --> LoginState[Daily Login State]
     Manager --> SdkCoordinator[SDK Coordinator<br/>OnSdkInitializationRequested]
     Manager --> ModuleInit[InitializeExtensionModules]
-    Manager --> Finalize[FinalizeAdSequence<br/>OnFoundationReady]
+    Manager --> FoundationReady[FoundationReady<br/>OnFoundationReady]
     Manager --> PauseQuit[Pause / Quit<br/>SaveAllData]
 
     ProjectExt --> MonoModules[GameFoundationModuleBehaviour<br/>Drag to Manager Extension Modules]
@@ -104,8 +104,6 @@ flowchart TD
 
     ModuleInit --> Services[Runtime/Services]
     ModuleInit --> Integrations[Runtime/Integrations]
-    ModuleInit --> Analytics[AnalyticsService]
-    ModuleInit --> Advertising[AdvertisingService]
     ModuleInit --> Features[Runtime/Features]
 
     Services --> Persistence[Persistence<br/>Setting / Player / ExtensionData]
@@ -122,21 +120,14 @@ flowchart TD
     Integrations --> IAP[Unity IAP]
     Integrations --> Haptics[Haptics]
     Integrations --> Device[Device APIs<br/>Torch]
-    Analytics --> AnalyticsProviders[Firebase / AppsFlyer Providers]
-    Advertising --> AdControllers[Ad Controllers<br/>Banner / Interstitial / Rewarded / AppOpen]
-    AdControllers --> AdProviders[AdMob / Custom Providers]
 
     Persistence --> SaveFiles[(Encrypted Save Files<br/>persistentDataPath)]
     Persistence --> Security[Runtime/Security<br/>Hash / Checksum / Obfuscation]
-    AnalyticsProviders --> OptionalSDKs[Optional SDKs<br/>via Define Symbols]
-    AdProviders --> OptionalSDKs
     IAP --> OptionalSDKs
 
     Services --> Core[Runtime/Core]
     Features --> Core
     Integrations --> Core
-    Analytics --> Core
-    Advertising --> Core
     Editor[Editor Tools<br/>Defines / Importers / Data / Build] -. editor only .-> Project
 
     Core --> Patterns[Patterns<br/>Singleton / ServiceLocator / EventBus]
@@ -155,11 +146,11 @@ flowchart TD
     classDef editor fill:#CDB4DB,stroke:#24292f,stroke-width:2px,color:#24292f
 
     class Project,ProjectExt project
-    class Scene,Manager,Concurrency,Loading,SdkCoordinator,ModuleInit,Finalize bootstrap
+    class Scene,Manager,Concurrency,Loading,SdkCoordinator,ModuleInit,FoundationReady bootstrap
     class Core,Patterns,Extensibility,Threading,Diagnostics,Utilities core
     class Services,Persistence,Audio,AssetsService,Pooling,NetworkTime services
     class Features,UI,Interaction,Pathfinding,CommonBehaviours features
-    class Integrations,IAP,Haptics,Device,Analytics,Advertising,AnalyticsProviders,AdControllers,AdProviders,OptionalSDKs integrations
+    class Integrations,IAP,Haptics,Device,OptionalSDKs integrations
     class SaveFiles,Security,ReadSave,LoginState,PauseQuit data
     class Editor editor
 ```
@@ -181,7 +172,7 @@ Design principles:
 | --- | --- |
 | [Documentation Index](Documentation/index.md) | Điểm vào tài liệu package. |
 | [Quick Start](Documentation/quick-start.md) | Cài package và tạo scene đầu tiên. |
-| [SDK Defines](Documentation/sdk-defines.md) | Define cho Firebase, AdMob, AppsFlyer, IAP và plugin tùy chọn. |
+| [SDK Defines](Documentation/sdk-defines.md) | Define cho Unity IAP tùy chọn. |
 | [Samples](Documentation/samples.md) | Cách import và dùng sample scene/code. |
 
 ## Cấu Trúc
@@ -192,8 +183,6 @@ Design principles:
 | `Runtime/Services` | Capability dùng chung cấp ứng dụng: persistence, audio, asset loading, pooling và network time. |
 | `Runtime/Features` | Feature Unity tùy chọn: UI, interaction, pathfinding, combat text và common behaviour. |
 | `Runtime/Bootstrap` | Composition root và loading flow của `Manager`. |
-| `Advertising` | AdMob và native ad adapter, được compile vào runtime assembly qua asmref. |
-| `Analytics` | Firebase và AppsFlyer analytics adapter, đặt ở package root. |
 | `Runtime/Integrations` | Adapter SDK/native API: IAP, haptics và device API. |
 | `Runtime/Security` | Integrity, obfuscation và compatibility với save encryption cũ. |
 | `Editor` | Build tool, importer, inspector và data tool chỉ chạy trong Unity Editor. |
@@ -232,12 +221,6 @@ Packages/com.dann.gamefoundation
 |       |-- Integrity
 |       |-- Legacy
 |       `-- Obfuscation
-|-- Advertising
-|   |-- GoogleMobileAds
-|   `-- JKit
-|-- Analytics
-|   |-- AppsFlyer
-|   `-- Firebases
 |-- Editor
 |-- Libraries
 |   |-- DOTween
@@ -248,7 +231,7 @@ Packages/com.dann.gamefoundation
 
 Không đổi tên file, class hoặc public API trong đợt tổ chức folder này. Code cũ tiếp tục gọi API bằng tên hiện có.
 
-Một số tên như `RuntimeStorageExtention`, `AdmobInterstitalOpen`, `AdMobInterstital`, `AdmobNativeCollap`, `Firebases` và `EditorCools` là tên legacy đang tồn tại trong code. Tài liệu giữ nguyên tên API/path để người dùng tìm đúng symbol; không rename nếu chưa có migration riêng.
+Một số tên như `RuntimeStorageExtention` và `EditorCools` là tên legacy đang tồn tại trong code. Tài liệu giữ nguyên tên API/path để người dùng tìm đúng symbol; không rename nếu chưa có migration riêng.
 
 <p align="center">
   <img src="Documentation/Images~/banner_4.jpg" alt="Game Foundation Package Structure" width="100%">
@@ -270,7 +253,7 @@ Project / Features
 
 - `Core` là lớp nền thấp nhất: contract, data structure, pattern, helper thuần, serialization, concurrency và Unity adapter cơ bản. Core không được phụ thuộc ngược vào Services hoặc logic riêng của một game.
 - `Services` cung cấp một capability hoàn chỉnh cho gameplay sử dụng, thường có state/cache, truy cập file/network/resource hoặc điều phối nhiều utility. Service có thể là static class, plain C# object hoặc `MonoBehaviour` nếu thực sự cần Unity lifecycle.
-- `Integrations` chứa code chạm trực tiếp SDK/package/native API bên ngoài như AdMob, Firebase, Unity IAP hoặc camera torch của từng platform.
+- `Integrations` chứa code chạm trực tiếp SDK/package/native API bên ngoài như Unity IAP, haptics hoặc camera torch của từng platform.
 - Logic chỉ phục vụ một game, ID sản phẩm, enum âm thanh, event gameplay và config economy phải nằm trong `Assets/_Project`, không nằm trong Core hay Services dùng chung.
 
 Quy tắc dependency mong muốn:
@@ -323,9 +306,8 @@ Sau khi cài đặt:
 2. Chỉ bật define cho SDK đã import thật sự.
 
 Package Manager tự resolve các dependency bắt buộc gồm Input System, TextMesh Pro,
-UGUI và các Unity built-in module được runtime sử dụng. Firebase, Google Mobile
-Ads, AppsFlyer, Unity IAP và JKit vẫn là integration tùy chọn; chỉ bật define
-tương ứng sau khi SDK đó đã được cài.
+UGUI và các Unity built-in module được runtime sử dụng. Unity IAP là integration
+tùy chọn; chỉ bật define sau khi package tương ứng đã được cài.
 
 > **Bắt buộc:** Nếu copy source vào `Assets` hoặc Package Manager không resolve
 > được dependency, phải cài/kiểm tra thủ công `com.cysharp.unitask`, Input System,
@@ -349,7 +331,7 @@ Với một scene bootstrap mới, mặc định nên có các script sau:
 | Tùy game | `InputManager` | `InputManager` | Dùng input wrapper trong `Runtime/Features/Interaction/Input`. |
 | Tùy game | `RaycastSystem` | `RaycastSystem` | Dùng raycast/touch interaction helper. |
 
-Setup tối thiểu không ads/Firebase:
+Setup tối thiểu:
 
 ```text
 Scene
@@ -374,16 +356,8 @@ Scene
 |   `-- CanvasManager
 |-- SoundService
 |   `-- SoundService
-|-- MusicService
-|   `-- MusicService
-|-- Analytics
-|   `-- AnalyticsService         # Provider prefabs: Firebase / AppsFlyer
-`-- Advertising
-    |-- AdvertisingService       # Nếu bật ADMOB hoặc provider ads khác
-    |-- BannerAdvertisingController
-    |-- InterstitialAdvertisingController
-    |-- RewardedVideoAdvertisingController
-    `-- AppOpenAdvertisingController
+`-- MusicService
+    `-- MusicService
 ```
 
 Nếu chỉ muốn dùng core helper và save/load, chỉ cần `Manager` + `Concurrency`. Các script còn lại thêm theo tính năng project thực sự dùng.
@@ -395,7 +369,7 @@ Tạo các GameObject sau trong scene đầu tiên:
 | GameObject gợi ý | Script cần gắn | Ghi chú |
 | --- | --- | --- |
 | `GameFoundation` hoặc `Manager` | `Manager` | Bootstrap chính: đọc save, init SDK, init extension modules, quản lý loading. |
-| `Concurrency` | `Concurrency` | Cần cho action/coroutine chạy về Unity main thread. Nhiều flow ads, callback, delayed action phụ thuộc object này. |
+| `Concurrency` | `Concurrency` | Cần cho action/coroutine chạy về Unity main thread và delayed action. |
 
 Trên object có script `Manager`:
 
@@ -406,21 +380,15 @@ Trên object có script `Manager`:
 
 | Khi dùng | GameObject gợi ý | Script cần gắn | Define cần bật |
 | --- | --- | --- | --- |
-| Firebase Analytics | `Analytics` | `AnalyticsService` + `FirebaseAnalyticsProvider` prefab | `FIREBASE` |
-| AdMob | `Advertising` | `AdvertisingService`, ad controllers, `Admob*AdvertisingProvider` prefab | `ADMOB` |
-| AdMob test id | `Advertising` | `AdvertisingService` + AdMob provider prefab | `ADMOB;ADMOB_TEST` |
-| Native ads/JKit | `Advertising` | `AdvertisingService`, `NativeAdvertisingController`, custom provider prefab | `ADMOB;USE_ADMOB_CUSTOM_PLUGIN` |
-| Omni UMP consent flow | Bật qua `Manager` | SDK/script `UMP` phải tồn tại trong project | `ADMOB;ADMOB_UMP` |
-| AppsFlyer | `Analytics` | `AnalyticsService` + `AppflyerAnalyticsProvider` prefab | `APPFLYER` |
 | IAP | Không cần scene object | Gọi qua `InappPurchase.I` | `IAPPURCHASE_ENABLE` |
 | Audio dùng chung | `SoundService`, `MusicService` | `SoundService`, `MusicService` | Không cần |
 | UI dùng chung | `CanvasManager` | `CanvasManager` | Không cần |
 
-Nếu không bật `ADMOB`, `Manager` sẽ tự finalize bootstrap sau khi init extension modules. Nếu dùng `AdvertisingService`, flow ads có thể gọi `Manager.FinalizeAdSequence()` sau promise ad startup; callback bị gọi lặp được chặn sẵn.
+`Manager` hoàn tất bootstrap sau khi khởi tạo các extension module. Callback `OnFoundationReady` chỉ được gọi một lần.
 
 ## Mở Rộng Cho Dự Án Mới
 
-Không sửa trực tiếp `Manager`, `RuntimeStorageData`, `AnalyticsService` hoặc `AdvertisingService` cho logic riêng của từng game nếu có thể tránh được. Đặt code riêng của project vào:
+Không sửa trực tiếp `Manager` hoặc `RuntimeStorageData` cho logic riêng của từng game nếu có thể tránh được. Đặt code riêng của project vào:
 
 ```text
 Assets/_Project/GameFoundationExtensions
@@ -659,7 +627,6 @@ Quy tắc:
 - Capability cấp ứng dụng đặt trong `GameFoundation/Runtime/Services`.
 - Component gameplay/UI tùy chọn đặt trong `GameFoundation/Runtime/Features`.
 - Thứ nào chỉ của một game đặt trong `Assets/_Project/GameFoundationExtensions`.
-- Analytics adapter đặt trong `GameFoundation/Analytics`; SDK/native API còn lại đặt trong `GameFoundation/Runtime/Integrations` và bọc bằng define.
 - Source vendor không chỉnh sửa đặt trong `GameFoundation/Libraries`.
 - Public API mà gameplay gọi nên có fallback/no-op khi define tắt.
 - Config của từng game như ad unit id, product id, economy, level, remote flag nên nằm trong ScriptableObject hoặc folder `_Project`, không hard-code vào foundation.
@@ -673,21 +640,15 @@ Có thể bật/tắt define bằng editor window:
 Unity menu > GameFoundation > Configuration > SDK Defines
 ```
 
-Window này đọc define của selected build target hiện tại, cho tick/bỏ tick các SDK define thường dùng, rồi bấm `Apply Defines` để lưu.
+Window này đọc define của selected build target hiện tại, cho tick/bỏ tick các define tùy chọn, rồi bấm `Apply Defines` để lưu.
 
 Nếu muốn chỉnh tay, vào `Project Settings > Player > Other Settings > Scripting Define Symbols`, thêm symbol theo SDK đang dùng.
 
 | Define | Dùng khi |
 | --- | --- |
-| `FIREBASE` | Đã import Firebase Unity SDK. |
-| `ADMOB` | Đã import Google Mobile Ads SDK. |
-| `ADMOB_TEST` | Muốn dùng test ad unit id của Google. |
-| `ADMOB_UMP` | Đã import flow UMP có API `UMP`. |
-| `USE_ADMOB_CUSTOM_PLUGIN` | Đã import plugin native ads/JKit. |
-| `APPFLYER` | Đã import AppsFlyer SDK. |
 | `IAPPURCHASE_ENABLE` | Đã import Unity IAP. |
 
-Nếu chưa import SDK, không bật define tương ứng.
+Chỉ bật `IAPPURCHASE_ENABLE` sau khi đã import Unity IAP.
 
 ## Core
 
@@ -847,91 +808,13 @@ public class MyRaycastHandler : MonoBehaviour, IRaycastEventsListener
 
 ## Integrations
 
-Analytics và advertising nằm ở package root; SDK/native API còn lại nằm trong `Runtime/Integrations`:
+Các integration hiện có nằm trong `Runtime/Integrations`:
 
-| Folder | Provider/chức năng |
+| Folder | Chức năng |
 | --- | --- |
-| `Advertising/Admob` | AdMob provider dùng Google Mobile Ads. |
-| `Advertising/Module` | Các ad controller: banner, interstitial, rewarded, app open, native, MREC. |
-| `Analytics/Firebases` | Firebase initialization và analytics. |
-| `Analytics/AppsFlyer` | AppsFlyer và ad revenue forwarding. |
 | `Runtime/Integrations/Purchasing/UnityIAP` | Unity In-App Purchasing. |
 | `Runtime/Integrations/Device/Torch` | Android/iOS torch native bridge. |
 | `Haptics` | Facade gọi haptic provider. |
-
-### Firebase
-
-Setup:
-
-1. Import Firebase Analytics SDK.
-2. Thêm `google-services.json` cho Android hoặc `GoogleService-Info.plist` cho iOS vào `Assets/`.
-3. Thêm `FIREBASE` vào Scripting Define Symbols.
-
-```text
-FIREBASE
-```
-
-```csharp
-using Dann.GameFoundation;
-using System.Collections.Generic;
-
-AnalyticsService.Get().Initialize();
-AnalyticsService.Get().TrackEvent("level_start");
-AnalyticsService.Get().TrackEvent("level_complete", new Dictionary<string, object>
-{
-    { "level", 10 },
-    { "time", 42.5f }
-});
-AnalyticsService.Get().TrackRevenue("paid_ads_banner", "home_banner", "ads", "USD", 0.0012);
-```
-
-Khi không có provider hoặc provider chưa initialize, `AnalyticsService` bỏ qua event cho provider đó.
-
-Kiểm tra event trong `Firebase Console > Analytics > Events`.
-
-### AdMob
-
-```text
-ADMOB
-```
-
-API hay dùng:
-
-```csharp
-using Dann.GameFoundation;
-
-AdvertisingService.Get().ShowBanner();
-AdvertisingService.Get().HideBanner();
-
-AdvertisingService.Get().ShowInterstitial(shown =>
-{
-    // Continue gameplay.
-});
-
-AdvertisingService.Get().ShowRewardedVideo(success =>
-{
-    if (success)
-    {
-        // Give reward.
-    }
-});
-```
-
-Lưu ý: kiểm tra lại ad unit id trên provider prefab cho từng project mới. Không nên giữ production id của project khác.
-
-### AppsFlyer
-
-```text
-APPFLYER
-```
-
-Tracking ad revenue cần cả AppsFlyer và AdMob:
-
-```text
-APPFLYER;ADMOB
-```
-
-`AppflyerAnalyticsProvider` nhận revenue qua `AnalyticsService.TrackRevenue(...)` và forward sang AppsFlyer.
 
 ### In-App Purchase
 
@@ -986,7 +869,7 @@ Editor tool nằm trong `Editor`, tách khỏi runtime build. Scene/code demo c�
 - [x] Save/load foundation qua `RuntimeStorageData` và `ExtensionData`.
 - [x] Optional SDK integrations qua scripting define symbols.
 - [ ] Tài liệu chi tiết cho từng module lớn.
-- [ ] Sample scene chuẩn cho bootstrap, save, UI và ads flow.
+- [ ] Sample scene chuẩn cho bootstrap, save, UI và integration flow.
 - [ ] Test coverage cho các service cốt lõi.
 
 ## Kiểm Tra Sau Khi Import
@@ -999,22 +882,6 @@ Editor tool nằm trong `Editor`, tách khỏi runtime build. Scene/code demo c�
 6. Regenerate `.csproj` từ Unity nếu IDE vẫn đọc path cũ.
 
 ## Troubleshooting
-
-### Lỗi namespace Firebase/GoogleMobileAds/AppsFlyer/JKit không tồn tại
-
-Tắt define tương ứng hoặc import đúng SDK trước khi bật define.
-
-### Lỗi `Omni` không tồn tại khi bật AdMob
-
-Chỉ bật `ADMOB_UMP` khi project đã có SDK/script cung cấp `UMP`. Nếu chỉ dùng Google Mobile Ads cơ bản, bật `ADMOB` là đủ.
-
-### Gameplay không tiếp tục sau ads
-
-Kiểm tra callback truyền vào `ShowInterstitialAdWithSpaceTime` / `ShowRewardedAd`, đảm bảo scene có `Concurrency`, và đảm bảo `Manager.FinalizeAdSequence()` được gọi khi flow ads kết thúc.
-
-### Manager initialize bị treo
-
-Kiểm tra scene có `AdvertisingService`, ad controller và provider prefab khi bật `ADMOB`. Nếu không dùng ads, bỏ define `ADMOB` để `Manager` tự finalize bootstrap.
 
 ### Mất reference prefab/script sau khi rename hoặc move
 
