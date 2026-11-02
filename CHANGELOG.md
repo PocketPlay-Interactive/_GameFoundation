@@ -4,11 +4,20 @@ All notable changes to this package are documented in this file.
 
 ## [Unreleased]
 
+Next release: 1.1.0.
+
 ### Added
 
 - Added `GameFoundation/Scene/Create Minimal Setup` and `Create Full Setup` menus that build the README bootstrap hierarchies by code in the open scene.
 - Added a menu item to install Unity IAP from `GameFoundation/Packages/Install InappPurchase`.
 - Added generic `ManagerCoordinator` completion hooks with a 15-second minimum loading duration and fallback for external startup flows.
+
+### Changed
+
+- Split `StaticVariable` into focused static classes: `InvokeExtensions`, `NumberExtensions`, `GeometryExtensions`, `ActiveStateExtensions`, `PlatformUtils`, `CollectionExtensions`, `HierarchyExtensions`, `LogExtensions`, `StringExtensions`, `DateUtils`, `UIExtensions`. Extension-method call sites are unaffected; direct `StaticVariable.X(...)` calls must change to the new class.
+- Moved save keys `DATA_PLAYER`/`DATA_SETTING` to `RuntimeStorageData` (values unchanged, existing saves keep working).
+- `Concurrency.Instance()` error now points to the `Create Minimal Setup` menu.
+- Added tests for extensions, `HashLib`, `Concurrency` and `RuntimeStorageData`.
 
 ### Removed
 
@@ -99,6 +108,13 @@ All notable changes to this package are documented in this file.
 - Fixed analytics provider initialization errors so editor logging is optional.
 - Fixed Unity IAP integration calls against current runtime storage APIs.
 
+### Changed
+
+- Split `StaticVariable` into focused static classes: `InvokeExtensions`, `NumberExtensions`, `GeometryExtensions`, `ActiveStateExtensions`, `PlatformUtils`, `CollectionExtensions`, `HierarchyExtensions`, `LogExtensions`, `StringExtensions`, `DateUtils`, `UIExtensions`. Extension-method call sites are unaffected; direct `StaticVariable.X(...)` calls must change to the new class.
+- Moved save keys `DATA_PLAYER`/`DATA_SETTING` to `RuntimeStorageData` (values unchanged, existing saves keep working).
+- `Concurrency.Instance()` error now points to the `Create Minimal Setup` menu.
+- Added tests for extensions, `HashLib`, `Concurrency` and `RuntimeStorageData`.
+
 ### Removed
 
 - Removed stored `Manager`, `SoundService`, `MusicService` prefabs and the `Runtime/Bootstrap/Material` sprites; the scene installer builds objects by code instead.
@@ -156,6 +172,13 @@ All notable changes to this package are documented in this file.
 - Added package upgrade menu at `GameFoundation/Packages/Upgrade GameFoundation`.
 - Added documentation pages for quick start, SDK defines, and samples.
 - Added README files for package samples.
+
+### Changed
+
+- Split `StaticVariable` into focused static classes: `InvokeExtensions`, `NumberExtensions`, `GeometryExtensions`, `ActiveStateExtensions`, `PlatformUtils`, `CollectionExtensions`, `HierarchyExtensions`, `LogExtensions`, `StringExtensions`, `DateUtils`, `UIExtensions`. Extension-method call sites are unaffected; direct `StaticVariable.X(...)` calls must change to the new class.
+- Moved save keys `DATA_PLAYER`/`DATA_SETTING` to `RuntimeStorageData` (values unchanged, existing saves keep working).
+- `Concurrency.Instance()` error now points to the `Create Minimal Setup` menu.
+- Added tests for extensions, `HashLib`, `Concurrency` and `RuntimeStorageData`.
 
 ### Removed
 

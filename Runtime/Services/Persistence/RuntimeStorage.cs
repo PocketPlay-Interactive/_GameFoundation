@@ -16,13 +16,17 @@ public static class RuntimeStorageData
         Pause
     }
 
+    // Persistent keys: changing them orphans existing save files.
+    public const string DATA_PLAYER = "player.data";
+    public const string DATA_SETTING = "setting.data";
+
     public static StatusGame _StatusGame = RuntimeStorageData.StatusGame.Playing;
     public static SettingSerializable SETTING;
     public static PlayerSerializable PLAYER;
 
     private static string _path = OptimizeComponent.GetStringOptimize(Application.persistentDataPath, "/");
-    private static string _dataSetting = OptimizeComponent.GetStringOptimize(Application.persistentDataPath, "/", HashLib.GetHashStringAndDeviceID(StaticVariable.DATA_SETTING));
-    private static string _dataPlayer = OptimizeComponent.GetStringOptimize(Application.persistentDataPath, "/", HashLib.GetHashStringAndDeviceID(StaticVariable.DATA_PLAYER));
+    private static string _dataSetting = OptimizeComponent.GetStringOptimize(Application.persistentDataPath, "/", HashLib.GetHashStringAndDeviceID(RuntimeStorageData.DATA_SETTING));
+    private static string _dataPlayer = OptimizeComponent.GetStringOptimize(Application.persistentDataPath, "/", HashLib.GetHashStringAndDeviceID(RuntimeStorageData.DATA_PLAYER));
 
     public static bool IsReady
     {

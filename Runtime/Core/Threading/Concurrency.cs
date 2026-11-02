@@ -88,7 +88,7 @@ public class Concurrency: MonoBehaviour {
 
     public static Concurrency Instance() {
         if (!Exists()) {
-        throw new Exception("Concurrency could not find the Concurrency object. Please ensure you have added the Concurrency Prefab to your scene.");
+        throw new Exception("Concurrency could not find the Concurrency object. Create it via menu GameFoundation/Scene/Create Minimal Setup.");
         }
         return _instance;
     }

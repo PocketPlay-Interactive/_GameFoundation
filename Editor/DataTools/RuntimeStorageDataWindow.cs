@@ -362,8 +362,8 @@ public sealed class RuntimeStorageDataWindow : EditorWindow
 
     private void Refresh()
     {
-        settingView = ReadStorage(StaticVariable.DATA_SETTING);
-        playerView = ReadStorage(StaticVariable.DATA_PLAYER);
+        settingView = ReadStorage(RuntimeStorageData.DATA_SETTING);
+        playerView = ReadStorage(RuntimeStorageData.DATA_PLAYER);
         Repaint();
     }
 
@@ -390,9 +390,9 @@ public sealed class RuntimeStorageDataWindow : EditorWindow
             var base64Data = HashLib.DecryptAndDeviceID(encryptedData);
             view.Json = HashLib.Base64Decode(base64Data);
 
-            if (dataName == StaticVariable.DATA_SETTING)
+            if (dataName == RuntimeStorageData.DATA_SETTING)
                 view.Setting = JsonUtility.FromJson<SettingView>(view.Json);
-            else if (dataName == StaticVariable.DATA_PLAYER)
+            else if (dataName == RuntimeStorageData.DATA_PLAYER)
                 view.Player = JsonUtility.FromJson<PlayerSerializable>(view.Json);
         }
         catch (Exception exception)
