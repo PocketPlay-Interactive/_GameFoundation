@@ -5,7 +5,7 @@ Sample này hướng dẫn dùng các attribute Inspector nằm trong `Libraries
 Mở scene:
 
 ```text
-Assets/_GameFoundation/Samples/EditorCools/Scenes/Demo.unity
+Samples/EditorCools/Scenes/Demo.unity
 ```
 
 Chọn GameObject có component `EditorCoolsDemo`, sau đó xem Inspector.

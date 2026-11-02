@@ -123,7 +123,6 @@ flowchart TD
 
     Persistence --> SaveFiles[(Encrypted Save Files<br/>persistentDataPath)]
     Persistence --> Security[Runtime/Security<br/>Hash / Checksum / Obfuscation]
-    IAP --> OptionalSDKs
 
     Services --> Core[Runtime/Core]
     Features --> Core
@@ -150,7 +149,7 @@ flowchart TD
     class Core,Patterns,Extensibility,Threading,Diagnostics,Utilities core
     class Services,Persistence,Audio,AssetsService,Pooling,NetworkTime services
     class Features,UI,Interaction,Pathfinding,CommonBehaviours features
-    class Integrations,IAP,Haptics,Device,OptionalSDKs integrations
+    class Integrations,IAP,Haptics,Device integrations
     class SaveFiles,Security,ReadSave,LoginState,PauseQuit data
     class Editor editor
 ```
@@ -190,7 +189,7 @@ Design principles:
 | `Samples` | Scene và code mẫu, không thuộc runtime production. |
 
 ```text
-Packages/com.dann.gamefoundation
+com.dann.gamefoundation
 |-- Runtime
 |   |-- Core
 |   |   |-- Diagnostics
@@ -207,7 +206,6 @@ Packages/com.dann.gamefoundation
 |   |   `-- Time
 |   |-- Features
 |   |   |-- CombatText
-|   |   |-- Common
 |   |   |-- CommonBehaviours
 |   |   |-- Interaction
 |   |   |-- Pathfinding
@@ -231,7 +229,7 @@ Packages/com.dann.gamefoundation
 
 Không đổi tên file, class hoặc public API trong đợt tổ chức folder này. Code cũ tiếp tục gọi API bằng tên hiện có.
 
-Một số tên như `RuntimeStorageExtention` và `EditorCools` là tên legacy đang tồn tại trong code. Tài liệu giữ nguyên tên API/path để người dùng tìm đúng symbol; không rename nếu chưa có migration riêng.
+`EditorCools` là tên thư mục vendor, giữ nguyên.
 
 <p align="center">
   <img src="Documentation/Images~/banner_4.jpg" alt="Game Foundation Package Structure" width="100%">
@@ -360,6 +358,8 @@ Scene
     `-- MusicService
 ```
 
+Menu `GameFoundation/Scene/Create Minimal Setup` và `Create Full Setup` dựng đúng hai cây trên vào scene đang mở (bằng code, không cần prefab). Chạy lại chỉ bổ sung phần còn thiếu.
+
 Nếu chỉ muốn dùng core helper và save/load, chỉ cần `Manager` + `Concurrency`. Các script còn lại thêm theo tính năng project thực sự dùng.
 
 ### Bắt Buộc
@@ -446,7 +446,7 @@ Lưu ý: module phải được register trước khi `Manager` chạy bước i
 
 ### Thêm User Data Riêng Mà Không Sửa GameFoundation
 
-Không thêm field riêng của từng game vào `PlayerSerializable`, `RuntimeStorageData` hoặc file nào trong `Assets/GameFoundation/Runtime`. Nếu cần lưu thêm data người chơi cho một game cụ thể, dùng sẵn `RuntimeStorageData.Player.ExtensionData` rồi bọc lại bằng class riêng trong:
+Không thêm field riêng của từng game vào `PlayerSerializable`, `RuntimeStorageData` hoặc file nào trong `Runtime` của package. Nếu cần lưu thêm data người chơi cho một game cụ thể, dùng sẵn `RuntimeStorageData.Player.ExtensionData` rồi bọc lại bằng class riêng trong:
 
 ```text
 Assets/_Project/GameFoundationExtensions
@@ -715,8 +715,6 @@ Với dự án mới, nếu cần data riêng, ưu tiên tạo wrapper trong `As
 #### RuntimeStorageExtension
 
 `RuntimeStorageExtension` là API rút gọn để lưu và đọc data riêng của project qua `Player.ExtensionData`. API hỗ trợ trực tiếp `string`, `int`, `float`, `bool`; các kiểu còn lại được serialize bằng `JsonUtility`.
-
-`RuntimeStorageExtention` vẫn tồn tại như alias legacy để code cũ không gãy.
 
 ```csharp
 RuntimeStorageExtension.Set("project.best_score", 1200);

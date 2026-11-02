@@ -3,37 +3,77 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
+// Builds the bootstrap hierarchies documented in README "Tạo Scene Mới" directly in the open scene.
+// No prefab or asset is stored in the package; re-running only adds what is missing.
 public static class SceneInstallerMenu
 {
-    private const string MenuPath = "GameFoundation/Scene/Install Manager and Audio Services";
-    private const string ManagerPrefabPath = "Packages/com.dann.gamefoundation/Runtime/Bootstrap/Prefabs/Manager.prefab";
-    private const string SoundServicePrefabPath = "Packages/com.dann.gamefoundation/Runtime/Bootstrap/Prefabs/SoundService.prefab";
-    private const string MusicServicePrefabPath = "Packages/com.dann.gamefoundation/Runtime/Bootstrap/Prefabs/MusicService.prefab";
+    private const string MinimalMenu = "GameFoundation/Scene/Create Minimal Setup";
+    private const string FullMenu = "GameFoundation/Scene/Create Full Setup";
 
-    [MenuItem(MenuPath)]
-    private static void Install()
+    [MenuItem(MinimalMenu)]
+    private static void CreateMinimal() => Build(full: false);
+
+    [MenuItem(FullMenu)]
+    private static void CreateFull() => Build(full: true);
+
+    [MenuItem(MinimalMenu, true)]
+    [MenuItem(FullMenu, true)]
+    private static bool Validate()
+    {
+        Scene scene = SceneManager.GetActiveScene();
+        return scene.IsValid() && !EditorSceneManager.IsPreviewScene(scene) && !EditorApplication.isPlayingOrWillChangePlaymode;
+    }
+
+    private static void Build(bool full)
     {
         Scene scene = SceneManager.GetActiveScene();
 
         try
         {
-            Manager manager = FindOrCreate<Manager>(ManagerPrefabPath, scene);
-            SoundService soundService = FindOrCreate<SoundService>(SoundServicePrefabPath, scene);
-            MusicService musicService = FindOrCreate<MusicService>(MusicServicePrefabPath, scene);
+            // GameFoundation
+            // |-- Manager (+ ManagerCoordinator)
+            // `-- LoadingCanvas            (full)
+            Manager manager = Find<Manager>(scene);
+            if (manager == null)
+            {
+                GameObject root = Create("GameFoundation", scene);
+                manager = root.AddComponent<Manager>();
+                root.AddComponent<ManagerCoordinator>();
+            }
+
+            ManagerCoordinator coordinator = manager.GetComponent<ManagerCoordinator>() ?? Find<ManagerCoordinator>(scene);
+            if (coordinator == null)
+                coordinator = manager.gameObject.AddComponent<ManagerCoordinator>();
+
+            // Concurrency
+            if (Find<Concurrency>(scene) == null)
+                Create("Concurrency", scene).AddComponent<Concurrency>();
 
             SerializedObject serializedManager = new SerializedObject(manager);
-            SerializedProperty extensionModules = serializedManager.FindProperty("extensionModules");
-            AddModuleReference(extensionModules, soundService);
-            AddModuleReference(extensionModules, musicService);
+            SetReference(serializedManager.FindProperty("managerCoordinator"), coordinator);
+
+            if (full)
+            {
+                LoadingCanvas loading = Find<LoadingCanvas>(scene) ?? CreateLoadingCanvas(manager.transform);
+                SetReference(new SerializedObject(coordinator).FindProperty("loadingCanvas"), loading, apply: true);
+
+                if (Find<CanvasManager>(scene) == null)
+                    Create("CanvasManager", scene).AddComponent<CanvasManager>();
+
+                SoundService sound = Find<SoundService>(scene) ?? CreateSoundService(scene);
+                MusicService music = Find<MusicService>(scene) ?? CreateMusicService(scene);
+
+                SerializedProperty modules = serializedManager.FindProperty("extensionModules");
+                AddModuleReference(modules, sound);
+                AddModuleReference(modules, music);
+            }
+
             serializedManager.ApplyModifiedProperties();
-
-            Debug.Assert(HasModuleReference(extensionModules, soundService));
-            Debug.Assert(HasModuleReference(extensionModules, musicService));
-
             EditorSceneManager.MarkSceneDirty(scene);
             Selection.activeGameObject = manager.gameObject;
-            Debug.Log("[GameFoundation] Installed Manager, SoundService and MusicService.");
+            Debug.Log($"[GameFoundation] Created {(full ? "full" : "minimal")} setup.");
         }
         catch (Exception exception)
         {
@@ -42,14 +82,66 @@ public static class SceneInstallerMenu
         }
     }
 
-    [MenuItem(MenuPath, true)]
-    private static bool ValidateInstall()
+    private static LoadingCanvas CreateLoadingCanvas(Transform parent)
     {
-        Scene scene = SceneManager.GetActiveScene();
-        return scene.IsValid() && !EditorSceneManager.IsPreviewScene(scene) && !EditorApplication.isPlayingOrWillChangePlaymode;
+        GameObject go = new GameObject("LoadingCanvas", typeof(RectTransform));
+        Undo.RegisterCreatedObjectUndo(go, "Create LoadingCanvas");
+        go.transform.SetParent(parent, false);
+        go.layer = LayerMask.NameToLayer("UI");
+
+        Canvas canvas = go.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 999;
+        go.AddComponent<CanvasScaler>();
+        go.AddComponent<GraphicRaycaster>();
+        go.AddComponent<CanvasGroup>();
+        LoadingCanvas loading = go.AddComponent<LoadingCanvas>();
+        SetReference(new SerializedObject(loading).FindProperty("canvasGroup"), go.GetComponent<CanvasGroup>(), apply: true);
+
+        GameObject bg = new GameObject("Background", typeof(RectTransform), typeof(Image));
+        bg.transform.SetParent(go.transform, false);
+        bg.layer = go.layer;
+        bg.GetComponent<Image>().color = Color.black;
+        RectTransform rect = bg.GetComponent<RectTransform>();
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.offsetMin = rect.offsetMax = Vector2.zero;
+        return loading;
     }
 
-    private static T FindOrCreate<T>(string prefabPath, Scene scene) where T : Component
+    private static SoundService CreateSoundService(Scene scene)
+    {
+        GameObject go = Create("SoundService", scene);
+        SoundService sound = go.AddComponent<SoundService>();
+
+        GameObject special = new GameObject("AudioSourceSpecial");
+        special.transform.SetParent(go.transform, false);
+        AudioSource source = special.AddComponent<AudioSource>();
+        source.playOnAwake = false;
+        SetReference(new SerializedObject(sound).FindProperty("audioSourceSpecial"), source, apply: true);
+        return sound;
+    }
+
+    private static MusicService CreateMusicService(Scene scene)
+    {
+        GameObject go = Create("MusicService", scene);
+        AudioSource source = go.AddComponent<AudioSource>();
+        source.playOnAwake = false;
+        source.loop = true;
+        MusicService music = go.AddComponent<MusicService>();
+        SetReference(new SerializedObject(music).FindProperty("audioSource"), source, apply: true);
+        return music;
+    }
+
+    private static GameObject Create(string name, Scene scene)
+    {
+        GameObject go = new GameObject(name);
+        SceneManager.MoveGameObjectToScene(go, scene);
+        Undo.RegisterCreatedObjectUndo(go, "Create " + name);
+        return go;
+    }
+
+    private static T Find<T>(Scene scene) where T : Component
     {
         foreach (T component in UnityEngine.Object.FindObjectsByType<T>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
@@ -57,20 +149,17 @@ public static class SceneInstallerMenu
                 return component;
         }
 
-        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
-        if (prefab == null)
-            throw new InvalidOperationException($"Prefab not found: {prefabPath}");
+        return null;
+    }
 
-        GameObject instance = PrefabUtility.InstantiatePrefab(prefab, scene) as GameObject;
-        if (instance == null)
-            throw new InvalidOperationException($"Could not instantiate prefab: {prefabPath}");
+    private static void SetReference(SerializedProperty property, UnityEngine.Object value, bool apply = false)
+    {
+        if (property == null)
+            throw new InvalidOperationException("Serialized field not found; GameFoundation source changed.");
 
-        Undo.RegisterCreatedObjectUndo(instance, "Install Game Foundation Service");
-        T componentInstance = instance.GetComponent<T>();
-        if (componentInstance == null)
-            throw new InvalidOperationException($"Component {typeof(T).Name} not found on prefab: {prefabPath}");
-
-        return componentInstance;
+        property.objectReferenceValue = value;
+        if (apply)
+            property.serializedObject.ApplyModifiedProperties();
     }
 
     private static void AddModuleReference(SerializedProperty modules, MonoBehaviour module)
@@ -93,16 +182,5 @@ public static class SceneInstallerMenu
 
         modules.InsertArrayElementAtIndex(modules.arraySize);
         modules.GetArrayElementAtIndex(modules.arraySize - 1).objectReferenceValue = module;
-    }
-
-    private static bool HasModuleReference(SerializedProperty modules, MonoBehaviour module)
-    {
-        for (int index = 0; index < modules.arraySize; index++)
-        {
-            if (modules.GetArrayElementAtIndex(index).objectReferenceValue == module)
-                return true;
-        }
-
-        return false;
     }
 }

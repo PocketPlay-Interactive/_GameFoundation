@@ -16,6 +16,8 @@ namespace DemoEditorCools
                     "other class 4"
                 };
             }
+
+            public static int WrongReturn() => 0;
         }
     }
 
@@ -37,6 +39,19 @@ namespace DemoEditorCools
         // left value will be stored in x, right one in y
         [MinMaxSlider(0f, 100f)]
         public Vector2 minMaxVector;
+
+        // Error cases: drawer shows "<error>" placeholders and logs an error.
+        [Space(10f)]
+        [Dropdown(nameof(EmptyOptions))]
+        public string emptyOptions;
+
+        [Dropdown("NotExist")]
+        public string missingMethod;
+
+        [Dropdown(typeof(Outter.Inner), nameof(Outter.Inner.WrongReturn))]
+        public string wrongReturnType;
+
+        private string[] EmptyOptions() => new string[0];
 
         private string[] GetOptions()
         {

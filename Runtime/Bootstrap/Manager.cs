@@ -93,7 +93,7 @@ public class Manager : SingletonGlobal<Manager>
 
     public void SetBootstrapCompletion()
     {
-        managerCoordinator?.SetCompletionDelay(14.0f);
+        managerCoordinator?.SetCompletionDelay(15.0f);
     }
 
     public void CompleteBootstrap()

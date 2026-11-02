@@ -2,7 +2,7 @@ using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
-public static class SliderTweenExtentions
+public static class SliderTweenExtensions
 {
     public static Tween DOSlider(
         this Slider slider,

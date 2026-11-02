@@ -6,11 +6,14 @@ All notable changes to this package are documented in this file.
 
 ### Added
 
+- Added `GameFoundation/Scene/Create Minimal Setup` and `Create Full Setup` menus that build the README bootstrap hierarchies by code in the open scene.
 - Added a menu item to install Unity IAP from `GameFoundation/Packages/Install InappPurchase`.
 - Added generic `ManagerCoordinator` completion hooks with a 15-second minimum loading duration and fallback for external startup flows.
 
 ### Removed
 
+- Removed stored `Manager`, `SoundService`, `MusicService` prefabs and the `Runtime/Bootstrap/Material` sprites; the scene installer builds objects by code instead.
+- Removed `AdvertisingService` (AdMob), `AnalyticsService` (Firebase, AppsFlyer) and the UMP consent helper from the package; they are no longer shipped under `Runtime`. Projects that need them must provide their own integration under `Assets/_Project`.
 - Removed obsolete SDK define toggles for Firebase, AdMob, advertising test IDs, AdMob UMP, and AppsFlyer.
 
 ## [1.0.24] - 2026-09-05
@@ -83,7 +86,7 @@ All notable changes to this package are documented in this file.
 - Reworked advertising from the legacy `GoogleMobileAds`/`JKit` managers into provider-based `Advertising`, `Admob`, and `Module` folders.
 - Moved built-in service prefabs under `Runtime/Bootstrap/Prefabs`, including advertising and analytics prefabs.
 - Renamed audio services from `MusicManager` and `SoundManager` to `MusicService` and `SoundService`.
-- Moved `SoundButton` to `Runtime/Services/Audio/Extentions/ButtonSound`.
+- Moved `SoundButton` to `Runtime/Services/Audio/Extensions/ButtonSound`.
 - Updated `Manager` startup flow to delegate SDK initialization through `ManagerCoordinator`.
 - Updated SDK define documentation and editor define labels for AdMob, UMP, Firebase, AppsFlyer, and Unity IAP.
 - Updated extension data sample and runtime storage editor behavior for current APIs.
@@ -98,6 +101,7 @@ All notable changes to this package are documented in this file.
 
 ### Removed
 
+- Removed stored `Manager`, `SoundService`, `MusicService` prefabs and the `Runtime/Bootstrap/Material` sprites; the scene installer builds objects by code instead.
 - Removed legacy `Advertising/GoogleMobileAds` and `Advertising/JKit` ad manager implementations.
 - Removed legacy `FirebaseManager` and `AppflyerEventTracking` in favor of provider-based analytics.
 
@@ -155,6 +159,7 @@ All notable changes to this package are documented in this file.
 
 ### Removed
 
+- Removed stored `Manager`, `SoundService`, `MusicService` prefabs and the `Runtime/Bootstrap/Material` sprites; the scene installer builds objects by code instead.
 - Removed `Runtime/Configuration`.
 - Removed legacy `GameEvent` in favor of `EventBus` events.
 - Removed unused `SystemControlEvent` and `SystemType`.

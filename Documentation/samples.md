@@ -1,6 +1,6 @@
 # Samples
 
-Source samples are kept under `Samples`. Binary package builds copy their README files and code into `Documentation/Samples`; code uses `.cs.txt` so Unity cannot compile it.
+Source samples are kept under `Samples`. See `Samples/README.md` for the full list.
 
 ## EditorCools
 
@@ -24,3 +24,13 @@ Shows `RuntimeStorageData.PLAYER.ExtensionData` with:
 - save/load with `RuntimeStorageData.SaveAllData()`.
 
 Run the scene and read the Console logs.
+
+## FoundationBasics
+
+Scene: `Samples/FoundationBasics/Scenes/FoundationBasics.unity`
+
+Bootstrap with `Manager`, runtime UGUI, save score, `EventBus`, haptics and torch.
+
+## ExtensionModules
+
+No scene. Code samples for MonoBehaviour and runtime-registered extension modules.

@@ -78,6 +78,7 @@ public static class RuntimeStorageData
             }
             catch (System.Exception error)
             {
+                LogSystem.LogError($"[RuntimeStorage] ReadData {dataType} failed, using default: {error.Message}");
                 var data = GetDataDefault<T>(dataType);
                 return data;
             }

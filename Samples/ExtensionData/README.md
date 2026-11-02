@@ -2,12 +2,12 @@
 
 Sample này hướng dẫn lưu data riêng của project vào `RuntimeStorageData.PLAYER.ExtensionData`.
 
-API ngắn hơn: xem `RUNTIME_STORAGE_EXTENSION_README.md`.
+API ngắn hơn: xem mục `RuntimeStorageExtension` ở cuối.
 
 Mở scene:
 
 ```text
-Assets/_GameFoundation/Samples/ExtensionData/Scenes/Demo.unity
+Samples/ExtensionData/Scenes/Demo.unity
 ```
 
 Bấm Play, sau đó xem Console.
@@ -64,3 +64,36 @@ PlayerProfileData profile = JsonUtility.FromJson<PlayerProfileData>(savedJson);
 - Chỉ đọc sau khi `RuntimeStorageData.IsReady == true`.
 - Gọi `RuntimeStorageData.SaveAllData()` sau khi ghi data quan trọng.
 - `JsonUtility` serialize field, không serialize property.
+
+## RuntimeStorageExtension
+
+`RuntimeStorageExtension` là wrapper ngắn cho `RuntimeStorageData.PLAYER.ExtensionData`. `Set()` tự gọi `RuntimeStorageData.SaveAllData()`.
+
+```csharp
+RuntimeStorageExtension.Set("coin", 100);
+int coin = RuntimeStorageExtension.Int("coin");
+
+RuntimeStorageExtension.Set("remove_ads", true);
+bool removeAds = RuntimeStorageExtension.Bool("remove_ads");
+
+RuntimeStorageExtension.Set("player_name", "Player One");
+string playerName = RuntimeStorageExtension.String("player_name");
+
+RuntimeStorageExtension.Delete("coin");
+```
+
+### Lưu object
+
+Object cần tương thích `JsonUtility`: có `[System.Serializable]`, dùng field thay vì property.
+
+```csharp
+[System.Serializable]
+public class ProfileData
+{
+    public string name;
+    public int level;
+}
+
+RuntimeStorageExtension.Set("profile", new ProfileData { name = "Player One", level = 10 });
+ProfileData loaded = RuntimeStorageExtension.Object<ProfileData>("profile");
+```
