@@ -1,11 +1,35 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
+
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Dann.GameFoundation.Tests")]
 
 public static class EventBus
 {
     private static readonly Dictionary<Type, Delegate> events = new();
     private static readonly object lockObj = new object();
+    private static volatile Thread mainThread;
+
+    // Unity invokes this on the main thread before scene loading (play mode) and at editor load
+    // (edit mode / EditMode tests). null = not ready: fails closed.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+#if UNITY_EDITOR
+    [UnityEditor.InitializeOnLoadMethod]
+#endif
+    private static void CaptureMainThread() => mainThread = Thread.CurrentThread;
+
+    // Test hook: simulate "not ready".
+    internal static void ResetMainThreadForTests(bool ready) => mainThread = ready ? Thread.CurrentThread : null;
+
+    internal static void RequireMainThread()
+    {
+        var thread = mainThread;
+        if (thread == null)
+            throw new InvalidOperationException("Canvas operations require Unity main thread initialization.");
+        if (thread != Thread.CurrentThread)
+            throw new InvalidOperationException("Canvas operations must run on the Unity main thread.");
+    }
 
     public static void Subscribe<T>(Action<T> callback)
     {
@@ -43,6 +67,8 @@ public static class EventBus
 
     public static void Publish<T>(T evt)
     {
+        if (typeof(T) == typeof(CanvasEvent)) RequireMainThread(); // contract: CanvasEvent = main thread only
+
         Delegate del;
         lock (lockObj)
         {

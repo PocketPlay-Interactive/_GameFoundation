@@ -54,25 +54,19 @@ public class CanvasManager : Singleton<CanvasManager>
     {
         if (!_autoChangeCanvas) return;
 
+        EventBus.RequireMainThread();
         var canvasId = evt.CanvasId;
         SetCanvasId(canvasId);
-        Concurrency.Instance().Enqueue( OnCanvas );
-        void OnCanvas()
-        {
-            ShowCanvas(canvasId);
-        }       
+        ShowCanvas(canvasId); // EventBus guarantees main thread for CanvasEvent
     }
 
     public void OnCanvas(string canvasId)
     {
         if (_autoChangeCanvas) return;
 
+        EventBus.RequireMainThread(); // direct Show/Hide below: no queue to hop threads
         SetCanvasId(canvasId);
-        Concurrency.Instance().Enqueue( OnCanvas );
-        void OnCanvas()
-        {
-            ShowCanvas(canvasId);
-        }
+        ShowCanvas(canvasId);
     }
 
     public virtual void OnPopupEventMethod(PopupEvent evt)
