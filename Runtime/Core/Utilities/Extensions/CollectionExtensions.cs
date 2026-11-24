@@ -4,25 +4,22 @@ using UnityEngine;
 
 public static class CollectionExtensions
 {
-    /// <summary>
-    /// Pick a random element from the provided params-array.
-    /// </summary>
+    /// <summary>Pick a random element from the provided params-array.</summary>
     public static int GetRandomChoice(params int[] values)
     {
         if (values == null || values.Length == 0) return 0;
-        if (values.Length == 1) return values[0];
-        int idx = UnityEngine.Random.Range(0, values.Length);
-        return values[idx];
+        return values.Length == 1 ? values[0] : values[UnityEngine.Random.Range(0, values.Length)];
     }
 
-    // --- Array helpers (kept API, reduced allocations where sensible) ---
+    // ---- Array helpers: return a NEW array (the input is left unchanged), or null for a null input --------
+
     public static T[] Append<T>(this T[] array, T item)
     {
         if (array == null) return null;
-        var len = array.Length;
-        T[] result = new T[len + 1];
-        Array.Copy(array, result, len);
-        result[len] = item;
+
+        var result = new T[array.Length + 1];
+        Array.Copy(array, result, array.Length);
+        result[array.Length] = item;
         return result;
     }
 
@@ -31,68 +28,53 @@ public static class CollectionExtensions
         if (target == null) return null;
         if (items == null || items.Length == 0) return target;
 
-        int oldLen = target.Length;
-        int newLen = oldLen + items.Length;
-        T[] result = new T[newLen];
-        Array.Copy(target, 0, result, 0, oldLen);
-        Array.Copy(items, 0, result, oldLen, items.Length);
+        var result = new T[target.Length + items.Length];
+        Array.Copy(target, 0, result, 0, target.Length);
+        Array.Copy(items, 0, result, target.Length, items.Length);
         return result;
     }
 
+    /// <summary>Returns the same array when the item is already present, otherwise a new array with it appended.</summary>
     public static T[] AddIfMissing<T>(this T[] target, T item)
     {
         if (target == null) return null;
-        for (int i = 0; i < target.Length; i++)
-            if (AreEqual(target[i], item)) return target;
-
-        var len = target.Length;
-        T[] result = new T[len + 1];
-        Array.Copy(target, result, len);
-        result[len] = item;
-        return result;
+        return target.ContainsItem(item) ? target : target.Append(item);
     }
 
     public static bool AreEqual<T>(T x, T y) => EqualityComparer<T>.Default.Equals(x, y);
 
-    public static bool ContainsItem<T>(this T[] target, T item)
-    {
-        if (target == null) return false;
+    public static bool ContainsItem<T>(this T[] target, T item) => target != null && Array.IndexOf(target, item) >= 0;
 
-        for (int i = 0; i < target.Length; i++)
-            if (AreEqual(target[i], item)) return true;
-        return false;
-    }
+    // ---- Random / cleanup (IList covers arrays and lists) ---------------------------------------------
 
-    public static T GetRandomElement<T>(this T[] target)
-    {
-        if (target == null || target.Length == 0) return default;
+    public static T GetRandomElement<T>(this IList<T> list) =>
+        list == null || list.Count == 0 ? default : list[UnityEngine.Random.Range(0, list.Count)];
 
-        int i = UnityEngine.Random.Range(0, target.Length);
-        return target[i];
-    }
+    public static T GetRandomElement<T>(this T[] target) => ((IList<T>)target).GetRandomElement();
 
-    // Extension cho List: GetRandomElement, RemoveNullItems
-    public static T GetRandomElement<T>(this IList<T> list)
-        => list == null || list.Count == 0 ? default : list[UnityEngine.Random.Range(0, list.Count)];
     public static void RemoveNullItems<T>(this List<T> list) where T : class
     {
-        if (list != null) list.RemoveAll(item => item == null);
+        list?.RemoveAll(item => item == null);
     }
+
+    // ---- In-place rotation: mutate and return the same array, null for a null or empty array --------------
 
     public static T[] MoveFirstToLast<T>(this T[] arr)
     {
         if (arr == null || arr.Length == 0) return null;
+
         T first = arr[0];
-        for (int i = 1; i < arr.Length; i++) arr[i - 1] = arr[i];
-        arr[^1] = first;
+        Array.Copy(arr, 1, arr, 0, arr.Length - 1);
+        arr[arr.Length - 1] = first;
         return arr;
     }
 
     public static T[] MoveLastToFirst<T>(this T[] arr)
     {
         if (arr == null || arr.Length == 0) return null;
-        T last = arr[^1];
-        for (int i = arr.Length - 1; i > 0; i--) arr[i] = arr[i - 1];
+
+        T last = arr[arr.Length - 1];
+        Array.Copy(arr, 0, arr, 1, arr.Length - 1);
         arr[0] = last;
         return arr;
     }

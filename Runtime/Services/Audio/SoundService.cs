@@ -75,7 +75,7 @@ public class SoundService : SingletonGlobal<SoundService>, IGameFoundationModule
             return;
 
         lastPlayKeyTime[key] = now;
-        PlayClipDirect(clips[UnityEngine.Random.Range(0, clips.Length)], volume);
+        PlayClipDirect(clips.GetRandomElement(), volume);
     }
 
     public void PlayOnShot(AudioClip clip, float volume = 1f)
@@ -88,7 +88,7 @@ public class SoundService : SingletonGlobal<SoundService>, IGameFoundationModule
         EnsureInitialized();
         if (string.IsNullOrWhiteSpace(key) || !soundKeyDics.TryGetValue(key, out var clips) || clips.Length == 0) return;
 
-        var clip = clips[UnityEngine.Random.Range(0, clips.Length)];
+        var clip = clips.GetRandomElement();
         if (!audioSourceSpecial || !clip) return;
 
         audioSourceSpecial.volume = volume;
@@ -106,7 +106,7 @@ public class SoundService : SingletonGlobal<SoundService>, IGameFoundationModule
         EnsureInitialized();
 
         if (!string.IsNullOrWhiteSpace(key) && soundKeyDics.TryGetValue(key, out var clips) && clips.Length > 0)
-            return clips[UnityEngine.Random.Range(0, clips.Length)];
+            return clips.GetRandomElement();
 
         return null;
     }
