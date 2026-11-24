@@ -1,9 +1,0 @@
-{
-  "name": "Dann.GameFoundation.Pathfinding",
-  "rootNamespace": "Dann.GameFoundation",
-  "references": [
-    "Dann.GameFoundation",
-    "EditorCools.Runtime"
-  ],
-  "autoReferenced": true
-}

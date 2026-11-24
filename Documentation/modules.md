@@ -29,7 +29,7 @@ Project code / Features
 | Bootstrap | `Runtime/Bootstrap` | Khởi tạo scene, loading và vòng đời ứng dụng. |
 | Core | `Runtime/Core` | Pattern, event, threading, I/O, utility và extensibility. |
 | Services | `Runtime/Services` | Storage, audio, asset, pooling và network time. |
-| Features | `Runtime/Features` | UI, input, interaction, pathfinding và common behaviours. |
+| Features | `Runtime/Features` | UI, input, interaction, combat text và common behaviours. |
 | Integrations | `Runtime/Integrations` | Unity IAP, haptics và device API. |
 | Security | `Runtime/Security` | Integrity, obfuscation và legacy save compatibility. |
 | Editor | `Editor` | Tool chỉ chạy trong Unity Editor. |
@@ -166,9 +166,9 @@ EventBus.Publish(new CanvasEvent { CanvasId = "home" });
 EventBus.Publish(new PopupEvent { PopupId = "settings" });
 ~~~
 
-### Interaction, Pathfinding và CombatText
+### Interaction và CombatText
 
-`Runtime/Features/Interaction` gồm input, touch, raycast và shake. `AStarPathfinder`, `GraphManager`, `PointNode` và `PathDrawer` cung cấp A* graph. `FloatingDamageInstance` và `FloatingDamageSprites` hiển thị combat text.
+`Runtime/Features/Interaction` gồm input, touch, raycast và shake. `FloatingDamageInstance` và `FloatingDamageSprites` hiển thị combat text.
 
 ## Integrations
 

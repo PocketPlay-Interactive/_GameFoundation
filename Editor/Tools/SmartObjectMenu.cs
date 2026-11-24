@@ -131,49 +131,58 @@ public static class SmartObjectMenu
         Finish(go);
     }
 
-    // GameFoundation/UI/Screen: full-screen ScreenCanvas registered into CanvasManager > Canvas Roots.
-    [MenuItem("GameObject/GameFoundation/UI/Screen", false, 18)]
-    private static void CreateScreen(MenuCommand command)
+    // Create UI structure only; the game supplies and registers its own screen or popup component.
+    [MenuItem("GameObject/GameFoundation/UI/Screen Canvas", false, 18)]
+    private static void CreateScreenCanvas(MenuCommand command)
     {
         GameObject go = NewUI("Screen", command, Vector2.zero);
         Stretch(go.GetComponent<RectTransform>());
-        ScreenCanvas screen = go.AddComponent<ScreenCanvas>();
-        RegisterScreen(go.scene, go.name, screen);
         Finish(go);
     }
 
-    private static void RegisterScreen(UnityEngine.SceneManagement.Scene scene, string name, ScreenCanvas screen)
+    [MenuItem("GameObject/GameFoundation/UI/Popup Canvas", false, 19)]
+    private static void CreatePopupCanvas(MenuCommand command)
     {
-        CanvasManager manager = SceneInstallerMenu.EnsureCanvasManager(scene);
-        SerializedObject serialized = new SerializedObject(manager);
-        SerializedProperty roots = serialized.FindProperty("CanvasRoots");
-        if (roots == null)
-        {
-            Debug.LogWarning("[GameFoundation] CanvasManager.CanvasRoots was not found; add the screen to Canvas Roots manually.");
-            return;
-        }
+        GameObject go = NewUI("Popup", command, Vector2.zero);
+        Stretch(go.GetComponent<RectTransform>());
+        go.AddComponent<CanvasGroup>();
 
-        string id = name;
-        for (int suffix = 2; IdExists(roots, id); suffix++)
-            id = name + " " + suffix;
+        GameObject dim = NewChild("Dim", go.transform, Vector2.zero);
+        Stretch(dim.GetComponent<RectTransform>());
+        dim.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.6f);
 
-        roots.InsertArrayElementAtIndex(roots.arraySize);
-        SerializedProperty element = roots.GetArrayElementAtIndex(roots.arraySize - 1);
-        element.FindPropertyRelative("CanvasID").stringValue = id;
-        element.FindPropertyRelative("Canvas").objectReferenceValue = screen;
-        serialized.ApplyModifiedProperties();
-        Debug.Log($"[GameFoundation] Screen registered with CanvasManager as \"{id}\". Open it with EventBusExtensions.PublishCanvas(\"{id}\").");
+        GameObject window = NewChild("Window", go.transform, new Vector2(700f, 420f));
+        Image windowImage = window.AddComponent<Image>();
+        windowImage.sprite = BuiltinSprite("UI/Skin/Background.psd");
+        windowImage.type = Image.Type.Sliced;
+        window.AddComponent<CanvasGroup>();
+
+        GameObject message = NewChild("Message", window.transform, new Vector2(620f, 220f));
+        message.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 60f);
+        TextMeshProUGUI messageText = message.AddComponent<TextMeshProUGUI>();
+        messageText.text = "Message";
+        messageText.fontSize = 36f;
+        messageText.alignment = TextAlignmentOptions.Center;
+        messageText.color = DarkText;
+        messageText.raycastTarget = false;
+
+        CreatePopupButton(window.transform, "Primary Button", "OK", new Vector2(-150f, -140f));
+        CreatePopupButton(window.transform, "Secondary Button", "Cancel", new Vector2(150f, -140f));
+        go.SetActive(false);
+        Finish(go);
     }
 
-    private static bool IdExists(SerializedProperty roots, string id)
+    private static Button CreatePopupButton(Transform parent, string name, string label, Vector2 position)
     {
-        for (int index = 0; index < roots.arraySize; index++)
-        {
-            if (roots.GetArrayElementAtIndex(index).FindPropertyRelative("CanvasID").stringValue == id)
-                return true;
-        }
-
-        return false;
+        GameObject go = NewChild(name, parent, new Vector2(240f, 70f));
+        go.GetComponent<RectTransform>().anchoredPosition = position;
+        Image image = go.AddComponent<Image>();
+        image.sprite = BuiltinSprite("UI/Skin/UISprite.psd");
+        image.type = Image.Type.Sliced;
+        Button button = go.AddComponent<Button>();
+        button.targetGraphic = image;
+        AddLabel(go.transform, "Text (TMP)", label, 30f);
+        return button;
     }
 
     [MenuItem(Root + "Smart Move", false, 30)]

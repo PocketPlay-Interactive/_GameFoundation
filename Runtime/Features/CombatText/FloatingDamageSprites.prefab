@@ -41,8 +41,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 664556094591561848}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 882908cbf4ab49448b6386bf77ca54a9, type: 3}
+  m_Script: {fileID: 11500000, guid: 2d86d1a6f7c020748af412259528a0c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageInstancePrefab: {fileID: 881819302813849094, guid: 5870fb80e0677fe45b8d2b91d150221f, type: 3}
+  damageInstancePrefab: {fileID: 881819302813849094, guid: 10f223b4759db054fab1f1407cec776d, type: 3}
   moveType: 6

@@ -258,19 +258,7 @@ Component dùng `Concurrency` (như `SmartPopup`, `SmartCanvas`) cần `Concurre
 </details>
 
 <details>
-<summary><strong>Pathfinding, combat text, haptics, torch</strong> — tính năng tùy chọn</summary>
-
-**Pathfinding (A\*)** dùng namespace `Pathfinding`. Cách dùng:
-1. Tạo đối tượng chứa `GraphManager`, tạo các đối tượng con gắn `PointNode`. Dùng nút **Auto Create Node** / **Get All Node** / **Build Graph** trong Inspector (hoặc menu **GameFoundation → Tools → Pathfinding Connector**) để tạo node và nối các node gần nhau theo `Connection Distance`.
-2. Thêm `AStarPathfinder` vào scene, rồi tìm đường:
-
-```csharp
-PointNode start = GraphManager.Get().GetNearestNode(player.transform);
-PointNode goal  = GraphManager.Get().GetNearestNode(target.transform);
-List<PointNode> path = AStarPathfinder.Get().FindPath(start, goal); // null nếu không có đường
-```
-
-`PathDrawer` vẽ đường tìm được: `DrawPath(path)`, `RemovePath()`.
+<summary><strong>Combat text, haptics, torch</strong> — tính năng tùy chọn</summary>
 
 **Combat text** hiển thị số sát thương bay lên. Tạo prefab `FloatingDamageInstance` (cấu hình sprite chữ số), gán vào `FloatingDamageSprites.damageInstancePrefab`, chọn `moveType`, rồi gọi:
 
@@ -336,7 +324,6 @@ Khi mở game, hệ thống tự kiểm tra lại với store và khôi phục s
 | Build → Build & Store Settings | Đặt tên, version, Application ID và thông tin ký app cho Android/iOS |
 | Tools → Delete Saved Data | Xóa dữ liệu save của package |
 | Tools → Capture Camera / PNG Resizer / Repair Missing Scripts | Chụp camera ra PNG, đổi kích thước ảnh, sửa script bị thiếu |
-| Tools → Pathfinding Connector | Công cụ nối node pathfinding |
 | GameObject → Copy Relative Path | Sao chép đường dẫn tương đối của đối tượng |
 
 Menu **Tools → Delete Saved Data** xóa file save của package và cả toàn bộ `PlayerPrefs` của project; sao lưu trước khi dùng.
@@ -350,7 +337,6 @@ Menu **Tools → Delete Saved Data** xóa file save của package và cả toàn
 | --- | --- | --- |
 | Core và service | `Dann.GameFoundation` | Input System, TextMesh Pro, UGUI; DOTween và EditorCools đóng gói trong `Libraries` |
 | Combat text | `Dann.GameFoundation.CombatText` | Core, DOTween, EditorCools |
-| Pathfinding | `Dann.GameFoundation.Pathfinding` | Core, EditorCools |
 | Haptics | `Dann.GameFoundation.Haptics` | Core, NiceVibrations |
 | Unity IAP | `Dann.GameFoundation.UnityIAP` | Core, Unity Purchasing và define IAP |
 
