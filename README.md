@@ -1,4 +1,25 @@
-﻿# Game Foundation
+﻿<p align="center">
+  <img src="Documentation/Images~/banner_1.jpg" alt="Game Foundation Banner" width="100%">
+</p>
+
+<h1 align="center">⚡ Game Foundation</h1>
+
+<p align="center">
+  <strong>Nền tảng Unity dùng chung cho hệ sinh thái game của PocketPlay Interactive.</strong>
+  <br/>
+  Tái sử dụng nhanh hơn. Mở rộng sạch hơn. Khởi động dự án mới gọn hơn.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Unity-2022.3+-000000?logo=unity&logoColor=white&style=flat-square">
+  <img src="https://img.shields.io/badge/UPM-Git%20Package-2C8EBB?style=flat-square">
+  <img src="https://img.shields.io/badge/Package-com.dann.gamefoundation-6A5ACD?style=flat-square">
+  <img src="https://img.shields.io/badge/Status-Active-2EA44F?style=flat-square">
+  <img src="https://img.shields.io/badge/Owner-PocketPlay-FF6B6B?style=flat-square">
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/Changelog-1.0.24-0366D6?style=flat-square"></a>
+</p>
+
+---
 
 Core Unity dùng chung: bootstrap, lưu dữ liệu, audio, pooling, UI và các tiện ích nền. Code gameplay, giao diện và cấu hình riêng đặt trong project game.
 
