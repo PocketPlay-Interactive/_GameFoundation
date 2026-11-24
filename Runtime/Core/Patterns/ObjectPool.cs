@@ -12,11 +12,16 @@ namespace Dann.GameFoundation.Patterns
         {
             this.prefab = prefab;
             for (int i = 0; i < initialSize; i++)
-                pool.Enqueue(Object.Instantiate(prefab));
+            {
+                var obj = Object.Instantiate(prefab);
+                obj.gameObject.Hide(); // pooled objects start inactive
+                pool.Enqueue(obj);
+            }
         }
 
         public T Get()
         {
+            while (pool.Count > 0 && (Object)pool.Peek() == null) pool.Dequeue(); // drop destroyed entries (Unity null check)
             if (pool.Count == 0)
                 pool.Enqueue(Object.Instantiate(prefab));
             var obj = pool.Dequeue();
@@ -26,6 +31,7 @@ namespace Dann.GameFoundation.Patterns
 
         public void Release(T obj)
         {
+            if (obj == null || pool.Contains(obj)) return; // ponytail: Contains is O(n); fine for small pools, use a HashSet if pools grow large
             obj.gameObject.Hide();
             pool.Enqueue(obj);
         }

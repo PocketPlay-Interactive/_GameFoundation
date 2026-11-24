@@ -9,12 +9,18 @@ public class Concurrency: MonoBehaviour {
     private static Concurrency _instance;
     private static readonly Queue < Action > _executionQueue = new Queue < Action > ();
 
+    private readonly List<Action> _drain = new List<Action>();
+
     public void Update() {
+        // Copy under lock, run outside it: actions may enqueue/block without deadlocking worker threads.
         lock(_executionQueue) {
-        while (_executionQueue.Count > 0) {
-            _executionQueue.Dequeue().Invoke();
+            while (_executionQueue.Count > 0) _drain.Add(_executionQueue.Dequeue());
         }
+        for (int i = 0; i < _drain.Count; i++) {
+            try { _drain[i].Invoke(); }
+            catch (Exception e) { Debug.LogException(e); }
         }
+        _drain.Clear();
     }
 
 
@@ -95,12 +101,14 @@ public class Concurrency: MonoBehaviour {
 
     void Awake() {
         if (_instance == null) {
-        _instance = this;
-        DontDestroyOnLoad(this.gameObject);
+            _instance = this;
+            DontDestroyOnLoad(this.gameObject);
+        } else if (_instance != this) {
+            Destroy(this); // duplicate dispatcher: drop the component only, keep the original and the GameObject
         }
     }
 
     void OnDestroy() {
-        _instance = null;
+        if (_instance == this) _instance = null;
     }
 }

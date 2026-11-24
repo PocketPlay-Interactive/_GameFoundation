@@ -24,7 +24,9 @@ public static class RuntimeStorageData
     public static SettingSerializable SETTING;
     public static PlayerSerializable PLAYER;
 
-    private static string _path = OptimizeComponent.GetStringOptimize(Application.persistentDataPath, "/");
+    // Save files whose unreadable original could not be backed up: never overwrite them.
+    private static readonly System.Collections.Generic.HashSet<string> blockedSavePaths = new System.Collections.Generic.HashSet<string>();
+
     private static string _dataSetting = OptimizeComponent.GetStringOptimize(Application.persistentDataPath, "/", HashLib.GetHashStringAndDeviceID(RuntimeStorageData.DATA_SETTING));
     private static string _dataPlayer = OptimizeComponent.GetStringOptimize(Application.persistentDataPath, "/", HashLib.GetHashStringAndDeviceID(RuntimeStorageData.DATA_PLAYER));
 
@@ -78,11 +80,14 @@ public static class RuntimeStorageData
             try
             {
                 var data = ReadDataExist<T>(dataPath);
-                return data;
+                if (data == null) throw new System.IO.InvalidDataException("Save data is empty or invalid.");
+                return data; // Keep any existing block until an explicit reset or a successful backup.
             }
             catch (System.Exception error)
             {
                 LogSystem.LogError($"[RuntimeStorage] ReadData {dataType} failed, using default: {error.Message}");
+                if (BackupUnreadable(dataPath)) blockedSavePaths.Remove(dataPath);
+                else blockedSavePaths.Add(dataPath);
                 var data = GetDataDefault<T>(dataType);
                 return data;
             }
@@ -108,14 +113,44 @@ public static class RuntimeStorageData
         {
             File.Delete(dataPath);
         }
+        // Unblock only after the delete succeeded: a failed reset (throws above) keeps the guard on the unreadable original.
+        blockedSavePaths.Remove(dataPath);
     }
 
+    // Only deletes this package's save files; never other files in persistentDataPath (SDK caches, etc).
     public static void DeleteAllData()
     {
-        string[] paths = Directory.GetFiles(_path);
-        foreach (var path in paths)
+        foreach (var path in new[] { _dataSetting, _dataPlayer })
         {
-            File.Delete(path);
+            if (File.Exists(path)) File.Delete(path);
+            blockedSavePaths.Remove(path); // only after the delete succeeded: a failed reset keeps the guard
+            if (File.Exists(path + ".tmp")) File.Delete(path + ".tmp");
+
+            // Backups are numbered (.corrupt, .corrupt1, ...): delete every slot.
+            var directory = Path.GetDirectoryName(path);
+            if (string.IsNullOrEmpty(directory) || !Directory.Exists(directory)) continue;
+            foreach (var backup in Directory.GetFiles(directory, Path.GetFileName(path) + ".corrupt*"))
+                File.Delete(backup);
+        }
+    }
+
+    // Keep an unreadable save for recovery so the default data written next never destroys it.
+    // Returns false when the backup failed: the caller must then block saving over this file.
+    private static bool BackupUnreadable(string path)
+    {
+        try
+        {
+            // Never overwrite an earlier backup: it may be the only recoverable copy.
+            // ponytail: one extra file per unreadable event, no cap; add pruning if saves corrupt often.
+            var backup = path + ".corrupt";
+            for (var i = 1; File.Exists(backup); i++) backup = path + ".corrupt" + i;
+            File.Copy(path, backup, false);
+            return true;
+        }
+        catch (System.Exception ex)
+        {
+            LogSystem.LogError($"[RuntimeStorage] Backup unreadable save failed: {ex.Message}");
+            return false;
         }
     }
 
@@ -146,6 +181,11 @@ public static class RuntimeStorageData
     private static void SaveData<T>(string path, T data)
     {
         if (data == null) return;
+        if (blockedSavePaths.Contains(path))
+        {
+            LogSystem.LogError($"[RuntimeStorage] Save skipped: unreadable original could not be backed up: {path}");
+            return;
+        }
         string _data = JsonUtility.ToJson(data);
         if (_data == null || _data == "" || _data == "{}") return;
         _data = HashLib.Base64Encode(_data);

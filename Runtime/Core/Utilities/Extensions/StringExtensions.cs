@@ -14,13 +14,16 @@ public static class StringExtensions
     {
         if (string.IsNullOrEmpty(input)) return input;
 
-        output.Clear();
-        for (int i = 0; i < input.Length; i++)
+        lock (output) // shared builder: serialize concurrent callers
         {
-            if (i > 0 && char.IsUpper(input[i])) output.Append(' ');
-            output.Append(input[i]);
+            output.Clear();
+            for (int i = 0; i < input.Length; i++)
+            {
+                if (i > 0 && char.IsUpper(input[i])) output.Append(' ');
+                output.Append(input[i]);
+            }
+            return output.ToString();
         }
-        return output.ToString();
     }
 
     // Extension cho string: ToTitleCase

@@ -1,53 +1,11 @@
-﻿using System.Text;
-
+﻿// string.Concat is thread-safe and reentrant (no shared builder, safe if a piece's ToString() calls back in).
 public static class OptimizeComponent
 {
-    static OptimizeComponent()
-    {
-        _stringBuilderOS = new StringBuilder();
-    }
+    public static string GetStringOptimize(params object[] pieces) => string.Concat(pieces);
 
-    private static StringBuilder _stringBuilderOS;
+    public static string GetStringOptimize(string[] stringArr) => string.Concat(stringArr);
 
-    public static string GetStringOptimize(params object[] pieces)
-    {
-        _stringBuilderOS.Clear();
+    public static string AddStringOptimize(this string _builder, string _str) => string.Concat(_builder, ", ", _str);
 
-        for (int i = 0; i < pieces.Length; i++)
-        {
-            _stringBuilderOS.Append(pieces[i]);
-        }
-
-        return _stringBuilderOS.ToString();
-    }
-
-    public static string GetStringOptimize(string[] stringArr)
-    {
-        _stringBuilderOS.Clear();
-
-        for (int i = 0; i < stringArr.Length; i++)
-        {
-            _stringBuilderOS.Append(stringArr[i]);
-        }
-
-        return _stringBuilderOS.ToString();
-    }
-
-    public static string AddStringOptimize(this string _builder, string _str)
-    {
-        _stringBuilderOS.Clear();
-        _stringBuilderOS.Append(_builder);
-        _stringBuilderOS.Append(", ");
-        _stringBuilderOS.Append(_str);
-        return _stringBuilderOS.ToString();
-    }
-
-    public static string AddString(this string _builder, string _str)
-    {
-        _stringBuilderOS.Clear();
-        _stringBuilderOS.Append(_builder);
-        _stringBuilderOS.Append(_str);
-        _builder = _stringBuilderOS.ToString();
-        return _builder;
-    }
+    public static string AddString(this string _builder, string _str) => string.Concat(_builder, _str);
 }

@@ -1,0 +1,10 @@
+{
+  "name": "Dann.GameFoundation.Haptics",
+  "rootNamespace": "Dann.GameFoundation",
+  "references": [
+    "Dann.GameFoundation",
+    "MoreMountains.NiceVibrations",
+    "MoreMountains.NiceVibrations.Haptics"
+  ],
+  "autoReferenced": true
+}

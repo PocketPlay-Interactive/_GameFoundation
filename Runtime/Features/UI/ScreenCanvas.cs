@@ -16,7 +16,7 @@ public class ScreenCanvas : MonoBehaviour
 
     public void Hide()
     {
-        if (!_isShown) return;
+        if (!_isShown && !gameObject.activeSelf) return;
         _isShown = false;
 
 

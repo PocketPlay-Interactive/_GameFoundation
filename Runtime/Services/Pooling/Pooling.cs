@@ -5,6 +5,12 @@ using UnityEngine;
 public class Pooling : GenericSingleton<Pooling>
 {
     private readonly Dictionary<int, List<GameObject>> pools = new();
+    // Rental counter per object: lets a delayed return detect the object was reused meanwhile.
+    // ponytail: entries for destroyed objects are never pruned; negligible for pooled objects.
+    private readonly Dictionary<int, int> rentals = new();
+
+    private int Rental(GameObject go) => rentals.TryGetValue(go.GetInstanceID(), out var r) ? r : 0;
+    private void Rent(GameObject go) => rentals[go.GetInstanceID()] = Rental(go) + 1;
 
     public GameObject GetPrefab(string prefabName)
     {
@@ -67,7 +73,11 @@ public class Pooling : GenericSingleton<Pooling>
     public void PushToPool(GameObject obj, float time)
     {
         if (obj == null) return;
-        DOVirtual.DelayedCall(time, () => PushToPool(obj));
+        int rental = Rental(obj);
+        DOVirtual.DelayedCall(time, () =>
+        {
+            if (obj != null && Rental(obj) == rental) PushToPool(obj); // skip if reused since
+        });
     }
 
     private List<GameObject> GetPool(GameObject prefab)
@@ -99,11 +109,13 @@ public class Pooling : GenericSingleton<Pooling>
 
     private GameObject Activate(GameObject go)
     {
+        Rent(go);
         go.SetActive(true);
         return go;
     }
     private GameObject Activate(GameObject go, Vector3 pos, Quaternion rot, Transform parent)
     {
+        Rent(go);
         go.transform.SetParent(parent);
         go.transform.SetPositionAndRotation(pos, rot);
         go.SetActive(true);

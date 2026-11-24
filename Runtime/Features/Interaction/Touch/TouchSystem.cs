@@ -13,9 +13,13 @@ public class TouchSystem : MonoBehaviour
         // Check UI block
         if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
         {
-            if (IsTouching && IsDebug) Debug.Log("[TouchSystem] Blocked by UI");
-            IsTouching = false;
-            IsHolding = false;
+            if (IsTouching)
+            {
+                if (IsDebug) Debug.Log("[TouchSystem] Blocked by UI");
+                IsTouching = false;
+                IsHolding = false;
+                EventBus.Publish(EventBusExtensions.TouchEndedEvent(TouchPosition)); // keep Began/Ended paired
+            }
             return;
         }
 

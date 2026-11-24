@@ -1,6 +1,8 @@
 using EditorCools;
 using UnityEngine;
 
+// Runs before other scripts so HideAll() deactivates screens/popups left enabled in the scene before their Awake/OnEnable run.
+[DefaultExecutionOrder(-1000)]
 public class CanvasManager : Singleton<CanvasManager>
 {
     [System.Serializable]
@@ -38,6 +40,21 @@ public class CanvasManager : Singleton<CanvasManager>
     [SerializeField] private bool _autoChangeCanvas = true;
     [SerializeField] private bool _autoChangePopup = true;
 
+    protected override void Awake()
+    {
+        base.Awake();
+        if (Get() != this) return;
+        HideAll(); // never rely on designer to disable screens/popups before run
+    }
+
+    public void HideAll()
+    {
+        foreach (var canvasRoot in CanvasRoots)
+            if (canvasRoot.Canvas != null) canvasRoot.Canvas.Hide();
+        foreach (var popupRoot in PopupRoots)
+            if (popupRoot.Popup != null) popupRoot.Popup.Hide();
+    }
+
     protected virtual void OnEnable()
     {
         EventBus.Subscribe<CanvasEvent>(OnCanvasEventMethod);
@@ -55,9 +72,7 @@ public class CanvasManager : Singleton<CanvasManager>
         if (!_autoChangeCanvas) return;
 
         EventBus.RequireMainThread();
-        var canvasId = evt.CanvasId;
-        SetCanvasId(canvasId);
-        ShowCanvas(canvasId); // EventBus guarantees main thread for CanvasEvent
+        ShowCanvas(evt.CanvasId); // EventBus guarantees main thread for CanvasEvent
     }
 
     public void OnCanvas(string canvasId)
@@ -65,7 +80,6 @@ public class CanvasManager : Singleton<CanvasManager>
         if (_autoChangeCanvas) return;
 
         EventBus.RequireMainThread(); // direct Show/Hide below: no queue to hop threads
-        SetCanvasId(canvasId);
         ShowCanvas(canvasId);
     }
 
@@ -74,7 +88,6 @@ public class CanvasManager : Singleton<CanvasManager>
         if (!_autoChangePopup) return;
 
         var popupId = evt.PopupId;
-        _popupId = popupId;
         Concurrency.Instance().Enqueue( OnPopup );
         void OnPopup()
         {
@@ -86,7 +99,6 @@ public class CanvasManager : Singleton<CanvasManager>
     {
         if (_autoChangePopup) return;
 
-        _popupId = popupId;
         Concurrency.Instance().Enqueue( OnPopup );
         void OnPopup()
         {
@@ -94,32 +106,36 @@ public class CanvasManager : Singleton<CanvasManager>
         }
     }
 
+    // Ids change only after the target is found, so CanvasId/PopupId always match what is on screen.
     private void ShowCanvas(string canvasId)
     {
-        foreach (var canvasRoot in CanvasRoots)
+        var target = GetCanvasById(canvasId);
+        if (target == null)
         {
-            if (canvasRoot.Canvas == null) continue;
-
-            if (canvasRoot.CanvasID == canvasId)
-            {
-                canvasRoot.Canvas.Show();
-            }
-            else canvasRoot.Canvas.Hide();
+            Debug.LogWarning($"[CanvasManager] Screen not found: {canvasId}");
+            return;
         }
+
+        SetCanvasId(canvasId);
+        HideAll();
+        _popupId = "";
+        target.Show();
     }
 
     private void ShowPopup(string popupId)
     {
-        foreach (var popupRoot in PopupRoots)
+        var target = GetPopupById(popupId);
+        if (target == null)
         {
-            if (popupRoot.Popup == null) continue;
-
-            if (popupRoot.PopupID == popupId)
-            {
-                popupRoot.Popup.Show();
-            }
-            else popupRoot.Popup.Hide();
+            Debug.LogWarning($"[CanvasManager] Popup not found: {popupId}");
+            return;
         }
+
+        // Popup opens over the current screen: hide only other popups, keep the screen behind.
+        _popupId = popupId;
+        foreach (var popupRoot in PopupRoots)
+            if (popupRoot.Popup != null && popupRoot.Popup != target) popupRoot.Popup.Hide();
+        target.Show();
     }
 
     private void SetCanvasId(string canvasId)
@@ -183,17 +199,7 @@ public class CanvasManager : Singleton<CanvasManager>
         void OnPopupDebug()
         {
             if (string.IsNullOrEmpty(_debugPopupId)) return;
-
-            foreach (var popupRoot in PopupRoots)
-            {
-                if (popupRoot.Popup == null) continue;
-
-                if (popupRoot.PopupID == _debugPopupId)
-                {
-                    popupRoot.Popup.Show();
-                }
-                else popupRoot.Popup.Hide();
-            }
+            ShowPopup(_debugPopupId);
         }
     }
 }

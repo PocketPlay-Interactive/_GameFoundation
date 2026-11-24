@@ -2,9 +2,18 @@
 
 All notable changes to this package are documented in this file.
 
-## [Unreleased]
+## [1.1.0] - 2026-11-24
 
-Next release: 1.1.0.
+### Fixed
+
+- `CanvasManager` hides registered screens and popups on startup; switching screens hides existing UI, and opening a popup hides other popups while keeping the current screen visible.
+- IAP: the startup module waits up to 10 seconds for initialization, and products are granted when the store reports the order confirmed (`OnPurchaseConfirmed`). On startup the store is re-checked for owned non-consumables; when offline, locally saved purchases are used and the store connection is retried on the next purchase attempt. Subscription/battle-pass products are not granted by this integration; games selling them must handle entitlement themselves. The IAP assembly is excluded when `IAPPURCHASE_ENABLE` is absent, including in the Editor.
+- `RuntimeStorageData.DeleteAllData()` only deletes this package's save files and their recovery backups. An unreadable save is copied to a unique `.corrupt` backup before defaults replace it; if backup fails, writes to that path are blocked until backup or an explicit reset succeeds.
+- `Concurrency`: no queue lock held while running actions, duplicate dispatchers are destroyed without clearing the original instance.
+- `ObjectPool` prewarms inactive objects; `Pooling.PushToPool(obj, time)` no longer deactivates an object that was reused meanwhile.
+- `TouchSystem` publishes `TouchEndedEvent` when a touch moves onto UI; `FloatingDamageInstance` critical index guard; `OptimizeComponent` is thread-safe; `InputManager.IsDebugInput` defaults to off.
+- Removed unused `UniTask` reference from `Dann.GameFoundation.asmdef`; package compiles without UniTask.
+- Added `GameObject.FindChildRecursive`.
 
 ### Added
 

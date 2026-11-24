@@ -94,7 +94,7 @@ public class FloatingDamageInstance : MonoBehaviour
             }
         }
 
-        if (damageCrit && specialSprites?.Length > 2) Spawn(specialSprites[4]);
+        if (damageCrit && specialSprites?.Length > 4) Spawn(specialSprites[4]);
         foreach (var ch in digitsStr)
             if (digitMap.TryGetValue(ch, out var sp)) Spawn(sp);
         if (suffix != null && specialSprites != null)

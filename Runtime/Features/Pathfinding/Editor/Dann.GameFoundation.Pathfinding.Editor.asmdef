@@ -2,7 +2,8 @@
   "name": "Dann.GameFoundation.Pathfinding.Editor",
   "rootNamespace": "Dann.GameFoundation.Editor",
   "references": [
-    "Dann.GameFoundation"
+    "Dann.GameFoundation",
+    "Dann.GameFoundation.Pathfinding"
   ],
   "includePlatforms": [
     "Editor"

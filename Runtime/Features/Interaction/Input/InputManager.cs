@@ -7,7 +7,7 @@ public class InputManager : Singleton<InputManager>
     public InputEvents InputActions { get; private set; }
     
     [Header("Debug")]
-    public bool IsDebugInput = true;
+    public bool IsDebugInput = false; // per-frame logging allocates; opt in from the Inspector
     
     // Player Actions
     public bool IsTouchPressed

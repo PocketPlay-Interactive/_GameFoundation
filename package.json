@@ -10,7 +10,6 @@
   "licensesUrl": "https://github.com/PocketPlay-Interactive/_GameFoundation/blob/main/LICENSE.md",
   "dependencies": {
     "com.unity.inputsystem": "1.7.0",
-    "com.unity.nuget.newtonsoft-json": "3.2.1",
     "com.unity.modules.animation": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
     "com.unity.modules.audio": "1.0.0",

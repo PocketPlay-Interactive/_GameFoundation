@@ -20,7 +20,7 @@ public abstract class PopupCanvas : MonoBehaviour
 
     public virtual void Hide()
     {
-        if (!IsActive()) return;
+        if (!gameObject.activeSelf) return; // activeSelf, not hierarchy: a popup under an inactive parent must still be turned off
         gameObject.Hide();
         OnHide();
     }
