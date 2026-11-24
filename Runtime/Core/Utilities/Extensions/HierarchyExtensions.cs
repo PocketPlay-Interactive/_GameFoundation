@@ -64,6 +64,12 @@ public static class HierarchyExtensions
     }
 
     // --- Recursive & direct child finders ---
+    public static Transform FindChildRecursive(this GameObject gameObject, string name)
+    {
+        if (gameObject == null) return null;
+        return gameObject.transform.FindChildRecursive(name);
+    }
+
     public static Transform FindChildRecursive(this Component component, string name)
     {
         if (component == null)
