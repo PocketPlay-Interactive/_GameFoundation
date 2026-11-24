@@ -13,6 +13,7 @@ public static class InappProductListMenu
     private const string AssetPath = "Assets/Resources/Data/InappProductList.asset";
 
     [MenuItem("GameObject/GameFoundation/IAP/Product List", false, 50)]
+    [MenuItem("Assets/GameFoundation/Create/IAP Product List", false, 3)]
     private static void CreateProductList()
     {
         InappProductList list = AssetDatabase.LoadAssetAtPath<InappProductList>(AssetPath);
