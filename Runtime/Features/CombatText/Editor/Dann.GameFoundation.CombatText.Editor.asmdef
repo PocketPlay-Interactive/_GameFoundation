@@ -1,0 +1,19 @@
+{
+  "name": "Dann.GameFoundation.CombatText.Editor",
+  "rootNamespace": "Dann.GameFoundation.Editor",
+  "references": [
+    "Dann.GameFoundation",
+    "Dann.GameFoundation.CombatText"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

@@ -1,0 +1,19 @@
+{
+  "name": "Dann.GameFoundation.Samples",
+  "rootNamespace": "Dann.GameFoundation.Samples",
+  "references": [
+    "Dann.GameFoundation",
+    "Dann.GameFoundation.Haptics",
+    "EditorCools.Runtime",
+    "UnityEngine.UI"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

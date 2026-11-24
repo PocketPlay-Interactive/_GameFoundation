@@ -1,0 +1,29 @@
+{
+  "name": "Dann.GameFoundation.UnityIAP.Editor",
+  "rootNamespace": "Dann.GameFoundation.Editor",
+  "references": [
+    "Dann.GameFoundation",
+    "Dann.GameFoundation.UnityIAP",
+    "Unity.Purchasing"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [
+    "IAPPURCHASE_ENABLE",
+    "GAMEFOUNDATION_UNITY_PURCHASING"
+  ],
+  "versionDefines": [
+    {
+      "name": "com.unity.purchasing",
+      "expression": "5.0.0",
+      "define": "GAMEFOUNDATION_UNITY_PURCHASING"
+    }
+  ],
+  "noEngineReferences": false
+}
