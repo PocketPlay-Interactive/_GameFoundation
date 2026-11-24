@@ -3,6 +3,8 @@
   "rootNamespace": "Dann.GameFoundation.Editor",
   "references": [
     "Dann.GameFoundation",
+    "Unity.InputSystem",
+    "Unity.TextMeshPro",
     "UnityEngine.UI"
   ],
   "includePlatforms": [

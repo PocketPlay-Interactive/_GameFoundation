@@ -35,42 +35,16 @@ public static class SceneInstallerMenu
             // GameFoundation
             // |-- Manager (+ ManagerCoordinator)
             // `-- LoadingCanvas            (full)
-            Manager manager = Find<Manager>(scene);
-            if (manager == null)
-            {
-                GameObject root = Create("GameFoundation", scene);
-                manager = root.AddComponent<Manager>();
-                root.AddComponent<ManagerCoordinator>();
-            }
-
-            ManagerCoordinator coordinator = manager.GetComponent<ManagerCoordinator>() ?? Find<ManagerCoordinator>(scene);
-            if (coordinator == null)
-                coordinator = manager.gameObject.AddComponent<ManagerCoordinator>();
-
-            // Concurrency
-            if (Find<Concurrency>(scene) == null)
-                Create("Concurrency", scene).AddComponent<Concurrency>();
-
-            SerializedObject serializedManager = new SerializedObject(manager);
-            SetReference(serializedManager.FindProperty("managerCoordinator"), coordinator);
+            Manager manager = EnsureManager(scene);
 
             if (full)
             {
-                LoadingCanvas loading = Find<LoadingCanvas>(scene) ?? CreateLoadingCanvas(manager.transform);
-                SetReference(new SerializedObject(coordinator).FindProperty("loadingCanvas"), loading, apply: true);
-
-                if (Find<CanvasManager>(scene) == null)
-                    Create("CanvasManager", scene).AddComponent<CanvasManager>();
-
-                SoundService sound = Find<SoundService>(scene) ?? CreateSoundService(scene);
-                MusicService music = Find<MusicService>(scene) ?? CreateMusicService(scene);
-
-                SerializedProperty modules = serializedManager.FindProperty("extensionModules");
-                AddModuleReference(modules, sound);
-                AddModuleReference(modules, music);
+                EnsureLoadingCanvas(scene);
+                EnsureCanvasManager(scene);
+                EnsureSound(scene);
+                EnsureMusic(scene);
             }
 
-            serializedManager.ApplyModifiedProperties();
             EditorSceneManager.MarkSceneDirty(scene);
             Selection.activeGameObject = manager.gameObject;
             Debug.Log($"[GameFoundation] Created {(full ? "full" : "minimal")} setup.");
@@ -81,6 +55,77 @@ public static class SceneInstallerMenu
             Debug.LogException(exception);
         }
     }
+
+    // Shared with the Hierarchy menu (GameObject/GameFoundation/...): every call only adds what is missing.
+    internal static Manager EnsureManager(Scene scene)
+    {
+        Manager manager = Find<Manager>(scene);
+        if (manager == null)
+        {
+            GameObject root = Create("GameFoundation", scene);
+            manager = root.AddComponent<Manager>();
+        }
+
+        ManagerCoordinator coordinator = manager.GetComponent<ManagerCoordinator>() ?? Find<ManagerCoordinator>(scene);
+        if (coordinator == null)
+            coordinator = manager.gameObject.AddComponent<ManagerCoordinator>();
+
+        if (Find<Concurrency>(scene) == null)
+            Create("Concurrency", scene).AddComponent<Concurrency>();
+
+        SerializedObject serializedManager = new SerializedObject(manager);
+        SetReference(serializedManager.FindProperty("managerCoordinator"), coordinator);
+        serializedManager.ApplyModifiedProperties();
+        return manager;
+    }
+
+    // LoadingCanvas lives under Manager and is wired into ManagerCoordinator.loadingCanvas.
+    internal static LoadingCanvas EnsureLoadingCanvas(Scene scene)
+    {
+        Manager manager = EnsureManager(scene);
+        ManagerCoordinator coordinator = (ManagerCoordinator)new SerializedObject(manager)
+            .FindProperty("managerCoordinator").objectReferenceValue;
+
+        LoadingCanvas loading = Find<LoadingCanvas>(scene) ?? CreateLoadingCanvas(manager.transform);
+        SetReference(new SerializedObject(coordinator).FindProperty("loadingCanvas"), loading, apply: true);
+        return loading;
+    }
+
+    internal static CanvasManager EnsureCanvasManager(Scene scene)
+    {
+        CanvasManager canvasManager = Find<CanvasManager>(scene);
+        return canvasManager != null ? canvasManager : Create("CanvasManager", scene).AddComponent<CanvasManager>();
+    }
+
+    internal static SoundService EnsureSound(Scene scene)
+    {
+        SoundService sound = Find<SoundService>(scene) ?? CreateSoundService(scene);
+        RegisterModule(scene, sound);
+        return sound;
+    }
+
+    internal static MusicService EnsureMusic(Scene scene)
+    {
+        MusicService music = Find<MusicService>(scene) ?? CreateMusicService(scene);
+        RegisterModule(scene, music);
+        return music;
+    }
+
+    // Adds the module to Manager > Extension Modules when a Manager exists in the scene.
+    private static void RegisterModule(Scene scene, MonoBehaviour module)
+    {
+        Manager manager = Find<Manager>(scene);
+        if (manager == null)
+            return;
+
+        SerializedObject serializedManager = new SerializedObject(manager);
+        AddModuleReference(serializedManager.FindProperty("extensionModules"), module);
+        serializedManager.ApplyModifiedProperties();
+    }
+
+    internal static T FindInScene<T>(Scene scene) where T : Component => Find<T>(scene);
+
+    internal static GameObject CreateInScene(string name, Scene scene) => Create(name, scene);
 
     private static LoadingCanvas CreateLoadingCanvas(Transform parent)
     {
